@@ -20,7 +20,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
       <Icon className="h-16 w-16 text-accent" />
-      <p className="text-foreground/80 tracking-tighter leading-[1.45]">
+      <p className="text-foreground/80 tracking-tighter leading-[1.3]">
         Simple, Safe
         <br />
         Insurance for
