@@ -61,9 +61,13 @@ const formSchema = z.object({
     }),
 });
 
-type InsuranceFormValues = z.infer<typeof formSchema>;
+export type InsuranceFormValues = z.infer<typeof formSchema>;
 
-export default function InsuranceForm() {
+interface InsuranceFormProps {
+  onNext: (data: InsuranceFormValues) => void;
+}
+
+export default function InsuranceForm({ onNext }: InsuranceFormProps) {
   const form = useForm<InsuranceFormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onTouched',
@@ -152,8 +156,7 @@ export default function InsuranceForm() {
 
 
   function onSubmit(data: InsuranceFormValues) {
-    console.log(data);
-    // Handle form submission, e.g. navigate to the next step
+    onNext(data);
   }
 
   return (

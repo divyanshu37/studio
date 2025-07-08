@@ -1,7 +1,57 @@
+'use client';
+
+import { useState } from 'react';
 import { Logo, Icon } from '@/components/logo';
-import InsuranceForm from '@/components/insurance-form';
+import InsuranceForm, { type InsuranceFormValues } from '@/components/insurance-form';
+import AdditionalQuestionsForm, { type AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
+import ThankYou from '@/components/thank-you';
+import { cn } from '@/lib/utils';
 
 export default function Home() {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({});
+  const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
+
+  const handleNextStep1 = (data: InsuranceFormValues) => {
+    setFormData(prev => ({ ...prev, ...data }));
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+      setStep(2);
+      setAnimationClass('animate-fade-in-up');
+    }, 300);
+  };
+
+  const handleBack = () => {
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+      setStep(step - 1);
+      setAnimationClass('animate-fade-in-up');
+    }, 300);
+  };
+  
+  const handleSubmit = (data: AdditionalQuestionsFormValues) => {
+    const finalData = { ...formData, ...data };
+    console.log('Final Submission:', finalData);
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+      setStep(3);
+      setAnimationClass('animate-fade-in-up');
+    }, 300);
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return <InsuranceForm onNext={handleNextStep1} />;
+      case 2:
+        return <AdditionalQuestionsForm onBack={handleBack} onSubmit={handleSubmit} />;
+      case 3:
+        return <ThankYou />;
+      default:
+        return <InsuranceForm onNext={handleNextStep1} />;
+    }
+  };
+
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
       <header className="absolute top-0 left-0 p-8 md:p-12">
@@ -17,7 +67,9 @@ export default function Home() {
             <p className="text-base text-foreground/80 mb-8">
                 Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
             </p>
-            <InsuranceForm />
+            <div className={cn("w-full", animationClass)}>
+              {renderStep()}
+            </div>
         </div>
       </main>
 
