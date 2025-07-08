@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { 
@@ -171,15 +171,14 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     changeStep(6); // Go to Thank You page
   };
   
-  const handleSelfEnroll = async () => {
+  const handleSelfEnrollSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      const data = form.getValues();
-      console.log('Submitting for self-enroll:', data);
+      console.log('Submitting self-enroll with validated data:', data);
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(7); // Move to loading page, which will trigger WebSocket connection
+        changeStep(7); // Move to loading page
       } else {
         toast({
           variant: "destructive",
@@ -198,6 +197,24 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       setIsSubmitting(false);
     }
   };
+
+  const handleSelfEnrollError = (formErrors: FieldErrors<FormValues>) => {
+    console.error('Form validation failed on self-enroll:', formErrors);
+    toast({
+      variant: "destructive",
+      title: "Incomplete Application",
+      description: "Please complete all required fields before submitting.",
+    });
+    
+    // Find the first field with an error and navigate to its step
+    const firstErrorField = Object.keys(formErrors)[0] as keyof FormValues;
+    const stepWithError = stepFields.findIndex(fields => fields.includes(firstErrorField));
+    
+    if (stepWithError !== -1) {
+      changeStep(stepWithError + 1);
+    }
+  };
+
 
   useEffect(() => {
     if (step === 7 && uuid && !ws.current) {
@@ -262,7 +279,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       case 5:
         return <PaymentForm />;
       case 6:
-        return <ThankYou onSelfEnroll={handleSelfEnroll} />;
+        return <ThankYou onSelfEnroll={() => form.handleSubmit(handleSelfEnrollSubmit, handleSelfEnrollError)()} />;
       case 7:
         return <SelfEnrollLoading />;
       case 8:

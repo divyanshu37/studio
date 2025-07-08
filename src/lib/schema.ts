@@ -107,7 +107,6 @@ export const paymentFormSchema = z.object({
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
 export const fullFormSchema = insuranceFormSchema
-  .merge(additionalQuestionsFormSchema)
   .merge(beneficiaryFormSchema)
   .merge(beneficiaryAddressFormSchema)
   .merge(paymentFormSchema);
