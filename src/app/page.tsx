@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Logo, Icon } from '@/components/logo';
 import InsuranceForm, { type InsuranceFormValues } from '@/components/insurance-form';
 import AdditionalQuestionsForm, { type AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
@@ -17,6 +18,17 @@ export default function Home() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormValues>({});
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      const stepNumber = parseInt(stepParam, 10);
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 6) {
+        setStep(stepNumber);
+      }
+    }
+  }, [searchParams]);
 
   const handleNextStep = (data: Partial<FormValues>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -68,7 +80,7 @@ export default function Home() {
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
-            <Icon className="h-40 w-40 text-accent mb-8" />
+            <Icon className="h-48 w-48 text-accent mb-8" />
             <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight">
                 State and Congress Approved Final Expense Benefits Emergency Funds
             </h1>
