@@ -152,7 +152,7 @@ export default function Home() {
                   State and Congress Approved Final Expense Benefits Emergency Funds
               </h1>
               <p className={cn(
-                "text-base text-foreground/80 mb-8 max-w-xl",
+                "text-base text-foreground/80 mb-8 max-w-[38rem]",
                 !showSubheading && "invisible"
               )}>
                 {step === 6
