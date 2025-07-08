@@ -67,14 +67,21 @@ export default function Home() {
       </header>
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
-        <div className="max-w-3xl w-full flex flex-col items-center">
+        <div className="max-w-4xl w-full flex flex-col items-center">
             <Icon className="h-28 w-28 text-accent mb-8" />
             <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight">
                 State and Congress Approved Final Expense Benefits Emergency Funds
             </h1>
-            <p className="text-base text-foreground/80 mb-8">
+            {step < 6 ? (
+              <p className="text-base text-foreground/80 mb-8">
                 Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
-            </p>
+              </p>
+            ) : (
+              <p className="text-base text-foreground/80 mb-8 max-w-md">
+                We have all of the information necessary. How would you
+                like to complete your application?
+              </p>
+            )}
             <div className={cn("w-full flex justify-center", animationClass)}>
               {renderStep()}
             </div>
