@@ -5,33 +5,36 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+
+import { 
+  fullFormSchema, 
+  insuranceFormSchema, 
+  additionalQuestionsFormSchema, 
+  beneficiaryFormSchema, 
+  beneficiaryAddressFormSchema, 
+  paymentFormSchema,
+  type FormValues,
+  type InsuranceFormValues,
+  type AdditionalQuestionsFormValues,
+  type BeneficiaryFormValues,
+  type BeneficiaryAddressFormValues,
+  type PaymentFormValues
+} from '@/lib/schema';
+import { submitApplication } from '@/ai/flows/submit-application-flow';
+import { useToast } from '@/hooks/use-toast';
 
 import { Logo, Icon } from '@/components/logo';
-import InsuranceForm, { insuranceFormSchema } from '@/components/insurance-form';
-import AdditionalQuestionsForm, { additionalQuestionsFormSchema } from '@/components/additional-questions-form';
-import BeneficiaryForm, { beneficiaryFormSchema } from '@/components/beneficiary-form';
-import BeneficiaryAddressForm, { beneficiaryAddressFormSchema } from '@/components/beneficiary-address-form';
-import PaymentForm, { paymentFormSchema } from '@/components/payment-form';
+import InsuranceForm from '@/components/insurance-form';
+import AdditionalQuestionsForm from '@/components/additional-questions-form';
+import BeneficiaryForm from '@/components/beneficiary-form';
+import BeneficiaryAddressForm from '@/components/beneficiary-address-form';
+import PaymentForm from '@/components/payment-form';
 import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
 import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
-import { InsuranceFormValues } from '@/components/insurance-form';
-import { AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
-import { BeneficiaryFormValues } from '@/components/beneficiary-form';
-import { BeneficiaryAddressFormValues } from '@/components/beneficiary-address-form';
-import { PaymentFormValues } from '@/components/payment-form';
-
-const fullFormSchema = insuranceFormSchema
-  .merge(additionalQuestionsFormSchema)
-  .merge(beneficiaryFormSchema)
-  .merge(beneficiaryAddressFormSchema)
-  .merge(paymentFormSchema);
-
-export type FormValues = z.infer<typeof fullFormSchema>;
 
 const stepFields: (keyof FormValues)[][] = [
   Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
@@ -47,7 +50,9 @@ export default function HomePageClient() {
   const [headerAnimationClass, setHeaderAnimationClass] = useState('animate-fade-in-up');
   const [isHeaderRendered, setIsHeaderRendered] = useState(true);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
+  const { toast } = useToast();
 
   const [isLayoutCentered, setIsLayoutCentered] = useState(false);
   const [isAnimatingToStep9, setIsAnimatingToStep9] = useState(false);
@@ -80,7 +85,6 @@ export default function HomePageClient() {
       beneficiary1Zip: "",
       beneficiary1Relationship: "",
       beneficiary1Phone: "",
-      contingentBeneficiaryCount: NaN,
       coverage: "",
       accountHolderName: "",
       accountNumber: "",
@@ -151,9 +155,32 @@ export default function HomePageClient() {
     changeStep(step - 1);
   };
   
-  const processForm = (data: FormValues) => {
-    console.log('Final Submission:', data);
-    changeStep(step + 1); // Move to Thank You page
+  const processForm = async (data: FormValues) => {
+    setIsSubmitting(true);
+    try {
+      console.log('Final Submission:', data);
+      const result = await submitApplication(data);
+      console.log('API Response:', result);
+
+      if (result.success) {
+        changeStep(step + 1); // Move to Thank You page
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Submission Failed",
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast({
+        variant: "destructive",
+        title: "An unexpected error occurred.",
+        description: "Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const goToNextStep = () => {
@@ -280,6 +307,7 @@ export default function HomePageClient() {
                       backButton={step > 1}
                       isSubmit={step === 5}
                       actionLabel={step === 5 ? "SUBMIT" : "NEXT"}
+                      disabled={isSubmitting}
                     >
                       {errorMessage && (
                         <p className="text-[10px] font-medium leading-tight text-destructive">

@@ -1,61 +1,12 @@
 
 'use client';
 
+import type { InsuranceFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
-import { z } from 'zod';
-import { differenceInYears, parse, isValid } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { FormField, FormItem, FormControl } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, formatPhoneNumber, formatSsn } from '@/lib/utils';
-
-const isValidSsn = (ssn: string) => {
-    const ssnParts = ssn.replace(/-/g, '');
-    if (ssnParts.length !== 9) return true;
-
-    const area = ssnParts.substring(0, 3);
-    const group = ssnParts.substring(3, 5);
-    const serial = ssnParts.substring(5, 9);
-    
-    if (area === "000" || area === "666" || parseInt(area, 10) >= 900) {
-        return false;
-    }
-    if (group === "00") {
-        return false;
-    }
-    if (serial === "0000") {
-        return false;
-    }
-    return true;
-};
-
-export const insuranceFormSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required." }),
-  lastName: z.string().min(1, { message: "Last name is required." }),
-  phone: z.string().min(14, { message: "Please enter a complete phone number." }),
-  email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
-  dob: z.string()
-    .min(1, { message: "Date of birth is required." })
-    .refine((dob) => isValid(parse(dob, 'yyyy-MM-dd', new Date())), {
-      message: "Invalid date format.",
-    })
-    .refine((dob) => {
-        const parsedDate = parse(dob, 'yyyy-MM-dd', new Date());
-        if (!isValid(parsedDate)) return false;
-        const age = differenceInYears(new Date(), parsedDate);
-        return age >= 45 && age <= 80;
-    }, {
-        message: "You must be between 45 and 80 years old to be eligible."
-    }),
-  ssn: z.string()
-    .min(11, { message: "Please enter a complete social security number." })
-    .refine(isValidSsn, {
-        message: "Please enter a valid social security number."
-    }),
-  gender: z.string().min(1, { message: "Please select a gender." }),
-});
-
-export type InsuranceFormValues = z.infer<typeof insuranceFormSchema>;
 
 export default function InsuranceForm() {
   const { control, formState: { errors } } = useFormContext<InsuranceFormValues>();

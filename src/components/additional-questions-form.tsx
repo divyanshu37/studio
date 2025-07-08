@@ -1,22 +1,11 @@
 
 'use client';
 
+import type { AdditionalQuestionsFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
-import { z } from 'zod';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
-
-export const additionalQuestionsFormSchema = z.object({
-  differentOwner: z.string().min(1, { message: "Please select an option." }),
-  healthQuestion1: z.string().min(1, { message: "This question is required." }),
-  healthQuestion2: z.string().min(1, { message: "This question is required." }),
-  healthQuestion3: z.string().min(1, { message: "This question is required." }),
-  tobaccoUse: z.string().min(1, { message: 'This question is required.' }),
-  existingPolicies: z.string().min(1, { message: 'This question is required.' }),
-});
-
-export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsFormSchema>;
 
 export default function AdditionalQuestionsForm() {
   const { control, formState: { errors } } = useFormContext<AdditionalQuestionsFormValues>();

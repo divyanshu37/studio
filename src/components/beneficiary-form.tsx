@@ -1,9 +1,8 @@
 
 'use client';
 
+import type { BeneficiaryFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
-import { z } from 'zod';
-import { parse, isValid } from 'date-fns';
 import {
   FormControl,
   FormField,
@@ -12,30 +11,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-
-export const beneficiaryFormSchema = z.object({
-  effectiveDate: z.string()
-    .min(1, { message: "An effective date is required." })
-    .refine((date) => isValid(parse(date, 'yyyy-MM-dd', new Date())), {
-      message: "Invalid effective date.",
-    })
-    .refine((date) => {
-        const [year, month, day] = date.split('-').map(Number);
-        const parsedDate = new Date(year, month - 1, day);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return parsedDate >= today;
-    }, {
-        message: "Effective date must be today or a future date."
-    }),
-  beneficiary1Address: z.string().min(1, { message: "Address is required." }),
-  beneficiary1Apt: z.string().optional(),
-  beneficiary1City: z.string().min(1, { message: "City is required." }),
-  beneficiary1State: z.string().min(1, { message: "State is required." }),
-  beneficiary1Zip: z.string().min(5, { message: "A valid zip code is required." }),
-});
-
-export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
 export default function BeneficiaryForm() {
   const { control, formState: { errors } } = useFormContext<BeneficiaryFormValues>();

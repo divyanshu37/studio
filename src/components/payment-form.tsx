@@ -1,8 +1,8 @@
 
 'use client';
 
+import type { PaymentFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
-import { z } from 'zod';
 import {
   FormControl,
   FormField,
@@ -15,15 +15,6 @@ import { cn } from '@/lib/utils';
 const coverageOptions = [
   "$10,000", "$12,000", "$14,000", "$16,000", "$18,000", "$20,000", "$25,000"
 ];
-
-export const paymentFormSchema = z.object({
-  coverage: z.string().min(1, { message: "Coverage amount is required." }),
-  accountHolderName: z.string().min(1, { message: "Account holder name is required." }),
-  accountNumber: z.string().min(1, { message: "Account number is required." }),
-  routingNumber: z.string().min(9, { message: "A valid 9-digit routing number is required." }).max(9, { message: "A valid 9-digit routing number is required." }),
-});
-
-export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
 export default function PaymentForm() {
   const { control, formState: { errors } } = useFormContext<PaymentFormValues>();

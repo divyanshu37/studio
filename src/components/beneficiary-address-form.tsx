@@ -1,9 +1,8 @@
 
 'use client';
 
+import type { BeneficiaryAddressFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
-import { z } from 'zod';
-import { parse, isValid } from 'date-fns';
 import {
   FormControl,
   FormField,
@@ -20,19 +19,6 @@ const relationshipOptions = [
   "Parent", "Self", "Sister", "Spouse", "Stepbrother", "Stepfather", 
   "Stepmother", "Stepsister", "Uncle"
 ];
-
-export const beneficiaryAddressFormSchema = z.object({
-  beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
-  beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
-  beneficiary1Dob: z.string().min(1, { message: "Date of birth is required." }).refine((dob) => isValid(parse(dob, 'yyyy-MM-dd', new Date())), {
-    message: "Invalid date of birth.",
-  }),
-  beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
-  beneficiary1Phone: z.string().min(14, { message: "Please enter a complete phone number." }),
-  contingentBeneficiaryCount: z.coerce.number().min(0, { message: "Please enter a number." }).int(),
-});
-
-export type BeneficiaryAddressFormValues = z.infer<typeof beneficiaryAddressFormSchema>;
 
 export default function BeneficiaryAddressForm() {
   const { control, formState: { errors } } = useFormContext<BeneficiaryAddressFormValues>();
@@ -119,17 +105,6 @@ export default function BeneficiaryAddressForm() {
           )}
         />
       </div>
-      <FormField
-        control={control}
-        name="contingentBeneficiaryCount"
-        render={({ field }) => (
-          <FormItem>
-            <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || '')} value={isNaN(field.value) ? '' : field.value} placeholder="How many contingent beneficiaries?" className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.contingentBeneficiaryCount && "border-destructive focus-visible:border-destructive animate-shake")} />
-            </FormControl>
-          </FormItem>
-        )}
-      />
     </div>
   );
 }
