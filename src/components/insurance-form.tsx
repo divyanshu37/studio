@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { differenceInYears, parse, isValid } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
@@ -14,7 +15,22 @@ const formSchema = z.object({
   lastName: z.string().min(1, { message: "Last name is required." }),
   phone: z.string().min(14, { message: "Please enter a complete phone number." }),
   email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
-  dob: z.string().min(10, { message: "Please enter a complete date of birth." }),
+  dob: z.string()
+    .min(10, { message: "Please enter a complete date of birth." })
+    .refine((dob) => {
+        const parsedDate = parse(dob, 'MM/dd/yyyy', new Date());
+        if (!isValid(parsedDate)) return false;
+
+        const [month, day, year] = dob.split('/').map(Number);
+        if (parsedDate.getFullYear() !== year || parsedDate.getMonth() !== month - 1 || parsedDate.getDate() !== day) {
+            return false;
+        }
+
+        const age = differenceInYears(new Date(), parsedDate);
+        return age >= 40 && age <= 80;
+    }, {
+        message: "You must be between 40 and 80 years old to be eligible."
+    }),
   ssn: z.string().min(11, { message: "Please enter a complete social security number." }),
 });
 
@@ -95,7 +111,7 @@ export default function InsuranceForm() {
                       <Input 
                         placeholder="First Name" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card shadow-lg", errors.firstName && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl", errors.firstName && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -110,7 +126,7 @@ export default function InsuranceForm() {
                       <Input 
                         placeholder="Last Name" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card shadow-lg", errors.lastName && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl", errors.lastName && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -128,7 +144,7 @@ export default function InsuranceForm() {
                         placeholder="Valid Phone Number" 
                         {...field} 
                         onChange={(e) => handlePhoneChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card shadow-lg", errors.phone && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl", errors.phone && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -144,7 +160,7 @@ export default function InsuranceForm() {
                         placeholder="Email" 
                         type="email" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card shadow-lg", errors.email && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl", errors.email && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -162,7 +178,7 @@ export default function InsuranceForm() {
                         placeholder="Date of Birth" 
                         {...field} 
                         onChange={(e) => handleDateChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card shadow-lg", errors.dob && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl", errors.dob && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -178,7 +194,7 @@ export default function InsuranceForm() {
                         placeholder="Social Security Number" 
                         {...field} 
                         onChange={(e) => handleSSNChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card shadow-lg", errors.ssn && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl", errors.ssn && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -189,11 +205,15 @@ export default function InsuranceForm() {
         <div className="relative flex justify-end items-center">
             <div className="absolute left-0 right-0 text-center pointer-events-none">
                 <div className="min-h-[1.25rem]">
-                    {Object.keys(errors).length > 0 && (
+                    {errors.dob?.message ? (
+                        <p className="text-sm font-medium text-destructive">
+                            {errors.dob.message}
+                        </p>
+                    ) : (Object.keys(errors).length > 0 && (
                         <p className="text-sm font-medium text-destructive">
                             Red fields must be entered correctly.
                         </p>
-                    )}
+                    ))}
                 </div>
             </div>
             <Button type="submit" size="lg" className="px-8 py-6 text-base font-body">
