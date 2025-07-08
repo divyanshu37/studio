@@ -15,7 +15,7 @@ export default function Home() {
                 State and Congress Approved Final Expense Benefits Emergency Funds
             </h1>
             <p className="text-lg text-foreground/80 mb-12">
-                Amounts between $5,000 - $25,000 / Available to anyone ages 40-80
+                Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
             </p>
             <InsuranceForm />
         </div>

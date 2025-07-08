@@ -27,9 +27,9 @@ const formSchema = z.object({
         }
 
         const age = differenceInYears(new Date(), parsedDate);
-        return age >= 40 && age <= 80;
+        return age >= 45 && age <= 80;
     }, {
-        message: "You must be between 40 and 80 years old to be eligible."
+        message: "You must be between 45 and 80 years old to be eligible."
     }),
   ssn: z.string().min(11, { message: "Please enter a complete social security number." }),
 });
