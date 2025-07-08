@@ -117,6 +117,7 @@ export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSche
 
 // 5. Public-facing function remains the same.
 export async function submitApplication(input: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
+  console.log('before submitting:', input);
   return submitApplicationFlow(input);
 }
 
@@ -143,7 +144,7 @@ const submitApplicationFlow = ai.defineFlow(
       console.log('Submitting final, transformed data to API:', applicantData);
 
       // Step 2: Send it to the backend.
-      const response = await axios.post(`${backendUrl}insurance`, applicantData);
+      const response = await axios.post(`${backendUrl}/insurance`, applicantData);
       const result = response.data;
 
       return {

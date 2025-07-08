@@ -69,7 +69,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       dob: '',
       ssn: '',
       gender: '',
-      differentOwner: 'no',
       healthQuestion1: '',
       healthQuestion2: '',
       healthQuestion3: '',
