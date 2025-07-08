@@ -11,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import { fullFormSchema, type FormValues } from '@/lib/schema';
 import { z } from 'zod';
+import axios from 'axios';
 
 const SubmitApplicationInputSchema = fullFormSchema.extend({
   uuid: z.string().uuid(),
@@ -113,19 +114,8 @@ const submitApplicationFlow = ai.defineFlow(
     };
 
     try {
-      const response = await fetch(`${backendUrl}/insurance`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(applicantData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('API submission failed:', response.status, errorData);
-        return { success: false, message: errorData.message || 'API submission failed.' };
-      }
-
-      const result = await response.json();
+      const response = await axios.post(`${backendUrl}/insurance`, applicantData);
+      const result = response.data;
 
       return {
         success: true,
@@ -133,6 +123,11 @@ const submitApplicationFlow = ai.defineFlow(
         policyId: result.policyId,
       };
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('API submission failed:', error.response.status, error.response.data);
+        return { success: false, message: error.response.data.message || 'API submission failed.' };
+      }
+      
       console.error('API submission error:', error);
       return { success: false, message: 'Failed to connect to the server.' };
     }
