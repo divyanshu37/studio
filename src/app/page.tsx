@@ -151,7 +151,7 @@ export default function Home() {
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
-            <Icon className={cn("h-48 w-48 text-accent mb-8", !showIcon && "invisible")} />
+            <Icon className={cn("h-36 w-36 text-accent mb-8", !showIcon && "invisible")} />
             
             <h1 className={cn("font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl", !showHeading && "invisible")}>
                 State and Congress Approved Final Expense Benefits Emergency Funds
