@@ -47,12 +47,16 @@ const submitApplicationFlow = ai.defineFlow(
       // The date from <input type="date"> is YYYY-MM-DD
       if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
       const [year, month, day] = dateString.split('-');
-      return `${month}/${day}/${year}`; // Format to MM/DD/YYYY
+      const formatted = `${month}/${day}/${year}`;
+      console.log('Formatted Date:', formatted);
+      return formatted;
     };
 
     const formatPhone = (phoneString: string) => {
       // Remove all non-digit characters
-      return phoneString.replace(/\D/g, '');
+      const formatted = phoneString.replace(/\D/g, '');
+      console.log('Formatted Phone:', formatted);
+      return formatted;
     };
 
     const capitalize = (s: string) => {
