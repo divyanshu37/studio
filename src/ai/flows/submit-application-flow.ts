@@ -138,6 +138,7 @@ const submitApplicationFlow = ai.defineFlow(
       const applicantData = transformDataForApi(formData);
       
       // Step 2: Send it to the backend.
+      console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance`);
       const response = await axios.post(`${backendUrl}/insurance`, applicantData);
       const result = response.data;
 
