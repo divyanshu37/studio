@@ -53,6 +53,15 @@ export default function Home() {
     handleNextStep(data);
   };
 
+  const handleStepChange = (newStep: number) => {
+    if (newStep === step) return;
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+      setStep(newStep);
+      setAnimationClass('animate-fade-in-up');
+    }, 300);
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -77,6 +86,29 @@ export default function Home() {
       <header className="absolute top-0 left-0 p-8 md:p-12">
         <Logo />
       </header>
+
+      {/* Temporary Step Navigator */}
+      <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
+        <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
+          <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
+          {[1, 2, 3, 4, 5, 6].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleStepChange(num)}
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors",
+                step === num 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-muted text-muted-foreground hover:bg-primary/80 hover:text-primary-foreground"
+              )}
+              aria-label={`Go to step ${num}`}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+      </div>
+
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
