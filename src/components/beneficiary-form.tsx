@@ -22,8 +22,8 @@ export default function BeneficiaryForm() {
           control={control}
           name="effectiveDate"
           render={({ field }) => (
-            <FormItem className="flex flex-col space-y-2">
-              <FormLabel className="text-left text-base font-semibold text-foreground">Desired effective date of this policy</FormLabel>
+            <FormItem className="flex flex-col space-y-2 text-left">
+              <FormLabel className="text-base font-semibold text-foreground">Desired effective date of this policy</FormLabel>
                 <FormControl>
                 <Input 
                   type="date"
@@ -37,14 +37,14 @@ export default function BeneficiaryForm() {
       </div>
       
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-foreground text-left pt-4">Primary Address</h3>
+        <h3 className="text-base font-semibold text-foreground text-left pt-4">Applicant's Primary Address</h3>
         <FormField
           control={control}
-          name="beneficiary1Address"
+          name="applicantAddress"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Street Address" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Address && "border-destructive focus-visible:border-destructive animate-shake")} />
+                <Input placeholder="Street Address" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantAddress && "border-destructive focus-visible:border-destructive animate-shake")} />
               </FormControl>
             </FormItem>
           )}
@@ -52,22 +52,22 @@ export default function BeneficiaryForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
            <FormField
               control={control}
-              name="beneficiary1Apt"
+              name="applicantApt"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Apt, suite, etc. (optional)" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Apt && "border-destructive focus-visible:border-destructive animate-shake")} />
+                    <Input placeholder="Apt, suite, etc. (optional)" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantApt && "border-destructive focus-visible:border-destructive animate-shake")} />
                   </FormControl>
                 </FormItem>
               )}
             />
           <FormField
             control={control}
-            name="beneficiary1City"
+            name="applicantCity"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="City" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1City && "border-destructive focus-visible:border-destructive animate-shake")} />
+                  <Input placeholder="City" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantCity && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
               </FormItem>
             )}
@@ -76,22 +76,22 @@ export default function BeneficiaryForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={control}
-            name="beneficiary1State"
+            name="applicantState"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="State" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1State && "border-destructive focus-visible:border-destructive animate-shake")} />
+                  <Input placeholder="State" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantState && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={control}
-            name="beneficiary1Zip"
+            name="applicantZip"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Zip Code" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Zip && "border-destructive focus-visible:border-destructive animate-shake")} />
+                  <Input placeholder="Zip Code" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantZip && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
               </FormItem>
             )}

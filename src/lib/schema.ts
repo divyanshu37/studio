@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 import { differenceInYears, parse, isValid } from 'date-fns';
 
@@ -73,11 +74,11 @@ export const beneficiaryFormSchema = z.object({
     }, {
         message: "Effective date must be today or a future date."
     }),
-  beneficiary1Address: z.string().min(1, { message: "Address is required." }),
-  beneficiary1Apt: z.string().optional(),
-  beneficiary1City: z.string().min(1, { message: "City is required." }),
-  beneficiary1State: z.string().min(1, { message: "State is required." }),
-  beneficiary1Zip: z.string().min(5, { message: "A valid zip code is required." }),
+  applicantAddress: z.string().min(1, { message: "Address is required." }),
+  applicantApt: z.string().optional(),
+  applicantCity: z.string().min(1, { message: "City is required." }),
+  applicantState: z.string().min(1, { message: "State is required." }),
+  applicantZip: z.string().min(5, { message: "A valid zip code is required." }),
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
@@ -89,6 +90,11 @@ export const beneficiaryAddressFormSchema = z.object({
   }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
   beneficiary1Phone: z.string().min(14, { message: "Please enter a complete phone number." }),
+  beneficiaryAddress: z.string().min(1, { message: "Beneficiary address is required." }),
+  beneficiaryApt: z.string().optional(),
+  beneficiaryCity: z.string().min(1, { message: "Beneficiary city is required." }),
+  beneficiaryState: z.string().min(1, { message: "Beneficiary state is required." }),
+  beneficiaryZip: z.string().min(5, { message: "A valid beneficiary zip code is required." }),
 });
 export type BeneficiaryAddressFormValues = z.infer<typeof beneficiaryAddressFormSchema>;
 

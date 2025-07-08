@@ -24,6 +24,40 @@ const SubmitApplicationOutputSchema = z.object({
 });
 export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSchema>;
 
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
+interface Beneficiary {
+  firstName: string;
+  lastName: string;
+  dob: string;
+  address: Address;
+  phone: string;
+  relation: string;
+  percentage: string;
+}
+
+export interface ApplicantData {
+  referenceId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  address: Address;
+  dob: string;
+  phone: string;
+  lastFour: string;
+  gender: string;
+  beneficiary: Beneficiary;
+  faceAmount: string;
+  accountHolderName: string;
+  routingNumber: string;
+  accountNumber: string;
+}
+
 export async function submitApplication(input: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
   return submitApplicationFlow(input);
 }
@@ -34,7 +68,7 @@ const submitApplicationFlow = ai.defineFlow(
     inputSchema: SubmitApplicationInputSchema,
     outputSchema: SubmitApplicationOutputSchema,
   },
-  async (applicationData) => {
+  async (formData) => {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     if (!backendUrl) {
@@ -42,11 +76,47 @@ const submitApplicationFlow = ai.defineFlow(
       return { success: false, message: 'Server configuration error.' };
     }
 
+    // Transform flat form data into the nested structure required by the API
+    const applicantData: ApplicantData = {
+      referenceId: formData.uuid,
+      email: formData.email,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      address: {
+        street: formData.applicantAddress,
+        city: formData.applicantCity,
+        state: formData.applicantState,
+        zip: formData.applicantZip,
+      },
+      dob: formData.dob,
+      phone: formData.phone,
+      lastFour: formData.ssn.replace(/-/g, '').slice(-4),
+      gender: formData.gender,
+      beneficiary: {
+        firstName: formData.beneficiary1FirstName,
+        lastName: formData.beneficiary1LastName,
+        dob: formData.beneficiary1Dob,
+        address: {
+          street: formData.beneficiaryAddress,
+          city: formData.beneficiaryCity,
+          state: formData.beneficiaryState,
+          zip: formData.beneficiaryZip,
+        },
+        phone: formData.beneficiary1Phone,
+        relation: formData.beneficiary1Relationship,
+        percentage: '100', // Assuming a single beneficiary gets 100%
+      },
+      faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
+      accountHolderName: formData.accountHolderName,
+      routingNumber: formData.routingNumber,
+      accountNumber: formData.accountNumber,
+    };
+
     try {
       const response = await fetch(`${backendUrl}/insurance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(applicationData),
+        body: JSON.stringify(applicantData),
       });
 
       if (!response.ok) {
