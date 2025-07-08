@@ -111,7 +111,7 @@ export default function InsuranceForm() {
                       <Input 
                         placeholder="First Name" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary", errors.firstName && "border-destructive focus-visible:border-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.firstName && "border-destructive focus-visible:border-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -126,7 +126,7 @@ export default function InsuranceForm() {
                       <Input 
                         placeholder="Last Name" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary", errors.lastName && "border-destructive focus-visible:border-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.lastName && "border-destructive focus-visible:border-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -144,7 +144,7 @@ export default function InsuranceForm() {
                         placeholder="Valid Phone Number" 
                         {...field} 
                         onChange={(e) => handlePhoneChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary", errors.phone && "border-destructive focus-visible:border-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.phone && "border-destructive focus-visible:border-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -160,7 +160,7 @@ export default function InsuranceForm() {
                         placeholder="Email" 
                         type="email" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary", errors.email && "border-destructive focus-visible:border-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.email && "border-destructive focus-visible:border-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -178,7 +178,7 @@ export default function InsuranceForm() {
                         placeholder="Date of Birth" 
                         {...field} 
                         onChange={(e) => handleDateChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary", errors.dob && "border-destructive focus-visible:border-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.dob && "border-destructive focus-visible:border-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -194,7 +194,7 @@ export default function InsuranceForm() {
                         placeholder="Social Security Number" 
                         {...field} 
                         onChange={(e) => handleSSNChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary", errors.ssn && "border-destructive focus-visible:border-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.ssn && "border-destructive focus-visible:border-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
