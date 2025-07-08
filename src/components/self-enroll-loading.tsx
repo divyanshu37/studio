@@ -17,7 +17,7 @@ export default function SelfEnrollLoading({ onComplete }: SelfEnrollLoadingProps
   }, [onComplete]);
 
   return (
-    <div className="w-full max-w-xl flex flex-col items-center text-center space-y-8">
+    <div className="w-full max-w-xl flex flex-col items-center text-center space-y-8 -mt-8">
       <Badge variant="secondary" className="px-6 py-2 text-base font-semibold rounded-full bg-black text-white hover:bg-black/90">
         Self-Enrolling
       </Badge>
