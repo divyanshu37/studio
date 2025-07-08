@@ -104,11 +104,9 @@ export default {
         },
         'grow-wiggle': {
           '0%, 100%': { transform: 'scale(1) rotate(0deg)' },
-          '5%': { transform: 'scale(1.15) rotate(-3deg)' },
-          '10%': { transform: 'scale(1.15) rotate(3deg)' },
-          '15%': { transform: 'scale(1.15) rotate(-3deg)' },
-          '20%': { transform: 'scale(1.15) rotate(3deg)' },
-          '25%': { transform: 'scale(1) rotate(0deg)' },
+          '25%': { transform: 'scale(1.1) rotate(-2deg)' },
+          '50%': { transform: 'scale(1.1) rotate(2deg)' },
+          '75%': { transform: 'scale(1.1) rotate(-2deg)' },
         }
       },
       animation: {
