@@ -44,7 +44,6 @@ export default function Home() {
     
     if (newStep === 9 && step < 9) {
       setHeaderAnimationClass('animate-fade-out-down');
-      setTimeout(() => setIsHeaderRendered(false), 300);
     }
 
     setTimeout(() => {
@@ -53,6 +52,9 @@ export default function Home() {
         setHeaderAnimationClass('animate-fade-in-up');
       }
       setStep(newStep);
+      if (newStep === 9) {
+        setIsHeaderRendered(false);
+      }
       setAnimationClass('animate-fade-in-up');
     }, 300);
   };
@@ -117,7 +119,6 @@ export default function Home() {
         <Logo />
       </header>
 
-      {/* Temporary Step Navigator */}
       <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
         <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
           <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
@@ -139,11 +140,8 @@ export default function Home() {
         </div>
       </div>
 
-      <main className={cn(
-        "flex-1 flex flex-col items-center w-full px-4 text-center",
-        isHeaderRendered ? "justify-start pt-24" : "justify-center"
-      )}>
-        <div className="max-w-4xl w-full flex flex-col items-center">
+      <main className="flex-1 flex flex-col items-center w-full px-4 text-center justify-start pt-24">
+        <div className="max-w-4xl w-full flex flex-col items-center flex-1">
             <div className={cn(
               "flex flex-col items-center",
               headerAnimationClass,
@@ -163,7 +161,11 @@ export default function Home() {
               </p>
             </div>
 
-            <div className={cn("w-full flex justify-center", animationClass)}>
+            <div className={cn(
+              "w-full flex",
+              step === 9 ? "flex-1 items-center justify-center" : "justify-center",
+              animationClass
+            )}>
               {renderStep()}
             </div>
         </div>
