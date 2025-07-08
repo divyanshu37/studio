@@ -6,27 +6,21 @@ import InsuranceForm, { type InsuranceFormValues } from '@/components/insurance-
 import AdditionalQuestionsForm, { type AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
 import BeneficiaryForm, { type BeneficiaryFormValues } from '@/components/beneficiary-form';
 import ThankYou from '@/components/thank-you';
+import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
+
+export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues>;
 
 export default function Home() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<FormValues>({});
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
 
-  const handleNextStep1 = (data: InsuranceFormValues) => {
+  const handleNextStep = (data: Partial<FormValues>) => {
     setFormData(prev => ({ ...prev, ...data }));
     setAnimationClass('animate-fade-out-down');
     setTimeout(() => {
-      setStep(2);
-      setAnimationClass('animate-fade-in-up');
-    }, 300);
-  };
-  
-  const handleNextStep2 = (data: AdditionalQuestionsFormValues) => {
-    setFormData(prev => ({ ...prev, ...data }));
-    setAnimationClass('animate-fade-out-down');
-    setTimeout(() => {
-      setStep(3);
+      setStep(prevStep => prevStep + 1);
       setAnimationClass('animate-fade-in-up');
     }, 300);
   };
@@ -40,27 +34,23 @@ export default function Home() {
   };
   
   const handleSubmit = (data: BeneficiaryFormValues) => {
-    const finalData = { ...formData, ...data };
+    const finalData: FormValues = { ...formData, ...data };
     console.log('Final Submission:', finalData);
-    setAnimationClass('animate-fade-out-down');
-    setTimeout(() => {
-      setStep(4);
-      setAnimationClass('animate-fade-in-up');
-    }, 300);
+    handleNextStep(data);
   };
 
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <InsuranceForm onNext={handleNextStep1} />;
+        return <InsuranceForm onNext={handleNextStep} />;
       case 2:
-        return <AdditionalQuestionsForm onBack={handleBack} onNext={handleNextStep2} />;
+        return <AdditionalQuestionsForm onBack={handleBack} onNext={handleNextStep} />;
       case 3:
         return <BeneficiaryForm onBack={handleBack} onSubmit={handleSubmit} />;
       case 4:
         return <ThankYou />;
       default:
-        return <InsuranceForm onNext={handleNextStep1} />;
+        return <InsuranceForm onNext={handleNextStep} />;
     }
   };
 
@@ -72,7 +62,7 @@ export default function Home() {
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
         <div className="max-w-3xl w-full flex flex-col items-center">
-            <Icon className="h-24 w-24 text-accent mb-8" />
+            <Icon className="h-28 w-28 text-accent mb-8" />
             <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight">
                 State and Congress Approved Final Expense Benefits Emergency Funds
             </h1>

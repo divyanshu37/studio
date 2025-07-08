@@ -17,8 +17,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
-import { ArrowLeft, ArrowRight, CalendarIcon } from 'lucide-react';
+import FormNavigation from '@/components/form-navigation';
+import { cn, formatDateInput } from '@/lib/utils';
+import { CalendarIcon } from 'lucide-react';
 
 const formSchema = z.object({
   tobaccoUse: z.string().min(1, { message: 'This question is required.' }),
@@ -57,16 +58,8 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
   const { formState: { errors } } = form;
   const hasErrors = Object.keys(errors).length > 0;
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    const rawValue = e.target.value.replace(/[^\d]/g, '');
-    let formattedValue = rawValue.substring(0, 2);
-    if (rawValue.length > 2) {
-        formattedValue += '/' + rawValue.substring(2, 4);
-    }
-    if (rawValue.length > 4) {
-        formattedValue += '/' + rawValue.substring(4, 8);
-    }
-    field.onChange(formattedValue);
+  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+    field.onChange(formatDateInput(e.target.value));
   };
 
   return (
@@ -174,7 +167,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                        <Input type="number" {...field} placeholder="How many primary beneficiaries?" className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryCount && "border-destructive focus-visible:border-destructive animate-shake")} />
+                        <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || '')} value={isNaN(field.value) ? '' : field.value} placeholder="How many primary beneficiaries?" className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryCount && "border-destructive focus-visible:border-destructive animate-shake")} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -212,34 +205,20 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Date of Birth (MM/DD/YYYY)" {...field} onChange={(e) => handleDateChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Dob && "border-destructive focus-visible:border-destructive animate-shake")} />
+                    <Input placeholder="Date of Birth (MM/DD/YYYY)" {...field} onChange={(e) => handleDateInputChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Dob && "border-destructive focus-visible:border-destructive animate-shake")} />
                   </FormControl>
                 </FormItem>
               )}
             />
           </div>
         </div>
-        <div className="relative flex justify-between items-center">
-            <Button type="button" onClick={onBack} variant="outline" className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-foreground/80 shadow-xl tracking-widest bg-black text-white hover:bg-black/90">
-                <ArrowLeft className="h-5 w-5" />
-                <span>BACK</span>
-            </Button>
-            <div className="absolute left-0 right-0 flex justify-center pointer-events-none">
-                <div className="w-full max-w-[20vw]">
-                    <div className="min-h-[1.25rem]">
-                        {hasErrors && (
-                             <p className="text-xs font-medium text-destructive text-center">
-                                All questions must be answered.
-                            </p>
-                        )}
-                    </div>
-                </div>
-            </div>
-            <Button type="submit" className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest">
-                <span>SUBMIT</span>
-                <ArrowRight className="h-5 w-5" />
-            </Button>
-        </div>
+        <FormNavigation onBack={onBack} actionLabel="SUBMIT" backButton={true}>
+          {hasErrors && (
+            <p className="text-[10px] font-medium text-destructive leading-tight">
+              All questions must be answered.
+            </p>
+          )}
+        </FormNavigation>
       </form>
     </Form>
   );

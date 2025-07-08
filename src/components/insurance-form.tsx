@@ -8,8 +8,8 @@ import { differenceInYears, parse, isValid } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
-import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import FormNavigation from '@/components/form-navigation';
+import { cn, formatPhoneNumber, formatDateInput, formatSsn } from '@/lib/utils';
 
 const isValidSsn = (ssn: string) => {
     const ssnParts = ssn.replace(/-/g, '');
@@ -116,52 +116,29 @@ export default function InsuranceForm({ onNext }: InsuranceFormProps) {
 
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    const rawValue = e.target.value.replace(/[^\d]/g, '');
-    let formattedValue = '';
-    if (rawValue.length > 0) {
-        formattedValue = '(' + rawValue.substring(0, 3);
-    }
-    if (rawValue.length >= 4) {
-        formattedValue += ') ' + rawValue.substring(3, 6);
-    }
-    if (rawValue.length >= 7) {
-        formattedValue += '-' + rawValue.substring(6, 10);
-    }
-    field.onChange(formattedValue);
+    field.onChange(formatPhoneNumber(e.target.value));
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    const rawValue = e.target.value.replace(/[^\d]/g, '');
-    let formattedValue = rawValue.substring(0, 2);
-    if (rawValue.length > 2) {
-        formattedValue += '/' + rawValue.substring(2, 4);
-    }
-    if (rawValue.length > 4) {
-        formattedValue += '/' + rawValue.substring(4, 8);
-    }
-    field.onChange(formattedValue);
+    field.onChange(formatDateInput(e.target.value));
   };
 
   const handleSSNChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    const rawValue = e.target.value.replace(/[^\d]/g, '');
-    let formattedValue = rawValue.substring(0, 3);
-    if (rawValue.length > 3) {
-        formattedValue += '-' + rawValue.substring(3, 5);
-    }
-    if (rawValue.length > 5) {
-        formattedValue += '-' + rawValue.substring(5, 9);
-    }
-    field.onChange(formattedValue);
+    field.onChange(formatSsn(e.target.value));
   };
 
-
-  function onSubmit(data: InsuranceFormValues) {
-    onNext(data);
+  function getErrorMessage() {
+    if (ssnValidationState === 'validating') return "One moment, validating SSN...";
+    if (ssnValidationState === 'valid') return "SSN validated";
+    if (errors.dob?.message) return errors.dob.message;
+    if (errors.ssn?.message) return errors.ssn.message;
+    if (Object.keys(errors).length > 0) return "Red fields must be entered correctly.";
+    return null;
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl space-y-8">
+      <form onSubmit={form.handleSubmit(onNext)} className="w-full max-w-2xl space-y-8">
         <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -270,39 +247,13 @@ export default function InsuranceForm({ onNext }: InsuranceFormProps) {
               />
             </div>
         </div>
-        <div className="relative flex justify-end items-center">
-            <div className="absolute left-0 right-0 flex justify-center pointer-events-none">
-                <div className="w-full max-w-[20vw]">
-                    <div className="min-h-[1.25rem]">
-                        {ssnValidationState === 'validating' ? (
-                            <p className="text-xs font-medium text-foreground text-center">
-                                One moment, validating SSN...
-                            </p>
-                        ) : ssnValidationState === 'valid' ? (
-                            <p className="text-xs font-medium text-foreground text-center">
-                                SSN validated
-                            </p>
-                        ) : errors.dob?.message ? (
-                            <p className="text-xs font-medium text-destructive text-center">
-                                {errors.dob.message}
-                            </p>
-                        ) : errors.ssn?.message ? (
-                            <p className="text-xs font-medium text-destructive text-center">
-                                {errors.ssn.message}
-                            </p>
-                        ) : (Object.keys(errors).length > 0 && (
-                            <p className="text-xs font-medium text-destructive text-center">
-                                Red fields must be entered correctly.
-                            </p>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            <Button type="submit" className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest">
-                <span>NEXT</span>
-                <ArrowRight className="h-5 w-5" />
-            </Button>
-        </div>
+        <FormNavigation actionLabel="NEXT">
+          {getErrorMessage() && (
+            <p className={cn("text-[10px] font-medium leading-tight", (errors.dob || errors.ssn) ? "text-destructive" : "text-foreground")}>
+              {getErrorMessage()}
+            </p>
+          )}
+        </FormNavigation>
       </form>
     </Form>
   );
