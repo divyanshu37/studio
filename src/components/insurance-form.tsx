@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import { differenceInYears, parse, isValid } from 'date-fns';
 import { Input } from '@/components/ui/input';
-import { FormField, FormItem, FormControl, FormLabel } from '@/components/ui/form';
+import { FormField, FormItem, FormControl } from '@/components/ui/form';
 import { cn, formatPhoneNumber, formatSsn } from '@/lib/utils';
 
 const isValidSsn = (ssn: string) => {
@@ -139,8 +139,7 @@ export default function InsuranceForm() {
             control={control}
             name="dob"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date of Birth</FormLabel>
+              <FormItem>
                 <FormControl>
                   <Input 
                     type="date"
