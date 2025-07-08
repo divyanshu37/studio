@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import { differenceInYears, parse, isValid } from 'date-fns';
 import { Input } from '@/components/ui/input';
-import { FormField, FormItem, FormControl, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormField, FormItem, FormControl, FormLabel } from '@/components/ui/form';
 import { cn, formatPhoneNumber, formatSsn } from '@/lib/utils';
 
 const isValidSsn = (ssn: string) => {
@@ -148,7 +148,6 @@ export default function InsuranceForm() {
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.dob && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -170,7 +169,6 @@ export default function InsuranceForm() {
                   )}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />

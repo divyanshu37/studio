@@ -9,7 +9,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
@@ -113,7 +112,6 @@ export default function BeneficiaryForm() {
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -168,7 +166,6 @@ export default function BeneficiaryForm() {
                   className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Dob && "border-destructive focus-visible:border-destructive animate-shake")}
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
