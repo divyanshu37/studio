@@ -105,8 +105,6 @@ export default function Home() {
     }
   };
 
-  const showIcon = step < 9;
-  const showHeading = step < 9;
   const showSubheading = step <= 6;
 
   return (
@@ -138,19 +136,21 @@ export default function Home() {
       </div>
 
 
-      <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
+      <main className={cn("flex flex-col items-center flex-1 w-full px-4 text-center", step === 9 ? 'justify-center' : 'justify-start pt-24 pb-12')}>
         <div className="max-w-4xl w-full flex flex-col items-center">
-            <Icon className={cn("h-28 w-28 text-accent mb-8", !showIcon && "invisible", step === 9 && "hidden")} />
-            
-            <h1 className={cn("font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl", !showHeading && "invisible", step === 9 && "hidden")}>
-                State and Congress Approved Final Expense Benefits Emergency Funds
-            </h1>
-            
-            <p className={cn("text-base text-foreground/80 mb-8 max-w-xl", !showSubheading && "invisible", step === 9 && "hidden")}>
-              {step === 6
-                ? "We have all of the information necessary. How would you like to complete your application?"
-                : "Amounts between $5,000 - $25,000 / Available to anyone ages 45-80"}
-            </p>
+            <div className={cn("flex flex-col items-center", step === 9 && "hidden")}>
+              <Icon className="h-28 w-28 text-accent mb-8" />
+              
+              <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
+                  State and Congress Approved Final Expense Benefits Emergency Funds
+              </h1>
+              
+              <p className={cn("text-base text-foreground/80 mb-8 max-w-xl", !showSubheading && "invisible")}>
+                {step === 6
+                  ? "We have all of the information necessary. How would you like to complete your application?"
+                  : "Amounts between $5,000 - $25,000 / Available to anyone ages 45-80"}
+              </p>
+            </div>
 
             <div className={cn("w-full flex justify-center", animationClass)}>
               {renderStep()}
