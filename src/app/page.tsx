@@ -22,6 +22,7 @@ export default function Home() {
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
   const [headerAnimationClass, setHeaderAnimationClass] = useState('animate-fade-in-up');
   const [isHeaderRendered, setIsHeaderRendered] = useState(true);
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function Home() {
   const changeStep = (newStep: number) => {
     if (newStep === step) return;
 
+    setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
     
     if (newStep === 9 && step < 9) {
@@ -47,6 +49,7 @@ export default function Home() {
     }
 
     setTimeout(() => {
+      setIsAnimatingOut(false);
       if (newStep < 9 && step === 9) {
         setIsHeaderRendered(true);
         setHeaderAnimationClass('animate-fade-in-up');
@@ -147,12 +150,12 @@ export default function Home() {
               headerAnimationClass,
               !isHeaderRendered && "hidden"
             )}>
-              <Icon className="h-28 w-28 text-accent mb-8" />
+              <Icon className="h-20 w-20 text-accent mb-8" />
               <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                   State and Congress Approved Final Expense Benefits Emergency Funds
               </h1>
               <p className={cn(
-                "text-base text-foreground/80 mb-8 max-w-[38rem]",
+                "text-base text-foreground/80 mb-8 max-w-[42rem]",
                 !showSubheading && "invisible"
               )}>
                 {step === 6
@@ -163,7 +166,7 @@ export default function Home() {
 
             <div className={cn(
               "w-full flex",
-              step === 9 ? "flex-1 items-center justify-center" : "justify-center",
+              step === 9 && !isAnimatingOut ? "flex-1 items-center justify-center" : "justify-center",
               animationClass
             )}>
               {renderStep()}
