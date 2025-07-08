@@ -37,10 +37,10 @@ export type BeneficiaryFormValues = z.infer<typeof formSchema>;
 
 interface BeneficiaryFormProps {
   onBack: () => void;
-  onSubmit: (data: BeneficiaryFormValues) => void;
+  onNext: (data: BeneficiaryFormValues) => void;
 }
 
-export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormProps) {
+export default function BeneficiaryForm({ onBack, onNext }: BeneficiaryFormProps) {
   const form = useForm<BeneficiaryFormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onTouched',
@@ -64,7 +64,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl space-y-8">
+      <form onSubmit={form.handleSubmit(onNext)} className="w-full max-w-2xl space-y-8">
         <div className="space-y-6">
           <FormField
             control={form.control}
@@ -212,7 +212,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
             />
           </div>
         </div>
-        <FormNavigation onBack={onBack} actionLabel="SUBMIT" backButton={true}>
+        <FormNavigation onBack={onBack} actionLabel="NEXT" backButton={true}>
           {hasErrors && (
             <p className="text-[10px] font-medium text-destructive leading-tight">
               All questions must be answered.

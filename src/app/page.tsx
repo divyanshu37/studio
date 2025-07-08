@@ -5,11 +5,12 @@ import { Logo, Icon } from '@/components/logo';
 import InsuranceForm, { type InsuranceFormValues } from '@/components/insurance-form';
 import AdditionalQuestionsForm, { type AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
 import BeneficiaryForm, { type BeneficiaryFormValues } from '@/components/beneficiary-form';
+import BeneficiaryAddressForm, { type BeneficiaryAddressFormValues } from '@/components/beneficiary-address-form';
 import ThankYou from '@/components/thank-you';
 import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
 
-export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues>;
+export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues & BeneficiaryAddressFormValues>;
 
 export default function Home() {
   const [step, setStep] = useState(1);
@@ -33,7 +34,7 @@ export default function Home() {
     }, 300);
   };
   
-  const handleSubmit = (data: BeneficiaryFormValues) => {
+  const handleSubmit = (data: BeneficiaryAddressFormValues) => {
     const finalData: FormValues = { ...formData, ...data };
     console.log('Final Submission:', finalData);
     handleNextStep(data);
@@ -46,8 +47,10 @@ export default function Home() {
       case 2:
         return <AdditionalQuestionsForm onBack={handleBack} onNext={handleNextStep} />;
       case 3:
-        return <BeneficiaryForm onBack={handleBack} onSubmit={handleSubmit} />;
+        return <BeneficiaryForm onBack={handleBack} onNext={handleNextStep} />;
       case 4:
+        return <BeneficiaryAddressForm onBack={handleBack} onSubmit={handleSubmit} />;
+      case 5:
         return <ThankYou />;
       default:
         return <InsuranceForm onNext={handleNextStep} />;
