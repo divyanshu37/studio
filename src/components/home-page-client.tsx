@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,7 +44,7 @@ const stepFields: (keyof FormValues)[][] = [
   Object.keys(paymentFormSchema.shape) as (keyof PaymentFormValues)[],
 ];
 
-export default function HomePageClient() {
+export default function HomePageClient({ uuid }: { uuid: string }) {
   const [step, setStep] = useState(1);
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
   const [headerAnimationClass, setHeaderAnimationClass] = useState('animate-fade-in-up');
@@ -53,6 +53,7 @@ export default function HomePageClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const ws = useRef<WebSocket | null>(null);
 
   const [isLayoutCentered, setIsLayoutCentered] = useState(false);
   const [isAnimatingToStep9, setIsAnimatingToStep9] = useState(false);
@@ -148,7 +149,11 @@ export default function HomePageClient() {
     
     if (!output) return;
     
-    changeStep(step + 1);
+    if (step === 5) {
+      form.handleSubmit(processForm)();
+    } else {
+      changeStep(step + 1);
+    }
   };
 
   const handleBack = () => {
@@ -156,14 +161,20 @@ export default function HomePageClient() {
   };
   
   const processForm = async (data: FormValues) => {
+    // This is called on step 5's submit, after validation
+    console.log('Form data collected:', data);
+    changeStep(6); // Go to Thank You page
+  };
+  
+  const handleSelfEnroll = async () => {
     setIsSubmitting(true);
     try {
-      console.log('Final Submission:', data);
-      const result = await submitApplication(data);
-      console.log('API Response:', result);
+      const data = form.getValues();
+      console.log('Submitting for self-enroll:', data);
+      const result = await submitApplication({ ...data, uuid });
 
       if (result.success) {
-        changeStep(step + 1); // Move to Thank You page
+        changeStep(7); // Move to loading page, which will trigger WebSocket connection
       } else {
         toast({
           variant: "destructive",
@@ -183,16 +194,54 @@ export default function HomePageClient() {
     }
   };
 
-  const goToNextStep = () => {
-    changeStep(step + 1);
-  }
+  useEffect(() => {
+    if (step === 7 && uuid && !ws.current) {
+      const websocketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/${uuid}`;
+      console.log(`Connecting to WebSocket at ${websocketUrl}`);
+      ws.current = new WebSocket(websocketUrl);
+
+      ws.current.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+
+      ws.current.onmessage = (event) => {
+        const message = event.data;
+        console.log('WebSocket message received:', message);
+        if (message === 'CONTRACT_READY') {
+          changeStep(8);
+        } else if (message === 'ENROLLMENT_COMPLETE') {
+          changeStep(9);
+          ws.current?.close();
+        }
+      };
+
+      ws.current.onclose = () => {
+        console.log('WebSocket connection closed');
+        ws.current = null;
+      };
+
+      ws.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        toast({
+          variant: "destructive",
+          title: "Connection Error",
+          description: "Could not connect to the enrollment service. Please try again later.",
+        });
+        changeStep(6); // Go back to the choice page on error
+      };
+    }
+
+  }, [step, uuid, toast]);
+
+  // Cleanup WebSocket on component unmount
+  useEffect(() => {
+    return () => {
+      ws.current?.close();
+    };
+  }, []);
 
   const handleStepChange = (newStep: number) => {
     changeStep(newStep);
-  };
-
-  const handleSelfEnroll = () => {
-    changeStep(7);
   };
 
   const renderStep = () => {
@@ -210,9 +259,9 @@ export default function HomePageClient() {
       case 6:
         return <ThankYou onSelfEnroll={handleSelfEnroll} />;
       case 7:
-        return <SelfEnrollLoading onComplete={goToNextStep} />;
+        return <SelfEnrollLoading />;
       case 8:
-        return <SelfEnrollContract onNext={goToNextStep} phoneNumber={form.getValues('phone')} />;
+        return <SelfEnrollContract phoneNumber={form.getValues('phone')} />;
       case 9:
         return <SelfEnrollComplete />;
       default:

@@ -4,11 +4,10 @@
 import { useState, useEffect } from 'react';
 
 interface SelfEnrollContractProps {
-  onNext: () => void;
   phoneNumber?: string;
 }
 
-export default function SelfEnrollContract({ onNext, phoneNumber }: SelfEnrollContractProps) {
+export default function SelfEnrollContract({ phoneNumber }: SelfEnrollContractProps) {
   const [generatedPin, setGeneratedPin] = useState('');
 
   useEffect(() => {
@@ -16,16 +15,6 @@ export default function SelfEnrollContract({ onNext, phoneNumber }: SelfEnrollCo
     const newPin = Math.floor(1000 + Math.random() * 9000).toString();
     setGeneratedPin(newPin);
   }, []);
-
-  // Auto-advance to the next step after a delay
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onNext();
-    }, 10000); // 10 seconds delay
-
-    return () => clearTimeout(timer);
-  }, [onNext]);
-
 
   const last4Digits = phoneNumber ? phoneNumber.replace(/[^\d]/g, '').slice(-4) : '2523';
   const maskedPhoneNumber = `***-***-${last4Digits}`;
@@ -48,6 +37,9 @@ export default function SelfEnrollContract({ onNext, phoneNumber }: SelfEnrollCo
           <p className="text-4xl font-bold tracking-widest text-primary mt-1">{generatedPin || '----'}</p>
         </div>
       </div>
+       <p className="text-sm text-foreground/60 max-w-xs">
+        Waiting for confirmation... this page will advance automatically.
+      </p>
     </div>
   );
 }

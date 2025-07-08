@@ -1,21 +1,9 @@
+
 'use client';
 
-import { useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 
-interface SelfEnrollLoadingProps {
-  onComplete: () => void;
-}
-
-export default function SelfEnrollLoading({ onComplete }: SelfEnrollLoadingProps) {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 30000); // 30 seconds
-
-    return () => clearTimeout(timer);
-  }, [onComplete]);
-
+export default function SelfEnrollLoading() {
   return (
     <div className="w-full max-w-xl flex flex-col items-center text-center space-y-8 -mt-8">
       <Badge variant="secondary" className="px-6 py-2 text-base font-semibold rounded-full bg-black text-white hover:bg-black/90">
@@ -23,8 +11,8 @@ export default function SelfEnrollLoading({ onComplete }: SelfEnrollLoadingProps
       </Badge>
       <p className="text-base text-foreground/80 max-w-md">
         We've started the process of completing your application!
-        Keep this page open. In approximately 30 seconds, you will
-        recieve a text with a code. Please have your phone ready.
+        Keep this page open. You will be advanced to the next step automatically.
+        Please have your phone ready.
       </p>
       <div className="relative w-24 h-24">
         <svg

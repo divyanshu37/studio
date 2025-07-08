@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  env: {
+    NEXT_PUBLIC_BACKEND_URL: process.env.BACKEND_URL,
+    NEXT_PUBLIC_WEBSOCKET_URL: process.env.WEBSOCKET_URL,
+  },
 };
 
 export default nextConfig;
