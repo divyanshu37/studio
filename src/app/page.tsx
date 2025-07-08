@@ -116,6 +116,10 @@ export default function Home() {
     }
   };
 
+  const showIcon = step < 9;
+  const showHeading = step < 9 && step !== 6;
+  const showSubheading = step <= 6;
+
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
       <header className="absolute top-0 left-0 p-8 md:p-12">
@@ -147,29 +151,17 @@ export default function Home() {
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
-            {step < 9 && <Icon className="h-48 w-48 text-accent mb-8" />}
-            {step < 7 &&
-              <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
-                  State and Congress Approved Final Expense Benefits Emergency Funds
-              </h1>
-            }
+            <Icon className={cn("h-48 w-48 text-accent mb-8", !showIcon && "invisible")} />
             
-            {step < 6 ? (
-              <p className="text-base text-foreground/80 mb-8 max-w-xl">
-                Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
-              </p>
-            ) : step === 6 ? (
-              <p className="text-base text-foreground/80 mb-8 max-w-xl">
-                We have all of the information necessary. How would you
-                like to complete your application?
-              </p>
-            ) : null }
-
-            {step >= 7 && step < 9 &&
-                <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
-                    State and Congress Approved Final Expense Benefits Emergency Funds
-                </h1>
-            }
+            <h1 className={cn("font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl", !showHeading && "invisible")}>
+                State and Congress Approved Final Expense Benefits Emergency Funds
+            </h1>
+            
+            <p className={cn("text-base text-foreground/80 mb-8 max-w-xl", !showSubheading && "invisible")}>
+              {step === 6
+                ? "We have all of the information necessary. How would you like to complete your application?"
+                : "Amounts between $5,000 - $25,000 / Available to anyone ages 45-80"}
+            </p>
 
             <div className={cn("w-full flex justify-center", animationClass)}>
               {renderStep()}

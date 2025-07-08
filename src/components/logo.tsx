@@ -19,7 +19,7 @@ const Icon = (props: React.SVGProps<SVGSVGElement>) => (
 export function Logo({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <Icon className="h-14 w-14 text-accent" />
+      <Icon className="h-11 w-11 text-accent" />
       <p className="text-foreground/80 leading-[0.7]">
         Simple, Safe
         <br />
