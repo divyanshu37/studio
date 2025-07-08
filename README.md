@@ -9,6 +9,39 @@ For a better long-term workflow, it is highly recommended to create a new backen
 
 ---
 
+### `.env`
+
+```
+
+```
+
+---
+
+### `.vscode/settings.json`
+
+```json
+{
+    "IDX.aI.enableInlineCompletion": true,
+    "IDX.aI.enableCodebaseIndexing": true
+}
+```
+
+---
+
+### `README.md`
+
+```md
+
+# Next Starter Pro - Code Snapshot
+
+This file contains a complete snapshot of all the code for your project. Your team can use this to recreate the project locally and push it to a new Git repository of your choice.
+
+**This is a temporary measure to give you access to your code.**
+
+For a better long-term workflow, it is highly recommended to create a new backend in Firebase App Hosting and connect it directly to your own GitHub repository.
+
+---
+
 ### `apphosting.yaml`
 
 ```yaml
