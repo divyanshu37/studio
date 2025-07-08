@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +22,7 @@ import {
 } from '@/lib/schema';
 import { submitApplication } from '@/ai/flows/submit-application-flow';
 import { useToast } from '@/hooks/use-toast';
+import { useSocket } from '@/hooks/use-socket';
 
 import { Logo, Icon } from '@/components/logo';
 import InsuranceForm from '@/components/insurance-form';
@@ -53,8 +54,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const ws = useRef<WebSocket | null>(null);
-
+  
   const [isLayoutCentered, setIsLayoutCentered] = useState(false);
   const [isAnimatingToStep9, setIsAnimatingToStep9] = useState(false);
 
@@ -100,21 +100,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   const { formState: { errors } } = form;
 
-  useEffect(() => {
-    const stepParam = searchParams.get('step');
-    if (stepParam) {
-      const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
-        setStep(stepNumber);
-        if (stepNumber >= 9) {
-          setIsHeaderRendered(false);
-          setIsLayoutCentered(true);
-        }
-      }
-    }
-  }, [searchParams]);
-
-  const changeStep = (newStep: number) => {
+  const changeStep = useCallback((newStep: number) => {
     if (newStep === step) return;
 
     setIsAnimatingOut(true);
@@ -146,7 +132,17 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       }
 
     }, 300);
-  };
+  }, [step, isAnimatingToStep9]);
+
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      const stepNumber = parseInt(stepParam, 10);
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
+        changeStep(stepNumber);
+      }
+    }
+  }, [searchParams, changeStep]);
   
   const handleNext = async () => {
     const fields = stepFields[step - 1];
@@ -206,7 +202,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       description: "Please complete all required fields before submitting.",
     });
     
-    // Find the first field with an error and navigate to its step
     const firstErrorField = Object.keys(formErrors)[0] as keyof FormValues;
     const stepWithError = stepFields.findIndex(fields => fields.includes(firstErrorField));
     
@@ -214,65 +209,28 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       changeStep(stepWithError + 1);
     }
   };
-
-
-  useEffect(() => {
-    if (step === 7 && uuid && !ws.current) {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-      if (!backendUrl) {
-        console.error('BACKEND_URL environment variable is not set for WebSocket.');
-        toast({
-          variant: 'destructive',
-          title: 'Configuration Error',
-          description: 'The application is missing the backend URL.',
-        });
-        changeStep(6);
-        return;
-      }
-      
-      const websocketUrl = `${backendUrl.replace(/^http/, 'ws')}/${uuid}`;
-      console.log(`Connecting to WebSocket at ${websocketUrl}`);
-      ws.current = new WebSocket(websocketUrl);
-
-      ws.current.onopen = () => {
-        console.log('WebSocket connection established');
-      };
-
-      ws.current.onmessage = (event) => {
-        const message = event.data;
-        console.log('WebSocket message received:', message);
-        if (message === 'CONTRACT_READY') {
-          changeStep(8);
-        } else if (message === 'ENROLLMENT_COMPLETE') {
-          changeStep(9);
-          ws.current?.close();
-        }
-      };
-
-      ws.current.onclose = () => {
-        console.log('WebSocket connection closed');
-        ws.current = null;
-      };
-
-      ws.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        toast({
+  
+  const handleSocketUpdate = useCallback((data: any) => {
+    if (data.error) {
+       toast({
           variant: "destructive",
-          title: "Connection Error",
-          description: "Could not connect to the enrollment service. Please try again later.",
-        });
-        changeStep(6); // Go back to the choice page on error
-      };
+          title: data.error.title,
+          description: data.error.message,
+       });
+       changeStep(6);
+       return;
     }
+    
+    const status = data.status;
+    if (status === 'CONTRACT_READY') {
+      changeStep(8);
+    } else if (status === 'ENROLLMENT_COMPLETE') {
+      changeStep(9);
+    }
+  }, [changeStep, toast]);
 
-  }, [step, uuid, toast]);
-
-  // Cleanup WebSocket on component unmount
-  useEffect(() => {
-    return () => {
-      ws.current?.close();
-    };
-  }, []);
+  const subscribeId = step === 7 ? uuid : null;
+  useSocket(subscribeId, handleSocketUpdate);
 
   const handleStepChange = (newStep: number) => {
     changeStep(newStep);
