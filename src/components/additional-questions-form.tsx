@@ -20,10 +20,10 @@ export type AdditionalQuestionsFormValues = z.infer<typeof formSchema>;
 
 interface AdditionalQuestionsFormProps {
   onBack: () => void;
-  onSubmit: (data: AdditionalQuestionsFormValues) => void;
+  onNext: (data: AdditionalQuestionsFormValues) => void;
 }
 
-export default function AdditionalQuestionsForm({ onBack, onSubmit }: AdditionalQuestionsFormProps) {
+export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQuestionsFormProps) {
   const form = useForm<AdditionalQuestionsFormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onTouched',
@@ -38,7 +38,7 @@ export default function AdditionalQuestionsForm({ onBack, onSubmit }: Additional
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl space-y-8">
+      <form onSubmit={form.handleSubmit(onNext)} className="w-full max-w-2xl space-y-8">
         <div className="space-y-6">
           <FormField
             control={form.control}
@@ -209,7 +209,7 @@ export default function AdditionalQuestionsForm({ onBack, onSubmit }: Additional
                 </div>
             </div>
             <Button type="submit" className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest">
-                <span>SUBMIT</span>
+                <span>NEXT</span>
                 <ArrowRight className="h-5 w-5" />
             </Button>
         </div>

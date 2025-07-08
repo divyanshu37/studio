@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Logo, Icon } from '@/components/logo';
 import InsuranceForm, { type InsuranceFormValues } from '@/components/insurance-form';
 import AdditionalQuestionsForm, { type AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
+import BeneficiaryForm, { type BeneficiaryFormValues } from '@/components/beneficiary-form';
 import ThankYou from '@/components/thank-you';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,15 @@ export default function Home() {
       setAnimationClass('animate-fade-in-up');
     }, 300);
   };
+  
+  const handleNextStep2 = (data: AdditionalQuestionsFormValues) => {
+    setFormData(prev => ({ ...prev, ...data }));
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+      setStep(3);
+      setAnimationClass('animate-fade-in-up');
+    }, 300);
+  };
 
   const handleBack = () => {
     setAnimationClass('animate-fade-out-down');
@@ -29,12 +39,12 @@ export default function Home() {
     }, 300);
   };
   
-  const handleSubmit = (data: AdditionalQuestionsFormValues) => {
+  const handleSubmit = (data: BeneficiaryFormValues) => {
     const finalData = { ...formData, ...data };
     console.log('Final Submission:', finalData);
     setAnimationClass('animate-fade-out-down');
     setTimeout(() => {
-      setStep(3);
+      setStep(4);
       setAnimationClass('animate-fade-in-up');
     }, 300);
   };
@@ -44,8 +54,10 @@ export default function Home() {
       case 1:
         return <InsuranceForm onNext={handleNextStep1} />;
       case 2:
-        return <AdditionalQuestionsForm onBack={handleBack} onSubmit={handleSubmit} />;
+        return <AdditionalQuestionsForm onBack={handleBack} onNext={handleNextStep2} />;
       case 3:
+        return <BeneficiaryForm onBack={handleBack} onSubmit={handleSubmit} />;
+      case 4:
         return <ThankYou />;
       default:
         return <InsuranceForm onNext={handleNextStep1} />;
