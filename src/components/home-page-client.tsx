@@ -69,7 +69,7 @@ export default function HomePageClient() {
       healthQuestion3: '',
       tobaccoUse: "",
       existingPolicies: "",
-      effectiveDate: new Date(),
+      effectiveDate: "",
       beneficiaryCount: NaN,
       beneficiary1FirstName: "",
       beneficiary1LastName: "",
@@ -198,6 +198,7 @@ export default function HomePageClient() {
   const showNavigation = step >= 1 && step <= 5;
 
   const getErrorMessage = () => {
+    if (step < 1 || step > stepFields.length) return null;
     const fields = stepFields[step - 1];
     if (!fields) return null;
 

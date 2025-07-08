@@ -3,8 +3,7 @@
 
 import { useFormContext } from 'react-hook-form';
 import { z } from 'zod';
-import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
+import { parse, isValid } from 'date-fns';
 import {
   FormControl,
   FormField,
@@ -14,17 +13,28 @@ import {
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { cn, formatDateInput } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
 
 export const beneficiaryFormSchema = z.object({
   tobaccoUse: z.string().min(1, { message: 'This question is required.' }),
   existingPolicies: z.string().min(1, { message: 'This question is required.' }),
-  effectiveDate: z.date({
-    required_error: 'An effective date is required.',
-  }),
+  effectiveDate: z.string()
+    .min(10, { message: "An effective date is required." })
+    .refine((date) => {
+        const parsedDate = parse(date, 'MM/dd/yyyy', new Date());
+        if (!isValid(parsedDate)) return false;
+
+        const [month, day, year] = date.split('/').map(Number);
+        if (parsedDate.getFullYear() !== year || parsedDate.getMonth() !== month - 1 || parsedDate.getDate() !== day) {
+            return false;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return parsedDate >= today;
+    }, {
+        message: "Effective date must be today or a future date."
+    }),
   beneficiaryCount: z.coerce.number().min(1, { message: 'Please enter a number.' }).int(),
   beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
   beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
@@ -101,38 +111,14 @@ export default function BeneficiaryForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col space-y-2">
                 <FormLabel className="text-left text-base font-semibold text-foreground">Desired effective date of this policy</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full h-auto py-4 pl-3 text-left font-normal bg-card shadow-xl text-base",
-                          !field.value && "text-muted-foreground",
-                          errors.effectiveDate && "border-destructive animate-shake"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span className="text-neutral-400">Select the desired effective date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date(new Date().setDate(new Date().getDate() - 1))
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                 <FormControl>
+                  <Input 
+                    placeholder="Effective Date (MM/DD/YYYY)" 
+                    {...field} 
+                    onChange={(e) => handleDateInputChange(e, field)} 
+                    className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
