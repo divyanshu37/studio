@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Questrial', 'sans-serif'],
-        headline: ['Questrial', 'sans-serif'],
+        body: ['StyreneAWeb', 'sans-serif'],
+        headline: ['StyreneAWeb', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
