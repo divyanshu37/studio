@@ -173,7 +173,7 @@ export default function HomePageClient() {
             )}>
               <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
               <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
-                  Final Expense Benefits
+                  State and Congress Approved Final Expense Benefits Emergency Funds
               </h1>
               <p className={cn(
                 "text-base text-foreground/80 mb-8 max-w-[55rem]",
