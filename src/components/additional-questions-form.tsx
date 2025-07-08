@@ -30,6 +30,10 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
     mode: 'onTouched',
     defaultValues: {
       differentOwner: 'no',
+      gender: '',
+      healthQuestion1: '',
+      healthQuestion2: '',
+      healthQuestion3: '',
     },
   });
 

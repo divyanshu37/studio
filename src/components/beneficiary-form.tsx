@@ -44,7 +44,13 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
     resolver: zodResolver(formSchema),
     mode: 'onTouched',
     defaultValues: {
+      tobaccoUse: "",
+      existingPolicies: "",
       effectiveDate: new Date(),
+      beneficiaryCount: NaN,
+      beneficiary1FirstName: "",
+      beneficiary1LastName: "",
+      beneficiary1Dob: "",
     }
   });
 
