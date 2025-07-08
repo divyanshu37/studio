@@ -198,16 +198,19 @@ export default function HomePageClient() {
   const showNavigation = step >= 1 && step <= 5;
 
   const getErrorMessage = () => {
-    if (step === 1) {
-      if (errors.dob?.message) return errors.dob.message;
-      if (errors.ssn?.message) return errors.ssn.message;
+    const fields = stepFields[step - 1];
+    if (!fields) return null;
+
+    for (const field of fields) {
+      if (errors[field]) {
+        return errors[field]?.message as string;
+      }
     }
-    const currentStepErrors = stepFields[step - 1].some(field => errors[field]);
-    if (currentStepErrors) {
-      return "Red fields must be entered correctly.";
-    }
+    
     return null;
   }
+  
+  const errorMessage = getErrorMessage();
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
@@ -278,9 +281,9 @@ export default function HomePageClient() {
                       isSubmit={step === 5}
                       actionLabel={step === 5 ? "SUBMIT" : "NEXT"}
                     >
-                      {getErrorMessage() && (
-                        <p className={cn("text-[10px] font-medium leading-tight", (errors.dob || errors.ssn) ? "text-destructive" : "text-foreground")}>
-                          {getErrorMessage()}
+                      {errorMessage && (
+                        <p className="text-[10px] font-medium leading-tight text-destructive">
+                          {errorMessage}
                         </p>
                       )}
                     </FormNavigation>
