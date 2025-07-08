@@ -4,15 +4,13 @@ import { Separator } from "@/components/ui/separator";
 
 interface ThankYouProps {
   onSelfEnroll: () => void;
-  onWithAgent: () => void;
 }
 
-export default function ThankYou({ onSelfEnroll, onWithAgent }: ThankYouProps) {
+export default function ThankYou({ onSelfEnroll }: ThankYouProps) {
   return (
     <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
       <div 
-        onClick={onWithAgent}
-        className="p-8 bg-card text-card-foreground rounded-lg shadow-xl border flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer">
+        className="p-8 bg-card text-card-foreground rounded-lg shadow-xl border flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-not-allowed opacity-60">
         <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">With An Agent</h2>
         <Separator className="bg-border my-2 w-full" />
         <div className="my-4">
