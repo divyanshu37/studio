@@ -124,7 +124,7 @@ export default function HomePageClient() {
       case 7:
         return <SelfEnrollLoading onComplete={goToNextStep} />;
       case 8:
-        return <SelfEnrollContract onNext={goToNextStep} />;
+        return <SelfEnrollContract onNext={goToNextStep} phoneNumber={formData.phone} />;
       case 9:
         return <SelfEnrollComplete />;
       default:
