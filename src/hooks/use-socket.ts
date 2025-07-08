@@ -35,7 +35,6 @@ export const useSocket = (subscribeId: string | null, callback: (data: any) => v
 
     const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(backendUrl, {
       path: '/socket',
-      transports: ['websocket'],
     });
 
     socketRef.current = socket;
