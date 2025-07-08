@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
       </head>
-      <body className="font-body antialiased font-medium">
+      <body className="font-body antialiased font-medium" suppressHydrationWarning>
         {children}
         <Toaster />
       </body>
