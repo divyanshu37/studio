@@ -293,7 +293,7 @@ export default function InsuranceForm() {
                     ))}
                 </div>
             </div>
-            <Button type="submit" size="lg" className="justify-between w-48 px-8 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest">
+            <Button type="submit" className="justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest">
                 <span>NEXT</span>
                 <ArrowRight className="h-5 w-5" />
             </Button>
