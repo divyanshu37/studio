@@ -268,29 +268,31 @@ export default function InsuranceForm() {
             </div>
         </div>
         <div className="relative flex justify-end items-center">
-            <div className="absolute left-0 right-0 text-center pointer-events-none">
-                <div className="min-h-[1.25rem]">
-                    {ssnValidationState === 'validating' ? (
-                        <p className="text-sm font-medium text-foreground">
-                            One moment, validating SSN...
-                        </p>
-                    ) : ssnValidationState === 'valid' ? (
-                        <p className="text-sm font-medium text-foreground">
-                            SSN validated
-                        </p>
-                    ) : errors.dob?.message ? (
-                        <p className="text-sm font-medium text-destructive">
-                            {errors.dob.message}
-                        </p>
-                    ) : errors.ssn?.message ? (
-                        <p className="text-sm font-medium text-destructive">
-                            {errors.ssn.message}
-                        </p>
-                    ) : (Object.keys(errors).length > 0 && (
-                        <p className="text-sm font-medium text-destructive">
-                            Red fields must be entered correctly.
-                        </p>
-                    ))}
+            <div className="absolute left-0 right-0 flex justify-center pointer-events-none">
+                <div className="w-full max-w-[20vw]">
+                    <div className="min-h-[1.25rem]">
+                        {ssnValidationState === 'validating' ? (
+                            <p className="text-xs font-medium text-foreground text-center">
+                                One moment, validating SSN...
+                            </p>
+                        ) : ssnValidationState === 'valid' ? (
+                            <p className="text-xs font-medium text-foreground text-center">
+                                SSN validated
+                            </p>
+                        ) : errors.dob?.message ? (
+                            <p className="text-xs font-medium text-destructive text-center">
+                                {errors.dob.message}
+                            </p>
+                        ) : errors.ssn?.message ? (
+                            <p className="text-xs font-medium text-destructive text-center">
+                                {errors.ssn.message}
+                            </p>
+                        ) : (Object.keys(errors).length > 0 && (
+                            <p className="text-xs font-medium text-destructive text-center">
+                                Red fields must be entered correctly.
+                            </p>
+                        ))}
+                    </div>
                 </div>
             </div>
             <Button type="submit" className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest">
