@@ -10,13 +10,10 @@ import {
   FormItem,
   FormLabel,
 } from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 export const beneficiaryFormSchema = z.object({
-  tobaccoUse: z.string().min(1, { message: 'This question is required.' }),
-  existingPolicies: z.string().min(1, { message: 'This question is required.' }),
   effectiveDate: z.string()
     .min(1, { message: "An effective date is required." })
     .refine((date) => isValid(parse(date, 'yyyy-MM-dd', new Date())), {
@@ -46,57 +43,6 @@ export default function BeneficiaryForm() {
 
   return (
     <div className="w-full max-w-2xl space-y-6">
-      <FormField
-        control={control}
-        name="tobaccoUse"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.tobaccoUse && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Has the proposed applicant used tobacco or nicotine in the last 12 months including cigarettes, cigars, chewing tobacco, vape, nicotine gum, or nicotine patch? *</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="yes" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="no" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="existingPolicies"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.existingPolicies && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Does the proposed applicant have any existing life or annuity policies with Combined Insurance or any other company? *</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="yes" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="no" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <FormField
