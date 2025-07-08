@@ -3,23 +3,46 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
 import { Logo, Icon } from '@/components/logo';
-import InsuranceForm, { type InsuranceFormValues } from '@/components/insurance-form';
-import AdditionalQuestionsForm, { type AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
-import BeneficiaryForm, { type BeneficiaryFormValues } from '@/components/beneficiary-form';
-import BeneficiaryAddressForm, { type BeneficiaryAddressFormValues } from '@/components/beneficiary-address-form';
-import PaymentForm, { type PaymentFormValues } from '@/components/payment-form';
+import InsuranceForm, { insuranceFormSchema } from '@/components/insurance-form';
+import AdditionalQuestionsForm, { additionalQuestionsFormSchema } from '@/components/additional-questions-form';
+import BeneficiaryForm, { beneficiaryFormSchema } from '@/components/beneficiary-form';
+import BeneficiaryAddressForm, { beneficiaryAddressFormSchema } from '@/components/beneficiary-address-form';
+import PaymentForm, { paymentFormSchema } from '@/components/payment-form';
 import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
+import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
+import { InsuranceFormValues } from '@/components/insurance-form';
+import { AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
+import { BeneficiaryFormValues } from '@/components/beneficiary-form';
+import { BeneficiaryAddressFormValues } from '@/components/beneficiary-address-form';
+import { PaymentFormValues } from '@/components/payment-form';
 
-export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues & BeneficiaryAddressFormValues & PaymentFormValues>;
+const fullFormSchema = insuranceFormSchema
+  .merge(additionalQuestionsFormSchema)
+  .merge(beneficiaryFormSchema)
+  .merge(beneficiaryAddressFormSchema)
+  .merge(paymentFormSchema);
+
+export type FormValues = z.infer<typeof fullFormSchema>;
+
+const stepFields: (keyof FormValues)[][] = [
+  Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
+  Object.keys(additionalQuestionsFormSchema.shape) as (keyof AdditionalQuestionsFormValues)[],
+  Object.keys(beneficiaryFormSchema.shape) as (keyof BeneficiaryFormValues)[],
+  Object.keys(beneficiaryAddressFormSchema.shape) as (keyof BeneficiaryAddressFormValues)[],
+  Object.keys(paymentFormSchema.shape) as (keyof PaymentFormValues)[],
+];
 
 export default function HomePageClient() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<FormValues>({});
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
   const [headerAnimationClass, setHeaderAnimationClass] = useState('animate-fade-in-up');
   const [isHeaderRendered, setIsHeaderRendered] = useState(true);
@@ -28,6 +51,45 @@ export default function HomePageClient() {
 
   const [isLayoutCentered, setIsLayoutCentered] = useState(false);
   const [isAnimatingToStep9, setIsAnimatingToStep9] = useState(false);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(fullFormSchema),
+    mode: 'onTouched',
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      phone: '',
+      email: '',
+      dob: '',
+      ssn: '',
+      differentOwner: 'no',
+      gender: '',
+      healthQuestion1: '',
+      healthQuestion2: '',
+      healthQuestion3: '',
+      tobaccoUse: "",
+      existingPolicies: "",
+      effectiveDate: new Date(),
+      beneficiaryCount: NaN,
+      beneficiary1FirstName: "",
+      beneficiary1LastName: "",
+      beneficiary1Dob: "",
+      beneficiary1Address: "",
+      beneficiary1Apt: "",
+      beneficiary1City: "",
+      beneficiary1State: "",
+      beneficiary1Zip: "",
+      beneficiary1Relationship: "",
+      beneficiary1Phone: "",
+      contingentBeneficiaryCount: NaN,
+      coverage: "",
+      accountHolderName: "",
+      accountNumber: "",
+      routingNumber: "",
+    },
+  });
+
+  const { formState: { errors } } = form;
 
   useEffect(() => {
     const stepParam = searchParams.get('step');
@@ -49,14 +111,12 @@ export default function HomePageClient() {
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
     
-    // Only animate header out if moving to a step where it's not shown.
     if (newStep >= 9 && step < 9) {
       setHeaderAnimationClass('animate-fade-out-down');
       setIsAnimatingToStep9(true);
     }
 
     setTimeout(() => {
-      // If we are coming back from a no-header step to a header step
       if (newStep < 9 && step >= 9) {
         setIsHeaderRendered(true);
         setHeaderAnimationClass('animate-fade-in-up');
@@ -67,7 +127,6 @@ export default function HomePageClient() {
       setIsAnimatingOut(false);
       setAnimationClass('animate-fade-in-up');
       
-      // Post-animation layout changes
       if (isAnimatingToStep9) {
         setIsHeaderRendered(false);
         setIsLayoutCentered(true);
@@ -79,25 +138,28 @@ export default function HomePageClient() {
 
     }, 300);
   };
-
-  const handleNextStep = (data: Partial<FormValues>) => {
-    setFormData(prev => ({ ...prev, ...data }));
+  
+  const handleNext = async () => {
+    const fields = stepFields[step - 1];
+    const output = await form.trigger(fields, { shouldFocus: true });
+    
+    if (!output) return;
+    
     changeStep(step + 1);
   };
-  
-  const goToNextStep = () => {
-    changeStep(step + 1);
-  }
 
   const handleBack = () => {
     changeStep(step - 1);
   };
   
-  const handleSubmit = (data: PaymentFormValues) => {
-    const finalData: FormValues = { ...formData, ...data };
-    console.log('Final Submission:', finalData);
-    handleNextStep(data);
+  const processForm = (data: FormValues) => {
+    console.log('Final Submission:', data);
+    changeStep(step + 1); // Move to Thank You page
   };
+
+  const goToNextStep = () => {
+    changeStep(step + 1);
+  }
 
   const handleStepChange = (newStep: number) => {
     changeStep(newStep);
@@ -110,29 +172,42 @@ export default function HomePageClient() {
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <InsuranceForm onNext={handleNextStep} />;
+        return <InsuranceForm />;
       case 2:
-        return <AdditionalQuestionsForm onBack={handleBack} onNext={handleNextStep} />;
+        return <AdditionalQuestionsForm />;
       case 3:
-        return <BeneficiaryForm onBack={handleBack} onNext={handleNextStep} />;
+        return <BeneficiaryForm />;
       case 4:
-        return <BeneficiaryAddressForm onBack={handleBack} onNext={handleNextStep} />;
+        return <BeneficiaryAddressForm />;
       case 5:
-        return <PaymentForm onBack={handleBack} onSubmit={handleSubmit} />;
+        return <PaymentForm />;
       case 6:
         return <ThankYou onSelfEnroll={handleSelfEnroll} />;
       case 7:
         return <SelfEnrollLoading onComplete={goToNextStep} />;
       case 8:
-        return <SelfEnrollContract onNext={goToNextStep} phoneNumber={formData.phone} />;
+        return <SelfEnrollContract onNext={goToNextStep} phoneNumber={form.getValues('phone')} />;
       case 9:
         return <SelfEnrollComplete />;
       default:
-        return <InsuranceForm onNext={handleNextStep} />;
+        return <InsuranceForm />;
     }
   };
 
   const showSubheading = step <= 6;
+  const showNavigation = step >= 1 && step <= 5;
+
+  const getErrorMessage = () => {
+    if (step === 1) {
+      if (errors.dob?.message) return errors.dob.message;
+      if (errors.ssn?.message) return errors.ssn.message;
+    }
+    const currentStepErrors = stepFields[step - 1].some(field => errors[field]);
+    if (currentStepErrors) {
+      return "Red fields must be entered correctly.";
+    }
+    return null;
+  }
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
@@ -188,9 +263,30 @@ export default function HomePageClient() {
             <div className={cn(
               "w-full flex justify-center",
               isLayoutCentered && "flex-1 items-center",
-              animationClass
             )}>
-              {renderStep()}
+              <FormProvider {...form}>
+                <form onSubmit={form.handleSubmit(processForm)} className={cn("w-full", animationClass)}>
+                  <div className={cn("w-full flex justify-center")}>
+                    {renderStep()}
+                  </div>
+
+                  {showNavigation && (
+                    <FormNavigation
+                      onBack={handleBack}
+                      onNext={handleNext}
+                      backButton={step > 1}
+                      isSubmit={step === 5}
+                      actionLabel={step === 5 ? "SUBMIT" : "NEXT"}
+                    >
+                      {getErrorMessage() && (
+                        <p className={cn("text-[10px] font-medium leading-tight", (errors.dob || errors.ssn) ? "text-destructive" : "text-foreground")}>
+                          {getErrorMessage()}
+                        </p>
+                      )}
+                    </FormNavigation>
+                  )}
+                </form>
+              </FormProvider>
             </div>
         </div>
       </main>

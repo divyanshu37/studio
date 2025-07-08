@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,8 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface FormNavigationProps {
   onBack?: () => void;
+  onNext?: () => void;
+  isSubmit?: boolean;
   backButton?: boolean;
   actionLabel: string;
   children?: React.ReactNode;
@@ -12,12 +15,14 @@ interface FormNavigationProps {
 
 export default function FormNavigation({
   onBack,
+  onNext,
+  isSubmit = false,
   backButton = false,
   actionLabel,
   children,
 }: FormNavigationProps) {
   return (
-    <div className="relative flex justify-between items-center mt-4">
+    <div className="relative flex justify-between items-center mt-8">
       {backButton ? (
         <Button
           type="button"
@@ -41,7 +46,8 @@ export default function FormNavigation({
       </div>
 
       <Button
-        type="submit"
+        type={isSubmit ? 'submit' : 'button'}
+        onClick={!isSubmit ? onNext : undefined}
         className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
       >
         <span>{actionLabel}</span>
