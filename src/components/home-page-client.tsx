@@ -69,6 +69,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       dob: '',
       ssn: '',
       gender: '',
+      differentOwner: '',
       healthQuestion1: '',
       healthQuestion2: '',
       healthQuestion3: '',
@@ -217,7 +218,19 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   useEffect(() => {
     if (step === 7 && uuid && !ws.current) {
-      const websocketUrl = `${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/${uuid}`;
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      if (!backendUrl) {
+        console.error('BACKEND_URL environment variable is not set for WebSocket.');
+        toast({
+          variant: 'destructive',
+          title: 'Configuration Error',
+          description: 'The application is missing the backend URL.',
+        });
+        changeStep(6);
+        return;
+      }
+      
+      const websocketUrl = `${backendUrl.replace(/^http/, 'ws')}/${uuid}`;
       console.log(`Connecting to WebSocket at ${websocketUrl}`);
       ws.current = new WebSocket(websocketUrl);
 
