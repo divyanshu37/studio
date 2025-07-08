@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   differentOwner: z.string().min(1, { message: "Please select an option." }),
@@ -44,7 +45,7 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
             control={form.control}
             name="differentOwner"
             render={({ field }) => (
-              <FormItem className="space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left">
+              <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.differentOwner && "border-destructive animate-shake")}>
                 <FormLabel className="text-base font-semibold text-foreground">Is the policy owner different than the insured?</FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -73,7 +74,7 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
             control={form.control}
             name="gender"
             render={({ field }) => (
-              <FormItem className="space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left">
+              <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.gender && "border-destructive animate-shake")}>
                 <FormLabel className="text-base font-semibold text-foreground">Your gender?</FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -108,7 +109,7 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
             control={form.control}
             name="healthQuestion1"
             render={({ field }) => (
-              <FormItem className="space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left">
+              <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.healthQuestion1 && "border-destructive animate-shake")}>
                 <FormLabel className="text-base font-semibold text-foreground">Have you ever been diagnosed, treated, tested positive for, or been given any medical advice by a member of the medical profession for AIDS or HIV, Bipolar Disorder, Schizophrenia, Alzheimer's, Dementia, or other progressive neurological disorder? *</FormLabel>
                  <FormControl>
                   <RadioGroup
@@ -137,7 +138,7 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
             control={form.control}
             name="healthQuestion2"
             render={({ field }) => (
-              <FormItem className="space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left">
+              <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.healthQuestion2 && "border-destructive animate-shake")}>
                 <FormLabel className="text-base font-semibold text-foreground">Have you ever been diagnosed, treated, tested positive for, or been given any medical advice by a member of the medical profession for any condition that requires the use of oxygen or dialysis? *</FormLabel>
                  <FormControl>
                   <RadioGroup
@@ -166,7 +167,7 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
             control={form.control}
             name="healthQuestion3"
             render={({ field }) => (
-              <FormItem className="space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left">
+              <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.healthQuestion3 && "border-destructive animate-shake")}>
                 <FormLabel className="text-base font-semibold text-foreground">Within the last 5 years, have you been diagnosed with, hospitalized, treated by a licensed member of the medical profession for Cancer (except basal/squamous cell of the skin), Stroke, Heart Attack, Diabetes requiring insulin, Chronic Obstructive Pulmonary Disease (COPD), Chronic Hepatitis, Cirrhosis of the Liver, Alcohol or Drug Abuse, Pulmonary Arterial Hypertension or Hereditary Angioedema except those related to the Human Immunodeficiency Virus (HIV) or have you had any diagnostic testing that has not been completed for any of the conditions listed above? *</FormLabel>
                  <FormControl>
                   <RadioGroup

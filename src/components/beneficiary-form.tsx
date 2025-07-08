@@ -71,7 +71,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
             control={form.control}
             name="tobaccoUse"
             render={({ field }) => (
-              <FormItem className="space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left">
+              <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.tobaccoUse && "border-destructive animate-shake")}>
                 <FormLabel className="text-base font-semibold text-foreground">Has the proposed applicant used tobacco or nicotine in the last 12 months including cigarettes, cigars, chewing tobacco, vape, nicotine gum, or nicotine patch? *</FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -96,7 +96,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
             control={form.control}
             name="existingPolicies"
             render={({ field }) => (
-              <FormItem className="space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left">
+              <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.existingPolicies && "border-destructive animate-shake")}>
                 <FormLabel className="text-base font-semibold text-foreground">Does the proposed applicant have any existing life or annuity policies with Combined Insurance or any other company? *</FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -134,7 +134,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
                             className={cn(
                               "w-full h-auto py-4 pl-3 text-left font-normal bg-card shadow-xl text-base",
                               !field.value && "text-muted-foreground",
-                              errors.effectiveDate && "border-destructive"
+                              errors.effectiveDate && "border-destructive animate-shake"
                             )}
                           >
                             {field.value ? (
@@ -168,7 +168,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                        <Input type="number" {...field} placeholder="How many primary beneficiaries?" className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiaryCount && "border-destructive")} />
+                        <Input type="number" {...field} placeholder="How many primary beneficiaries?" className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryCount && "border-destructive focus-visible:border-destructive animate-shake")} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -183,7 +183,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Beneficiary First Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiary1FirstName && "border-destructive")} />
+                      <Input placeholder="Beneficiary First Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1FirstName && "border-destructive focus-visible:border-destructive animate-shake")} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -194,7 +194,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Beneficiary Last Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiary1LastName && "border-destructive")} />
+                      <Input placeholder="Beneficiary Last Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1LastName && "border-destructive focus-visible:border-destructive animate-shake")} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -206,7 +206,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Date of Birth (MM/DD/YYYY)" {...field} onChange={(e) => handleDateChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiary1Dob && "border-destructive")} />
+                    <Input placeholder="Date of Birth (MM/DD/YYYY)" {...field} onChange={(e) => handleDateChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Dob && "border-destructive focus-visible:border-destructive animate-shake")} />
                   </FormControl>
                 </FormItem>
               )}
