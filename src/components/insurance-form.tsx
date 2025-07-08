@@ -31,7 +31,29 @@ const formSchema = z.object({
     }, {
         message: "You must be between 45 and 80 years old to be eligible."
     }),
-  ssn: z.string().min(11, { message: "Please enter a complete social security number." }),
+  ssn: z.string()
+    .min(11, { message: "Please enter a complete social security number." })
+    .refine((ssn) => {
+        const ssnParts = ssn.replace(/-/g, '');
+        if (ssnParts.length !== 9) return true; // Let min validation handle this
+
+        const area = ssnParts.substring(0, 3);
+        const group = ssnParts.substring(3, 5);
+        const serial = ssnParts.substring(5, 9);
+        
+        if (area === "000" || area === "666" || parseInt(area, 10) >= 900) {
+            return false;
+        }
+        if (group === "00") {
+            return false;
+        }
+        if (serial === "0000") {
+            return false;
+        }
+        return true;
+    }, {
+        message: "Please enter a valid social security number."
+    }),
 });
 
 type InsuranceFormValues = z.infer<typeof formSchema>;
@@ -208,6 +230,10 @@ export default function InsuranceForm() {
                     {errors.dob?.message ? (
                         <p className="text-sm font-medium text-destructive">
                             {errors.dob.message}
+                        </p>
+                    ) : errors.ssn?.message ? (
+                        <p className="text-sm font-medium text-destructive">
+                            {errors.ssn.message}
                         </p>
                     ) : (Object.keys(errors).length > 0 && (
                         <p className="text-sm font-medium text-destructive">
