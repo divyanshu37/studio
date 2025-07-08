@@ -1,7 +1,7 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 
 interface SelfEnrollContractProps {
   onNext: () => void;
@@ -16,6 +16,16 @@ export default function SelfEnrollContract({ onNext, phoneNumber }: SelfEnrollCo
     const newPin = Math.floor(1000 + Math.random() * 9000).toString();
     setGeneratedPin(newPin);
   }, []);
+
+  // Auto-advance to the next step after a delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onNext();
+    }, 10000); // 10 seconds delay
+
+    return () => clearTimeout(timer);
+  }, [onNext]);
+
 
   const last4Digits = phoneNumber ? phoneNumber.replace(/[^\d]/g, '').slice(-4) : '2523';
   const maskedPhoneNumber = `***-***-${last4Digits}`;
@@ -37,12 +47,6 @@ export default function SelfEnrollContract({ onNext, phoneNumber }: SelfEnrollCo
           <p className="text-sm text-primary">Access PIN:</p>
           <p className="text-4xl font-bold tracking-widest text-primary mt-1">{generatedPin || '----'}</p>
         </div>
-      </div>
-      
-      <div className="w-full pt-4">
-        <Button onClick={onNext} className="w-full">
-          Continue
-        </Button>
       </div>
     </div>
   );
