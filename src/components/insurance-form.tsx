@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required." }),
@@ -22,6 +23,7 @@ type InsuranceFormValues = z.infer<typeof formSchema>;
 export default function InsuranceForm() {
   const form = useForm<InsuranceFormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onTouched',
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -31,6 +33,8 @@ export default function InsuranceForm() {
       ssn: '',
     },
   });
+
+  const { formState: { errors } } = form;
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
     const rawValue = e.target.value.replace(/[^\d]/g, '');
@@ -88,7 +92,11 @@ export default function InsuranceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="First Name" {...field} className="h-auto py-4 bg-card" />
+                      <Input 
+                        placeholder="First Name" 
+                        {...field} 
+                        className={cn("h-auto py-4 bg-card", errors.firstName && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -100,7 +108,11 @@ export default function InsuranceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Last Name" {...field} className="h-auto py-4 bg-card" />
+                      <Input 
+                        placeholder="Last Name" 
+                        {...field} 
+                        className={cn("h-auto py-4 bg-card", errors.lastName && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,7 +126,12 @@ export default function InsuranceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Valid Phone Number" {...field} onChange={(e) => handlePhoneChange(e, field)} className="h-auto py-4 bg-card" />
+                      <Input 
+                        placeholder="Valid Phone Number" 
+                        {...field} 
+                        onChange={(e) => handlePhoneChange(e, field)} 
+                        className={cn("h-auto py-4 bg-card", errors.phone && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -126,7 +143,12 @@ export default function InsuranceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Email" type="email" {...field} className="h-auto py-4 bg-card" />
+                      <Input 
+                        placeholder="Email" 
+                        type="email" 
+                        {...field} 
+                        className={cn("h-auto py-4 bg-card", errors.email && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -140,7 +162,12 @@ export default function InsuranceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Date of Birth" {...field} onChange={(e) => handleDateChange(e, field)} className="h-auto py-4 bg-card" />
+                      <Input 
+                        placeholder="Date of Birth" 
+                        {...field} 
+                        onChange={(e) => handleDateChange(e, field)} 
+                        className={cn("h-auto py-4 bg-card", errors.dob && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -152,7 +179,12 @@ export default function InsuranceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Social Security Number" {...field} onChange={(e) => handleSSNChange(e, field)} className="h-auto py-4 bg-card" />
+                      <Input 
+                        placeholder="Social Security Number" 
+                        {...field} 
+                        onChange={(e) => handleSSNChange(e, field)} 
+                        className={cn("h-auto py-4 bg-card", errors.ssn && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -160,8 +192,15 @@ export default function InsuranceForm() {
               />
             </div>
         </div>
-        <div className="flex justify-end">
-            <Button type="submit" size="lg" className="px-8 py-6 text-base">
+        <div className="flex justify-between items-center">
+            <div className="min-h-[1.25rem]">
+                {Object.keys(errors).length > 0 && (
+                    <p className="text-sm font-medium text-destructive">
+                        Red fields must be entered correctly.
+                    </p>
+                )}
+            </div>
+            <Button type="submit" size="lg" className="px-8 py-6 text-base font-body">
                 NEXT
                 <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
