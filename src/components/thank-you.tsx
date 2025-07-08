@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function ThankYou() {
   return (
-    <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+    <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
       <div className="p-8 bg-card text-card-foreground rounded-lg shadow-xl border flex flex-col items-center">
         <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">With An Agent</h2>
         <Separator className="bg-border my-2 w-full" />
@@ -21,7 +21,7 @@ export default function ThankYou() {
         <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">Self-Enroll</h2>
         <Separator className="bg-primary-foreground/50 my-2 w-full" />
         <div className="my-4">
-          <span className="bg-white text-primary text-xs font-bold px-4 py-2 rounded-full">
+          <span className="bg-white text-primary text-xs font-bold px-4 py-2 rounded-full animate-grow-wiggle">
             2 MINUTES
           </span>
         </div>

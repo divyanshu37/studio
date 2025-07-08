@@ -101,6 +101,14 @@ export default {
         'fade-out-down': {
           'from': { opacity: '1', transform: 'translateY(0)' },
           'to': { opacity: '0', transform: 'translateY(1rem)' },
+        },
+        'grow-wiggle': {
+          '0%, 100%': { transform: 'scale(1) rotate(0deg)' },
+          '5%': { transform: 'scale(1.15) rotate(-3deg)' },
+          '10%': { transform: 'scale(1.15) rotate(3deg)' },
+          '15%': { transform: 'scale(1.15) rotate(-3deg)' },
+          '20%': { transform: 'scale(1.15) rotate(3deg)' },
+          '25%': { transform: 'scale(1) rotate(0deg)' },
         }
       },
       animation: {
@@ -109,6 +117,7 @@ export default {
         'shake': 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
         'fade-in-up': 'fade-in-up 0.3s ease-out',
         'fade-out-down': 'fade-out-down 0.3s ease-out',
+        'grow-wiggle': 'grow-wiggle 4s ease-in-out infinite',
       },
     },
   },
