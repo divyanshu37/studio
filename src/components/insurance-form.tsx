@@ -95,7 +95,7 @@ export default function InsuranceForm() {
                       <Input 
                         placeholder="First Name" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card", errors.firstName && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-sm", errors.firstName && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -110,7 +110,7 @@ export default function InsuranceForm() {
                       <Input 
                         placeholder="Last Name" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card", errors.lastName && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-sm", errors.lastName && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -128,7 +128,7 @@ export default function InsuranceForm() {
                         placeholder="Valid Phone Number" 
                         {...field} 
                         onChange={(e) => handlePhoneChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card", errors.phone && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-sm", errors.phone && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -144,7 +144,7 @@ export default function InsuranceForm() {
                         placeholder="Email" 
                         type="email" 
                         {...field} 
-                        className={cn("h-auto py-4 bg-card", errors.email && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-sm", errors.email && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -162,7 +162,7 @@ export default function InsuranceForm() {
                         placeholder="Date of Birth" 
                         {...field} 
                         onChange={(e) => handleDateChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card", errors.dob && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-sm", errors.dob && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
@@ -178,7 +178,7 @@ export default function InsuranceForm() {
                         placeholder="Social Security Number" 
                         {...field} 
                         onChange={(e) => handleSSNChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card", errors.ssn && "border-destructive focus-visible:ring-destructive animate-shake")} 
+                        className={cn("h-auto py-4 bg-card shadow-sm", errors.ssn && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
                   </FormItem>
