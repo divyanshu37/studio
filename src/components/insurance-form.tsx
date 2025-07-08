@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { differenceInYears, parse, isValid } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { FormField, FormItem, FormControl } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, formatPhoneNumber, formatSsn } from '@/lib/utils';
 
 const isValidSsn = (ssn: string) => {
@@ -51,6 +52,7 @@ export const insuranceFormSchema = z.object({
     .refine(isValidSsn, {
         message: "Please enter a valid social security number."
     }),
+  gender: z.string().min(1, { message: "Please select a gender." }),
 });
 
 export type InsuranceFormValues = z.infer<typeof insuranceFormSchema>;
@@ -152,26 +154,46 @@ export default function InsuranceForm() {
           />
           <FormField
             control={control}
-            name="ssn"
+            name="gender"
             render={({ field }) => (
               <FormItem>
-                <FormControl>
-                  <Input 
-                    placeholder="Social Security Number" 
-                    {...field} 
-                    onChange={(e) => handleSSNChange(e, field)} 
-                    className={cn(
-                      "h-auto py-4 bg-card shadow-xl focus-visible:ring-0 focus-visible:ring-offset-0",
-                      errors.ssn
-                          ? "border-destructive focus-visible:border-destructive animate-shake"
-                          : "focus-visible:border-primary"
-                  )}
-                  />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.gender && "border-destructive focus-visible:border-destructive animate-shake")}>
+                      <SelectValue placeholder="Gender" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="not-specified">Not specified</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />
         </div>
+        <FormField
+          control={control}
+          name="ssn"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input 
+                  placeholder="Social Security Number" 
+                  {...field} 
+                  onChange={(e) => handleSSNChange(e, field)} 
+                  className={cn(
+                    "h-auto py-4 bg-card shadow-xl focus-visible:ring-0 focus-visible:ring-offset-0",
+                    errors.ssn
+                        ? "border-destructive focus-visible:border-destructive animate-shake"
+                        : "focus-visible:border-primary"
+                )}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
     </div>
   );
 }

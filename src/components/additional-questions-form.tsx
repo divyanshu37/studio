@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 
 export const additionalQuestionsFormSchema = z.object({
   differentOwner: z.string().min(1, { message: "Please select an option." }),
-  gender: z.string().min(1, { message: "Please select your gender." }),
   healthQuestion1: z.string().min(1, { message: "This question is required." }),
   healthQuestion2: z.string().min(1, { message: "This question is required." }),
   healthQuestion3: z.string().min(1, { message: "This question is required." }),
@@ -45,41 +44,6 @@ export default function AdditionalQuestionsForm() {
                     <RadioGroupItem value="no" className="border-foreground/80 border-2" />
                   </FormControl>
                   <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="gender"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.gender && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Your gender?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="male" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Male</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="female" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Female</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="not-specified" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Not specified</FormLabel>
                 </FormItem>
               </RadioGroup>
             </FormControl>
