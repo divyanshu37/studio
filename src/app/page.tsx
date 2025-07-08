@@ -12,7 +12,6 @@ import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
-import WithAgent from '@/components/with-agent';
 import { cn } from '@/lib/utils';
 
 export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues & BeneficiaryAddressFormValues & PaymentFormValues>;
@@ -33,7 +32,7 @@ export default function Home() {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 10) {
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
         setStep(stepNumber);
         if (stepNumber >= 9) {
           setIsHeaderRendered(false);
@@ -107,10 +106,6 @@ export default function Home() {
     changeStep(7);
   };
 
-  const handleWithAgent = () => {
-    changeStep(10);
-  };
-
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -124,15 +119,13 @@ export default function Home() {
       case 5:
         return <PaymentForm onBack={handleBack} onSubmit={handleSubmit} />;
       case 6:
-        return <ThankYou onSelfEnroll={handleSelfEnroll} onWithAgent={handleWithAgent} />;
+        return <ThankYou onSelfEnroll={handleSelfEnroll} />;
       case 7:
         return <SelfEnrollLoading onComplete={goToNextStep} />;
       case 8:
         return <SelfEnrollContract onNext={goToNextStep} />;
       case 9:
         return <SelfEnrollComplete />;
-      case 10:
-        return <WithAgent />;
       default:
         return <InsuranceForm onNext={handleNextStep} />;
     }
@@ -149,7 +142,7 @@ export default function Home() {
       <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
         <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
           <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button
               key={num}
               onClick={() => handleStepChange(num)}
@@ -177,7 +170,7 @@ export default function Home() {
               headerAnimationClass,
               !isHeaderRendered && "hidden"
             )}>
-              <Icon className="h-20 w-20 md:h-28 md:w-28 text-accent mb-2 md:mb-8" />
+              <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
               <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                   State and Congress Approved Final Expense Benefits Emergency Funds
               </h1>
