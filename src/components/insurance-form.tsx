@@ -19,6 +19,8 @@ const isValidSsn = (ssn: string) => {
     const group = ssnParts.substring(3, 5);
     const serial = ssnParts.substring(5, 9);
     
+    // More robust validation based on SSA rules to better catch fakes.
+    // Area number cannot be 000, 666, or in the 900-999 range.
     if (area === "000" || area === "666" || parseInt(area, 10) >= 900) {
         return false;
     }
@@ -291,7 +293,7 @@ export default function InsuranceForm() {
                     ))}
                 </div>
             </div>
-            <Button type="submit" size="lg" className="px-8 py-6 text-base font-body">
+            <Button type="submit" size="lg" className="px-8 py-6 text-base font-body border-2 border-white shadow-xl">
                 NEXT
                 <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
