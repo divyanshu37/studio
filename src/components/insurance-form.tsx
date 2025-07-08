@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,6 +10,26 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const isValidSsn = (ssn: string) => {
+    const ssnParts = ssn.replace(/-/g, '');
+    if (ssnParts.length !== 9) return true; // Let min validation handle length, we only care about structure here.
+
+    const area = ssnParts.substring(0, 3);
+    const group = ssnParts.substring(3, 5);
+    const serial = ssnParts.substring(5, 9);
+    
+    if (area === "000" || area === "666" || parseInt(area, 10) >= 900) {
+        return false;
+    }
+    if (group === "00") {
+        return false;
+    }
+    if (serial === "0000") {
+        return false;
+    }
+    return true;
+};
 
 const formSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required." }),
@@ -33,25 +54,7 @@ const formSchema = z.object({
     }),
   ssn: z.string()
     .min(11, { message: "Please enter a complete social security number." })
-    .refine((ssn) => {
-        const ssnParts = ssn.replace(/-/g, '');
-        if (ssnParts.length !== 9) return true; // Let min validation handle this
-
-        const area = ssnParts.substring(0, 3);
-        const group = ssnParts.substring(3, 5);
-        const serial = ssnParts.substring(5, 9);
-        
-        if (area === "000" || area === "666" || parseInt(area, 10) >= 900) {
-            return false;
-        }
-        if (group === "00") {
-            return false;
-        }
-        if (serial === "0000") {
-            return false;
-        }
-        return true;
-    }, {
+    .refine(isValidSsn, {
         message: "Please enter a valid social security number."
     }),
 });
@@ -73,6 +76,38 @@ export default function InsuranceForm() {
   });
 
   const { formState: { errors } } = form;
+  const [ssnValidationState, setSsnValidationState] = useState<'idle' | 'validating' | 'valid'>('idle');
+  const ssnValue = form.watch('ssn');
+
+  useEffect(() => {
+    const rawSsn = ssnValue.replace(/[^\d]/g, '');
+
+    if (rawSsn.length < 9) {
+      setSsnValidationState('idle');
+      if (errors.ssn?.type === 'manual') {
+        form.clearErrors('ssn');
+      }
+      return;
+    }
+
+    if (rawSsn.length === 9) {
+      setSsnValidationState('validating');
+      const timer = setTimeout(() => {
+        if (isValidSsn(ssnValue)) {
+          setSsnValidationState('valid');
+          if (errors.ssn) {
+            form.clearErrors('ssn');
+          }
+        } else {
+          setSsnValidationState('idle');
+          form.setError('ssn', { type: 'manual', message: 'Please enter a valid social security number.' });
+        }
+      }, 1000); // Simulate network latency
+
+      return () => clearTimeout(timer);
+    }
+  }, [ssnValue, form, errors.ssn]);
+
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
     const rawValue = e.target.value.replace(/[^\d]/g, '');
@@ -216,7 +251,13 @@ export default function InsuranceForm() {
                         placeholder="Social Security Number" 
                         {...field} 
                         onChange={(e) => handleSSNChange(e, field)} 
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.ssn && "border-destructive focus-visible:border-destructive animate-shake")} 
+                        className={cn(
+                          "h-auto py-4 bg-card shadow-xl focus-visible:ring-0 focus-visible:ring-offset-0",
+                          errors.ssn
+                              ? "border-destructive focus-visible:border-destructive animate-shake"
+                              : "focus-visible:border-primary",
+                          ssnValidationState === 'valid' && "border-primary focus-visible:border-primary"
+                      )}
                       />
                     </FormControl>
                   </FormItem>
@@ -227,7 +268,15 @@ export default function InsuranceForm() {
         <div className="relative flex justify-end items-center">
             <div className="absolute left-0 right-0 text-center pointer-events-none">
                 <div className="min-h-[1.25rem]">
-                    {errors.dob?.message ? (
+                    {ssnValidationState === 'validating' ? (
+                        <p className="text-sm font-medium text-foreground">
+                            One moment, validating SSN...
+                        </p>
+                    ) : ssnValidationState === 'valid' ? (
+                        <p className="text-sm font-medium text-foreground">
+                            SSN validated
+                        </p>
+                    ) : errors.dob?.message ? (
                         <p className="text-sm font-medium text-destructive">
                             {errors.dob.message}
                         </p>
