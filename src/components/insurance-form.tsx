@@ -5,8 +5,8 @@ import { useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import { differenceInYears, parse, isValid } from 'date-fns';
 import { Input } from '@/components/ui/input';
-import { FormField, FormItem, FormControl } from '@/components/ui/form';
-import { cn, formatPhoneNumber, formatDateInput, formatSsn } from '@/lib/utils';
+import { FormField, FormItem, FormControl, FormLabel, FormMessage } from '@/components/ui/form';
+import { cn, formatPhoneNumber, formatSsn } from '@/lib/utils';
 
 const isValidSsn = (ssn: string) => {
     const ssnParts = ssn.replace(/-/g, '');
@@ -34,16 +34,13 @@ export const insuranceFormSchema = z.object({
   phone: z.string().min(14, { message: "Please enter a complete phone number." }),
   email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
   dob: z.string()
-    .min(10, { message: "Please enter a complete date of birth." })
+    .min(1, { message: "Date of birth is required." })
+    .refine((dob) => isValid(parse(dob, 'yyyy-MM-dd', new Date())), {
+      message: "Invalid date format.",
+    })
     .refine((dob) => {
-        const parsedDate = parse(dob, 'MM/dd/yyyy', new Date());
+        const parsedDate = parse(dob, 'yyyy-MM-dd', new Date());
         if (!isValid(parsedDate)) return false;
-
-        const [month, day, year] = dob.split('/').map(Number);
-        if (parsedDate.getFullYear() !== year || parsedDate.getMonth() !== month - 1 || parsedDate.getDate() !== day) {
-            return false;
-        }
-
         const age = differenceInYears(new Date(), parsedDate);
         return age >= 45 && age <= 80;
     }, {
@@ -63,10 +60,6 @@ export default function InsuranceForm() {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
     field.onChange(formatPhoneNumber(e.target.value));
-  };
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    field.onChange(formatDateInput(e.target.value));
   };
 
   const handleSSNChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
@@ -141,20 +134,21 @@ export default function InsuranceForm() {
             )}
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <FormField
             control={control}
             name="dob"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
+                <FormLabel>Date of Birth</FormLabel>
                 <FormControl>
                   <Input 
-                    placeholder="Date of Birth" 
-                    {...field} 
-                    onChange={(e) => handleDateChange(e, field)} 
+                    type="date"
+                    {...field}
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.dob && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -176,6 +170,7 @@ export default function InsuranceForm() {
                   )}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />

@@ -20,18 +20,6 @@ export const formatPhoneNumber = (value: string) => {
   return formattedValue;
 };
 
-export const formatDateInput = (value: string) => {
-  const rawValue = value.replace(/[^\d]/g, '');
-  let formattedValue = rawValue.substring(0, 2);
-  if (rawValue.length > 2) {
-    formattedValue += '/' + rawValue.substring(2, 4);
-  }
-  if (rawValue.length > 4) {
-    formattedValue += '/' + rawValue.substring(4, 8);
-  }
-  return formattedValue;
-};
-
 export const formatSsn = (value: string) => {
   const rawValue = value.replace(/[^\d]/g, '');
   let formattedValue = rawValue.substring(0, 3);

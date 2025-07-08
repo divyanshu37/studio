@@ -13,22 +13,19 @@ import {
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { cn, formatDateInput } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 export const beneficiaryFormSchema = z.object({
   tobaccoUse: z.string().min(1, { message: 'This question is required.' }),
   existingPolicies: z.string().min(1, { message: 'This question is required.' }),
   effectiveDate: z.string()
-    .min(10, { message: "An effective date is required." })
+    .min(1, { message: "An effective date is required." })
+    .refine((date) => isValid(parse(date, 'yyyy-MM-dd', new Date())), {
+      message: "Invalid effective date.",
+    })
     .refine((date) => {
-        const parsedDate = parse(date, 'MM/dd/yyyy', new Date());
-        if (!isValid(parsedDate)) return false;
-
-        const [month, day, year] = date.split('/').map(Number);
-        if (parsedDate.getFullYear() !== year || parsedDate.getMonth() !== month - 1 || parsedDate.getDate() !== day) {
-            return false;
-        }
-
+        const [year, month, day] = date.split('-').map(Number);
+        const parsedDate = new Date(year, month - 1, day);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return parsedDate >= today;
@@ -38,17 +35,15 @@ export const beneficiaryFormSchema = z.object({
   beneficiaryCount: z.coerce.number().min(1, { message: 'Please enter a number.' }).int(),
   beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
   beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
-  beneficiary1Dob: z.string().min(10, { message: "Please enter a complete date of birth." }),
+  beneficiary1Dob: z.string().min(1, { message: "Date of birth is required." }).refine((dob) => isValid(parse(dob, 'yyyy-MM-dd', new Date())), {
+    message: "Invalid date of birth.",
+  }),
 });
 
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
 export default function BeneficiaryForm() {
   const { control, formState: { errors } } = useFormContext<BeneficiaryFormValues>();
-
-  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    field.onChange(formatDateInput(e.target.value));
-  };
 
   return (
     <div className="w-full max-w-2xl space-y-6">
@@ -113,9 +108,8 @@ export default function BeneficiaryForm() {
                 <FormLabel className="text-left text-base font-semibold text-foreground">Desired effective date of this policy</FormLabel>
                  <FormControl>
                   <Input 
-                    placeholder="Effective Date (MM/DD/YYYY)" 
+                    type="date"
                     {...field} 
-                    onChange={(e) => handleDateInputChange(e, field)} 
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
                 </FormControl>
@@ -165,10 +159,16 @@ export default function BeneficiaryForm() {
           control={control}
           name="beneficiary1Dob"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col">
+              <FormLabel>Date of Birth</FormLabel>
               <FormControl>
-                <Input placeholder="Date of Birth (MM/DD/YYYY)" {...field} onChange={(e) => handleDateInputChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Dob && "border-destructive focus-visible:border-destructive animate-shake")} />
+                <Input
+                  type="date"
+                  {...field}
+                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Dob && "border-destructive focus-visible:border-destructive animate-shake")}
+                />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
