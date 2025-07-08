@@ -45,6 +45,7 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
     mode: 'onTouched',
     defaultValues: {
       beneficiaryCount: 1,
+      effectiveDate: new Date(),
     }
   });
 
@@ -80,11 +81,11 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
                     className="flex flex-col space-y-2"
                   >
                     <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl><RadioGroupItem value="yes" /></FormControl>
+                      <FormControl><RadioGroupItem value="yes" className="border-foreground/80 border-2" /></FormControl>
                       <FormLabel className="font-normal">Yes</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl><RadioGroupItem value="no" /></FormControl>
+                      <FormControl><RadioGroupItem value="no" className="border-foreground/80 border-2" /></FormControl>
                       <FormLabel className="font-normal">No</FormLabel>
                     </FormItem>
                   </RadioGroup>
@@ -105,11 +106,11 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
                     className="flex flex-col space-y-2"
                   >
                     <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl><RadioGroupItem value="yes" /></FormControl>
+                      <FormControl><RadioGroupItem value="yes" className="border-foreground/80 border-2" /></FormControl>
                       <FormLabel className="font-normal">Yes</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl><RadioGroupItem value="no" /></FormControl>
+                      <FormControl><RadioGroupItem value="no" className="border-foreground/80 border-2" /></FormControl>
                       <FormLabel className="font-normal">No</FormLabel>
                     </FormItem>
                   </RadioGroup>
@@ -117,86 +118,88 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="effectiveDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col p-6 bg-card/50 rounded-lg shadow-lg text-left space-y-3">
-                <FormLabel className="text-base font-semibold text-foreground">Select the desired effective date of this policy.</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="effectiveDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full h-auto py-4 pl-3 text-left font-normal bg-card shadow-xl text-base",
+                              !field.value && "text-muted-foreground",
+                              errors.effectiveDate && "border-destructive"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span className="text-neutral-400">Select the desired effective date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date < new Date(new Date().setDate(new Date().getDate() - 1))
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="beneficiaryCount"
+                render={({ field }) => (
+                  <FormItem>
                     <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full h-auto py-4 pl-3 text-left font-normal bg-card shadow-xl text-base",
-                          !field.value && "text-muted-foreground",
-                          errors.effectiveDate && "border-destructive"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span className="text-neutral-400">Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
+                        <Input type="number" {...field} placeholder="How many primary beneficiaries?" className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiaryCount && "border-destructive")} />
                     </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date(new Date().setDate(new Date().getDate() - 1))
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="beneficiaryCount"
-            render={({ field }) => (
-                <FormItem className="p-6 bg-card/50 rounded-lg shadow-lg text-left">
-                <FormLabel className="text-base font-semibold text-foreground">How many primary beneficiaries?</FormLabel>
-                <FormControl>
-                    <Input type="number" {...field} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiaryCount && "border-destructive")} />
-                </FormControl>
-                </FormItem>
-            )}
-          />
-
-          <div className="p-6 bg-card/50 rounded-lg shadow-lg text-left space-y-4">
-            <h3 className="text-base font-semibold text-foreground">Primary Beneficiary 1</h3>
-            <FormField
-              control={form.control}
-              name="beneficiary1FirstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Beneficiary First Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiary1FirstName && "border-destructive")} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="beneficiary1LastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Beneficiary Last Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiary1LastName && "border-destructive")} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                  </FormItem>
+                )}
+              />
+            </div>
+          
+            <h3 className="text-base font-semibold text-foreground text-left pt-4">Primary Beneficiary 1</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="beneficiary1FirstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Beneficiary First Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiary1FirstName && "border-destructive")} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="beneficiary1LastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Beneficiary Last Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl", errors.beneficiary1LastName && "border-destructive")} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="beneficiary1Dob"
