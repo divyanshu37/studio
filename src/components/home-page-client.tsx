@@ -70,7 +70,6 @@ export default function HomePageClient() {
       tobaccoUse: "",
       existingPolicies: "",
       effectiveDate: "",
-      beneficiaryCount: NaN,
       beneficiary1FirstName: "",
       beneficiary1LastName: "",
       beneficiary1Dob: "",

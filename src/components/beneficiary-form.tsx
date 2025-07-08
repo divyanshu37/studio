@@ -28,7 +28,6 @@ export const beneficiaryFormSchema = z.object({
     }, {
         message: "Effective date must be today or a future date."
     }),
-  beneficiaryCount: z.coerce.number().min(1, { message: 'Please enter a number.' }).int(),
   beneficiary1Address: z.string().min(1, { message: "Address is required." }),
   beneficiary1Apt: z.string().optional(),
   beneficiary1City: z.string().min(1, { message: "City is required." }),
@@ -44,39 +43,26 @@ export default function BeneficiaryForm() {
   return (
     <div className="w-full max-w-2xl space-y-6">
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-          <FormField
-            control={control}
-            name="effectiveDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col space-y-2">
-                <FormLabel className="text-left text-base font-semibold text-foreground">Desired effective date of this policy</FormLabel>
-                 <FormControl>
-                  <Input 
-                    type="date"
-                    {...field} 
-                    className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="beneficiaryCount"
-            render={({ field }) => (
-              <FormItem>
+        <FormField
+          control={control}
+          name="effectiveDate"
+          render={({ field }) => (
+            <FormItem className="flex flex-col space-y-2">
+              <FormLabel className="text-left text-base font-semibold text-foreground">Desired effective date of this policy</FormLabel>
                 <FormControl>
-                    <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || '')} value={isNaN(field.value) ? '' : field.value} placeholder="How many primary beneficiaries?" className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryCount && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
+                <Input 
+                  type="date"
+                  {...field} 
+                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </div>
       
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-foreground text-left pt-4">Primary Beneficiary 1 Address</h3>
+        <h3 className="text-base font-semibold text-foreground text-left pt-4">Primary Address</h3>
         <FormField
           control={control}
           name="beneficiary1Address"
