@@ -143,7 +143,7 @@ export default function Home() {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col items-center w-full px-4 text-center justify-start pt-24">
+      <main className="flex-1 flex flex-col items-center w-full px-6 text-center justify-start pt-24">
         <div className="max-w-4xl w-full flex flex-col items-center flex-1">
             <div className={cn(
               "flex flex-col items-center",
