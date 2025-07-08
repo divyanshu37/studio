@@ -9,7 +9,10 @@ import BeneficiaryForm, { type BeneficiaryFormValues } from '@/components/benefi
 import BeneficiaryAddressForm, { type BeneficiaryAddressFormValues } from '@/components/beneficiary-address-form';
 import PaymentForm, { type PaymentFormValues } from '@/components/payment-form';
 import ThankYou from '@/components/thank-you';
-import FormNavigation from '@/components/form-navigation';
+import SelfEnrollLoading from '@/components/self-enroll-loading';
+import SelfEnrollContract from '@/components/self-enroll-contract';
+import SelfEnrollComplete from '@/components/self-enroll-complete';
+import WithAgent from '@/components/with-agent';
 import { cn } from '@/lib/utils';
 
 export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues & BeneficiaryAddressFormValues & PaymentFormValues>;
@@ -24,7 +27,7 @@ export default function Home() {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 6) {
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 10) {
         setStep(stepNumber);
       }
     }
@@ -38,6 +41,14 @@ export default function Home() {
       setAnimationClass('animate-fade-in-up');
     }, 300);
   };
+  
+  const goToNextStep = () => {
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+        setStep(prev => prev + 1);
+        setAnimationClass('animate-fade-in-up');
+    }, 300);
+  }
 
   const handleBack = () => {
     setAnimationClass('animate-fade-out-down');
@@ -62,6 +73,22 @@ export default function Home() {
     }, 300);
   };
 
+  const handleSelfEnroll = () => {
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+      setStep(7);
+      setAnimationClass('animate-fade-in-up');
+    }, 300);
+  };
+  
+  const handleWithAgent = () => {
+    setAnimationClass('animate-fade-out-down');
+    setTimeout(() => {
+      setStep(10);
+      setAnimationClass('animate-fade-in-up');
+    }, 300);
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -75,7 +102,15 @@ export default function Home() {
       case 5:
         return <PaymentForm onBack={handleBack} onSubmit={handleSubmit} />;
       case 6:
-        return <ThankYou />;
+        return <ThankYou onSelfEnroll={handleSelfEnroll} onWithAgent={handleWithAgent} />;
+      case 7:
+        return <SelfEnrollLoading onComplete={goToNextStep} />;
+      case 8:
+        return <SelfEnrollContract onNext={goToNextStep} />;
+      case 9:
+        return <SelfEnrollComplete />;
+      case 10:
+        return <WithAgent />;
       default:
         return <InsuranceForm onNext={handleNextStep} />;
     }
@@ -91,7 +126,7 @@ export default function Home() {
       <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
         <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
           <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
-          {[1, 2, 3, 4, 5, 6].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
             <button
               key={num}
               onClick={() => handleStepChange(num)}
@@ -112,20 +147,30 @@ export default function Home() {
 
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
-            <Icon className="h-48 w-48 text-accent mb-8" />
-            <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
-                State and Congress Approved Final Expense Benefits Emergency Funds
-            </h1>
+            {step < 9 && <Icon className="h-48 w-48 text-accent mb-8" />}
+            {step < 7 &&
+              <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
+                  State and Congress Approved Final Expense Benefits Emergency Funds
+              </h1>
+            }
+            
             {step < 6 ? (
               <p className="text-base text-foreground/80 mb-8 max-w-xl">
                 Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
               </p>
-            ) : (
+            ) : step === 6 ? (
               <p className="text-base text-foreground/80 mb-8 max-w-xl">
                 We have all of the information necessary. How would you
                 like to complete your application?
               </p>
-            )}
+            ) : null }
+
+            {step >= 7 && step < 9 &&
+                <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
+                    State and Congress Approved Final Expense Benefits Emergency Funds
+                </h1>
+            }
+
             <div className={cn("w-full flex justify-center", animationClass)}>
               {renderStep()}
             </div>
