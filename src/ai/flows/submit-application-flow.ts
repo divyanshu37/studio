@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import { fullFormSchema, type FormValues } from '@/lib/schema';
+import { fullFormSchema } from '@/lib/schema';
 import { z } from 'zod';
 import axios from 'axios';
 
@@ -24,40 +24,6 @@ const SubmitApplicationOutputSchema = z.object({
   policyId: z.string().optional(),
 });
 export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSchema>;
-
-interface Address {
-  street: string;
-  city: string;
-  state: string;
-  zip: string;
-}
-
-interface Beneficiary {
-  firstName: string;
-  lastName: string;
-  dob: string;
-  address: Address;
-  phone: string;
-  relation: string;
-  percentage: string;
-}
-
-export interface ApplicantData {
-  referenceId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  address: Address;
-  dob: string;
-  phone: string;
-  lastFour: string;
-  gender: string;
-  beneficiary: Beneficiary;
-  faceAmount: string;
-  accountHolderName: string;
-  routingNumber: string;
-  accountNumber: string;
-}
 
 export async function submitApplication(input: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
   return submitApplicationFlow(input);
@@ -77,44 +43,53 @@ const submitApplicationFlow = ai.defineFlow(
       return { success: false, message: 'Server configuration error.' };
     }
 
-    // Transform flat form data into the nested structure required by the API
-    const applicantData: ApplicantData = {
+    const formatDate = (dateString: string) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+      const [year, month, day] = dateString.split('-');
+      return `${month}/${day}/${year}`;
+    };
+
+    const formatPhone = (phoneString: string) => {
+      return phoneString.replace(/\D/g, '');
+    };
+
+    const capitalize = (s: string) => {
+      if (typeof s !== 'string' || s.length === 0) return '';
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+
+    const applicantData = {
       referenceId: formData.uuid,
       email: formData.email,
       firstName: formData.firstName,
       lastName: formData.lastName,
-      address: {
-        street: formData.applicantAddress,
-        city: formData.applicantCity,
-        state: formData.applicantState,
-        zip: formData.applicantZip,
-      },
-      dob: formData.dob,
-      phone: formData.phone,
+      addressStreet: formData.applicantAddress,
+      addressCity: formData.applicantCity,
+      addressState: formData.applicantState,
+      addressZip: formData.applicantZip,
+      dob: formatDate(formData.dob),
+      phone: formatPhone(formData.phone),
       lastFour: formData.ssn.replace(/-/g, '').slice(-4),
-      gender: formData.gender,
-      beneficiary: {
-        firstName: formData.beneficiary1FirstName,
-        lastName: formData.beneficiary1LastName,
-        dob: formData.beneficiary1Dob,
-        address: {
-          street: formData.beneficiaryAddress,
-          city: formData.beneficiaryCity,
-          state: formData.beneficiaryState,
-          zip: formData.beneficiaryZip,
-        },
-        phone: formData.beneficiary1Phone,
-        relation: formData.beneficiary1Relationship,
-        percentage: '100', // Assuming a single beneficiary gets 100%
-      },
+      gender: capitalize(formData.gender),
+      beneficiaryFirstName: formData.beneficiary1FirstName,
+      beneficiaryLastName: formData.beneficiary1LastName,
+      beneficiaryDob: formatDate(formData.beneficiary1Dob),
+      beneficiaryAddressStreet: formData.beneficiaryAddress,
+      beneficiaryAddressCity: formData.beneficiaryCity,
+      beneficiaryAddressState: formData.beneficiaryState,
+      beneficiaryAddressZip: formData.beneficiaryZip,
+      beneficiaryPhone: formatPhone(formData.beneficiary1Phone),
+      beneficiaryRelation: formData.beneficiary1Relationship,
+      beneficiaryPercentage: "100",
       faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
-      accountHolderName: formData.accountHolderName,
-      routingNumber: formData.routingNumber,
-      accountNumber: formData.accountNumber,
+      paymentAccountHolderName: formData.accountHolderName,
+      paymentRoutingNumber: formData.routingNumber,
+      paymentAccountNumber: formData.accountNumber,
     };
 
     try {
-      const response = await axios.post(`${backendUrl}/insurance`, applicantData);
+      console.log('Submitting to API:', applicantData);
+      const response = await axios.post(`${backendUrl}insurance`, applicantData);
       const result = response.data;
 
       return {
@@ -125,7 +100,8 @@ const submitApplicationFlow = ai.defineFlow(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         console.error('API submission failed:', error.response.status, error.response.data);
-        return { success: false, message: error.response.data.message || 'API submission failed.' };
+        const errorMessage = error.response.data.message || 'API submission failed.';
+        return { success: false, message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage };
       }
       
       console.error('API submission error:', error);
