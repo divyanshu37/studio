@@ -1,36 +1,30 @@
-import { siteConfig } from '@/config/site';
-import AIContactForm from '@/components/ai-contact-form';
-import Header from '@/components/layout/header';
-import { Separator } from '@/components/ui/separator';
+import { Logo, Icon } from '@/components/logo';
+import InsuranceForm from '@/components/insurance-form';
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header />
-      <main className="flex-1">
-        <section id="welcome" className="container mx-auto px-4 py-16 md:py-24 text-center">
-          <h1 className="font-headline text-4xl md:text-6xl font-bold tracking-tighter mb-4">{siteConfig.welcomeMessage}</h1>
-          <p className="max-w-3xl mx-auto text-muted-foreground md:text-xl">{siteConfig.welcomeSubtitle}</p>
-        </section>
+    <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
+      <header className="absolute top-0 left-0 p-8 md:p-12">
+        <Logo />
+      </header>
 
-        <Separator />
-
-        <section id="ai-assistant" className="container mx-auto px-4 py-16 md:py-24">
-            <div className="max-w-2xl mx-auto">
-                <h2 className="text-3xl font-bold font-headline text-center mb-2">AI Contact Info Assistant</h2>
-                <p className="text-muted-foreground text-center mb-8">
-                    Let our AI create a contact card for you. Just specify the role and working hours.
-                </p>
-                <AIContactForm />
-            </div>
-        </section>
-      </main>
-      <footer className="py-6 md:px-8 md:py-0 border-t">
-        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-            <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-                Built with Next.js and a touch of AI.
+      <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
+        <div className="max-w-3xl w-full flex flex-col items-center">
+            <Icon className="h-16 w-16 text-accent mb-8" />
+            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter mb-4 leading-tight">
+                State and Congress Approved Final Expense Benefits Emergency Funds
+            </h1>
+            <p className="text-lg text-foreground/80 mb-12">
+                Amounts between $5,000 - $25,000 / Available to anyone ages 40-80
             </p>
+            <InsuranceForm />
         </div>
+      </main>
+
+      <footer className="w-full py-8 text-center">
+        <p className="text-xs text-foreground/60">
+          All information provided is private and securely protected.
+        </p>
       </footer>
     </div>
   );
