@@ -54,13 +54,13 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
                   >
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="yes" />
+                        <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">Yes</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="no" />
+                        <RadioGroupItem value="no" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">No</FormLabel>
                     </FormItem>
@@ -83,19 +83,19 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
                   >
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="male" />
+                        <RadioGroupItem value="male" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">Male</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="female" />
+                        <RadioGroupItem value="female" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">Female</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="not-specified" />
+                        <RadioGroupItem value="not-specified" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">Not specified</FormLabel>
                     </FormItem>
@@ -118,13 +118,13 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
                   >
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="yes" />
+                        <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">Yes</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="no" />
+                        <RadioGroupItem value="no" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">No</FormLabel>
                     </FormItem>
@@ -147,13 +147,13 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
                   >
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="yes" />
+                        <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">Yes</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="no" />
+                        <RadioGroupItem value="no" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">No</FormLabel>
                     </FormItem>
@@ -176,13 +176,13 @@ export default function AdditionalQuestionsForm({ onBack, onNext }: AdditionalQu
                   >
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="yes" />
+                        <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">Yes</FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="no" />
+                        <RadioGroupItem value="no" className="border-foreground/80 border-2" />
                       </FormControl>
                       <FormLabel className="font-normal">No</FormLabel>
                     </FormItem>

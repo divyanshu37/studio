@@ -44,7 +44,6 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
     resolver: zodResolver(formSchema),
     mode: 'onTouched',
     defaultValues: {
-      beneficiaryCount: 1,
       effectiveDate: new Date(),
     }
   });
@@ -120,12 +119,13 @@ export default function BeneficiaryForm({ onBack, onSubmit }: BeneficiaryFormPro
           />
           
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
               <FormField
                 control={form.control}
                 name="effectiveDate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col space-y-2">
+                    <FormLabel className="text-left text-base font-semibold text-foreground">Desired effective date of this policy</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
