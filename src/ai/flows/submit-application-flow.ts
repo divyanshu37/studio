@@ -57,14 +57,12 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
     const [year, month, day] = dateString.split('-');
     const formatted = `${month}/${day}/${year}`;
-    console.log('Formatted Date:', formatted);
     return formatted;
   };
 
   const formatPhone = (phoneString: string) => {
     // Remove all non-digit characters
     const formatted = phoneString.replace(/\D/g, '');
-    console.log('Formatted Phone:', formatted);
     return formatted;
   };
 
@@ -117,7 +115,6 @@ export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSche
 
 // 5. Public-facing function remains the same.
 export async function submitApplication(input: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
-  console.log('before submitting:', input);
   return submitApplicationFlow(input);
 }
 
@@ -140,9 +137,6 @@ const submitApplicationFlow = ai.defineFlow(
       // Step 1: Transform the data using our new, reliable function.
       const applicantData = transformDataForApi(formData);
       
-      // Log the final, transformed data to be 100% sure.
-      console.log('Submitting final, transformed data to API:', applicantData);
-
       // Step 2: Send it to the backend.
       const response = await axios.post(`${backendUrl}/insurance`, applicantData);
       const result = response.data;
