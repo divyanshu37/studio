@@ -6,11 +6,12 @@ import InsuranceForm, { type InsuranceFormValues } from '@/components/insurance-
 import AdditionalQuestionsForm, { type AdditionalQuestionsFormValues } from '@/components/additional-questions-form';
 import BeneficiaryForm, { type BeneficiaryFormValues } from '@/components/beneficiary-form';
 import BeneficiaryAddressForm, { type BeneficiaryAddressFormValues } from '@/components/beneficiary-address-form';
+import PaymentForm, { type PaymentFormValues } from '@/components/payment-form';
 import ThankYou from '@/components/thank-you';
 import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
 
-export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues & BeneficiaryAddressFormValues>;
+export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues & BeneficiaryAddressFormValues & PaymentFormValues>;
 
 export default function Home() {
   const [step, setStep] = useState(1);
@@ -34,7 +35,7 @@ export default function Home() {
     }, 300);
   };
   
-  const handleSubmit = (data: BeneficiaryAddressFormValues) => {
+  const handleSubmit = (data: PaymentFormValues) => {
     const finalData: FormValues = { ...formData, ...data };
     console.log('Final Submission:', finalData);
     handleNextStep(data);
@@ -49,8 +50,10 @@ export default function Home() {
       case 3:
         return <BeneficiaryForm onBack={handleBack} onNext={handleNextStep} />;
       case 4:
-        return <BeneficiaryAddressForm onBack={handleBack} onSubmit={handleSubmit} />;
+        return <BeneficiaryAddressForm onBack={handleBack} onNext={handleNextStep} />;
       case 5:
+        return <PaymentForm onBack={handleBack} onSubmit={handleSubmit} />;
+      case 6:
         return <ThankYou />;
       default:
         return <InsuranceForm onNext={handleNextStep} />;
