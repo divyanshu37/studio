@@ -67,7 +67,7 @@ export default function Home() {
             <p className="text-base text-foreground/80 mb-8">
                 Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
             </p>
-            <div className={cn("w-full", animationClass)}>
+            <div className={cn("w-full flex justify-center", animationClass)}>
               {renderStep()}
             </div>
         </div>
