@@ -1,6 +1,6 @@
 export const siteConfig = {
-  name: 'Next Starter Pro',
-  description: 'A Next.js starter project with SEO, navigation, and an AI assistant.',
+  name: 'Final Expense v2.0',
+  description: 'Simplified final expense insurance application.',
 };
 
 export type SiteConfig = typeof siteConfig;
