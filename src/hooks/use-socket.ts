@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -35,6 +34,7 @@ export const useSocket = (subscribeId: string | null, callback: (data: any) => v
 
     const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(backendUrl, {
       path: '/socket',
+      transports: ['polling'],
     });
 
     socketRef.current = socket;
