@@ -11,7 +11,7 @@ export default function Home() {
       <main className="flex flex-col items-center justify-center flex-1 w-full px-4 py-24 text-center">
         <div className="max-w-3xl w-full flex flex-col items-center">
             <Icon className="h-16 w-16 text-accent mb-8" />
-            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-wide mb-4 leading-tight">
+            <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-wide mb-4 leading-tight">
                 State and Congress Approved Final Expense Benefits Emergency Funds
             </h1>
             <p className="text-lg text-foreground/80 mb-12">

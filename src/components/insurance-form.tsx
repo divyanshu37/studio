@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -98,7 +98,6 @@ export default function InsuranceForm() {
                         className={cn("h-auto py-4 bg-card", errors.firstName && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -114,7 +113,6 @@ export default function InsuranceForm() {
                         className={cn("h-auto py-4 bg-card", errors.lastName && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -133,7 +131,6 @@ export default function InsuranceForm() {
                         className={cn("h-auto py-4 bg-card", errors.phone && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -150,7 +147,6 @@ export default function InsuranceForm() {
                         className={cn("h-auto py-4 bg-card", errors.email && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -169,7 +165,6 @@ export default function InsuranceForm() {
                         className={cn("h-auto py-4 bg-card", errors.dob && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -186,19 +181,20 @@ export default function InsuranceForm() {
                         className={cn("h-auto py-4 bg-card", errors.ssn && "border-destructive focus-visible:ring-destructive animate-shake")} 
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
         </div>
-        <div className="flex justify-between items-center">
-            <div className="min-h-[1.25rem]">
-                {Object.keys(errors).length > 0 && (
-                    <p className="text-sm font-medium text-destructive">
-                        Red fields must be entered correctly.
-                    </p>
-                )}
+        <div className="relative flex justify-end items-center">
+            <div className="absolute left-0 right-0 text-center pointer-events-none">
+                <div className="min-h-[1.25rem]">
+                    {Object.keys(errors).length > 0 && (
+                        <p className="text-sm font-medium text-destructive">
+                            Red fields must be entered correctly.
+                        </p>
+                    )}
+                </div>
             </div>
             <Button type="submit" size="lg" className="px-8 py-6 text-base font-body">
                 NEXT
