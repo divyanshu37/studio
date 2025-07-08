@@ -12,6 +12,7 @@ import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
+import WithAgent from '@/components/with-agent';
 import { cn } from '@/lib/utils';
 
 export type FormValues = Partial<InsuranceFormValues & AdditionalQuestionsFormValues & BeneficiaryFormValues & BeneficiaryAddressFormValues & PaymentFormValues>;
@@ -29,8 +30,8 @@ export default function Home() {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
-        if (stepNumber === 9) {
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 10) {
+        if (stepNumber === 9 || stepNumber === 10) {
           setIsHeaderRendered(false);
         }
         setStep(stepNumber);
@@ -44,18 +45,18 @@ export default function Home() {
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
     
-    if (newStep === 9 && step < 9) {
+    if ((newStep === 9 || newStep === 10) && step < 9) {
       setHeaderAnimationClass('animate-fade-out-down');
     }
 
     setTimeout(() => {
       setIsAnimatingOut(false);
-      if (newStep < 9 && step === 9) {
+      if (newStep < 9 && (step === 9 || step === 10)) {
         setIsHeaderRendered(true);
         setHeaderAnimationClass('animate-fade-in-up');
       }
       setStep(newStep);
-      if (newStep === 9) {
+      if (newStep === 9 || newStep === 10) {
         setIsHeaderRendered(false);
       }
       setAnimationClass('animate-fade-in-up');
@@ -89,6 +90,10 @@ export default function Home() {
     changeStep(7);
   };
 
+  const handleWithAgent = () => {
+    changeStep(10);
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -102,13 +107,15 @@ export default function Home() {
       case 5:
         return <PaymentForm onBack={handleBack} onSubmit={handleSubmit} />;
       case 6:
-        return <ThankYou onSelfEnroll={handleSelfEnroll} />;
+        return <ThankYou onSelfEnroll={handleSelfEnroll} onWithAgent={handleWithAgent} />;
       case 7:
         return <SelfEnrollLoading onComplete={goToNextStep} />;
       case 8:
         return <SelfEnrollContract onNext={goToNextStep} />;
       case 9:
         return <SelfEnrollComplete />;
+      case 10:
+        return <WithAgent />;
       default:
         return <InsuranceForm onNext={handleNextStep} />;
     }
@@ -125,7 +132,7 @@ export default function Home() {
       <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
         <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
           <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
             <button
               key={num}
               onClick={() => handleStepChange(num)}
@@ -143,7 +150,7 @@ export default function Home() {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col items-center w-full px-6 text-center justify-start pt-24">
+      <main className="flex-1 flex flex-col items-center w-full px-12 text-center justify-start pt-24">
         <div className="max-w-4xl w-full flex flex-col items-center flex-1">
             <div className={cn(
               "flex flex-col items-center",
@@ -155,7 +162,7 @@ export default function Home() {
                   State and Congress Approved Final Expense Benefits Emergency Funds
               </h1>
               <p className={cn(
-                "text-base text-foreground/80 mb-8 max-w-[42rem]",
+                "text-base text-foreground/80 mb-8 max-w-[46rem]",
                 !showSubheading && "invisible"
               )}>
                 {step === 6
@@ -166,7 +173,7 @@ export default function Home() {
 
             <div className={cn(
               "w-full flex",
-              step === 9 && !isAnimatingOut ? "flex-1 items-center justify-center" : "justify-center",
+              (step === 9 || step === 10) && !isAnimatingOut ? "flex-1 items-center justify-center" : "justify-center",
               animationClass
             )}>
               {renderStep()}
