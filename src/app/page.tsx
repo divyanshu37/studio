@@ -26,15 +26,19 @@ export default function Home() {
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const searchParams = useSearchParams();
 
+  const [isLayoutCentered, setIsLayoutCentered] = useState(false);
+  const [isAnimatingToStep9, setIsAnimatingToStep9] = useState(false);
+
   useEffect(() => {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
       if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 10) {
-        if (stepNumber === 9 || stepNumber === 10) {
-          setIsHeaderRendered(false);
-        }
         setStep(stepNumber);
+        if (stepNumber >= 9) {
+          setIsHeaderRendered(false);
+          setIsLayoutCentered(true);
+        }
       }
     }
   }, [searchParams]);
@@ -45,21 +49,34 @@ export default function Home() {
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
     
-    if ((newStep === 9 || newStep === 10) && step < 9) {
+    // Only animate header out if moving to a step where it's not shown.
+    if (newStep >= 9 && step < 9) {
       setHeaderAnimationClass('animate-fade-out-down');
+      setIsAnimatingToStep9(true);
     }
 
     setTimeout(() => {
-      setIsAnimatingOut(false);
-      if (newStep < 9 && (step === 9 || step === 10)) {
+      // If we are coming back from a no-header step to a header step
+      if (newStep < 9 && step >= 9) {
         setIsHeaderRendered(true);
         setHeaderAnimationClass('animate-fade-in-up');
+        setIsLayoutCentered(false);
       }
+      
       setStep(newStep);
-      if (newStep === 9 || newStep === 10) {
-        setIsHeaderRendered(false);
-      }
+      setIsAnimatingOut(false);
       setAnimationClass('animate-fade-in-up');
+      
+      // Post-animation layout changes
+      if (isAnimatingToStep9) {
+        setIsHeaderRendered(false);
+        setIsLayoutCentered(true);
+        setIsAnimatingToStep9(false);
+      } else if (newStep >= 9) {
+        setIsHeaderRendered(false);
+        setIsLayoutCentered(true);
+      }
+
     }, 300);
   };
 
@@ -150,19 +167,22 @@ export default function Home() {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col items-center w-full px-12 text-center justify-start pt-24">
-        <div className="max-w-4xl w-full flex flex-col items-center flex-1">
+      <main className="flex-1 flex flex-col items-center w-full px-8 sm:px-12 text-center">
+        <div className={cn(
+          "max-w-4xl w-full flex flex-col items-center flex-1 pt-24",
+          isLayoutCentered && "justify-center pt-0"
+        )}>
             <div className={cn(
               "flex flex-col items-center",
               headerAnimationClass,
               !isHeaderRendered && "hidden"
             )}>
               <Icon className="h-20 w-20 text-accent mb-8" />
-              <h1 className="font-headline text-4xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
+              <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                   State and Congress Approved Final Expense Benefits Emergency Funds
               </h1>
               <p className={cn(
-                "text-base text-foreground/80 mb-8 max-w-[46rem]",
+                "text-base text-foreground/80 mb-8 max-w-[50rem]",
                 !showSubheading && "invisible"
               )}>
                 {step === 6
@@ -172,8 +192,8 @@ export default function Home() {
             </div>
 
             <div className={cn(
-              "w-full flex",
-              (step === 9 || step === 10) && !isAnimatingOut ? "flex-1 items-center justify-center" : "justify-center",
+              "w-full flex justify-center",
+              isLayoutCentered && "flex-1 items-center",
               animationClass
             )}>
               {renderStep()}
