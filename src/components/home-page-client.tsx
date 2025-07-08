@@ -176,7 +176,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     try {
       const data = form.getValues();
       console.log('Submitting for self-enroll:', data);
-      const result = await submitApplication({ ...data, uuid });
+      const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
         changeStep(7); // Move to loading page, which will trigger WebSocket connection

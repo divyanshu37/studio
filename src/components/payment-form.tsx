@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 
 const coverageOptions = [
-  "$10,000", "$12,000", "$14,000", "$16,000", "$18,000", "$20,000", "$25,000"
+  "$ 10,000", "$ 12,000", "$ 14,000", "$ 16,000", "$ 18,000", "$ 20,000", "$ 25,000"
 ];
 
 export default function PaymentForm() {

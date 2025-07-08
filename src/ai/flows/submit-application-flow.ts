@@ -14,7 +14,7 @@ import { z } from 'zod';
 import axios from 'axios';
 
 const SubmitApplicationInputSchema = fullFormSchema.extend({
-  uuid: z.string().uuid(),
+  referenceId: z.string().uuid(),
 });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
@@ -59,7 +59,7 @@ const submitApplicationFlow = ai.defineFlow(
     };
 
     const applicantData = {
-      referenceId: formData.uuid,
+      referenceId: formData.referenceId,
       email: formData.email,
       firstName: formData.firstName,
       lastName: formData.lastName,
