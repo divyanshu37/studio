@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Smartphone, FileText } from 'lucide-react';
+import { MessageSquare, FileText } from 'lucide-react';
 
 interface SelfEnrollContractProps {
   onNext: () => void;
@@ -24,7 +23,7 @@ export default function SelfEnrollContract({ onNext, phoneNumber }: SelfEnrollCo
   return (
     <div className="w-full max-w-sm flex flex-col items-center text-center space-y-6">
       <div className="flex justify-center items-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-2">
-        <Smartphone className="w-8 h-8" />
+        <MessageSquare className="w-8 h-8" />
       </div>
       <h2 className="text-2xl font-bold tracking-tight">Phone Verification</h2>
       <p className="text-base text-foreground/80 max-w-xs">
@@ -52,10 +51,6 @@ export default function SelfEnrollContract({ onNext, phoneNumber }: SelfEnrollCo
             </p>
         </div>
       </div>
-
-      <Button onClick={onNext} className="h-auto px-8 py-3 text-base font-body tracking-tight w-full">
-        I have signed the agreement
-      </Button>
     </div>
   );
 }
