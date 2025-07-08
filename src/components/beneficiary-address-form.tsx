@@ -136,7 +136,7 @@ export default function BeneficiaryAddressForm({ onBack, onSubmit }: Beneficiary
                 <FormItem>
                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-neutral-400 focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Relationship && "border-destructive focus-visible:border-destructive animate-shake")}>
+                      <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Relationship && "border-destructive focus-visible:border-destructive animate-shake")}>
                         <SelectValue placeholder="Relationship to Insured" />
                       </SelectTrigger>
                     </FormControl>
