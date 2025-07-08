@@ -128,37 +128,39 @@ export default function BeneficiaryAddressForm({ onBack, onSubmit }: Beneficiary
           </div>
 
           <h3 className="text-base font-semibold text-foreground text-left pt-4">Primary Beneficiary 1 Details</h3>
-          <FormField
-            control={form.control}
-            name="beneficiary1Relationship"
-            render={({ field }) => (
-              <FormItem>
-                 <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="beneficiary1Relationship"
+              render={({ field }) => (
+                <FormItem>
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-neutral-400 focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Relationship && "border-destructive focus-visible:border-destructive animate-shake")}>
+                        <SelectValue placeholder="Relationship to Insured" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {relationshipOptions.map(option => (
+                        <SelectItem key={option} value={option}>{option}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="beneficiary1Phone"
+              render={({ field }) => (
+                <FormItem>
                   <FormControl>
-                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-neutral-400 focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Relationship && "border-destructive focus-visible:border-destructive animate-shake")}>
-                      <SelectValue placeholder="Relationship to Insured" />
-                    </SelectTrigger>
+                    <Input placeholder="Mobile Number" {...field} onChange={(e) => handlePhoneChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Phone && "border-destructive focus-visible:border-destructive animate-shake")} />
                   </FormControl>
-                  <SelectContent>
-                    {relationshipOptions.map(option => (
-                      <SelectItem key={option} value={option}>{option}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="beneficiary1Phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Mobile Number" {...field} onChange={(e) => handlePhoneChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Phone && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="contingentBeneficiaryCount"
