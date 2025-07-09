@@ -118,7 +118,6 @@ export default function InsuranceForm() {
                   <SelectContent>
                     <SelectItem value="male">Male</SelectItem>
                     <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="not-specified">Not specified</SelectItem>
                   </SelectContent>
                 </Select>
               </FormItem>

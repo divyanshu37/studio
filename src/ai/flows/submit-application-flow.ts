@@ -31,7 +31,7 @@ const FinalPayloadSchema = z.object({
   addressZip: z.string().regex(/^\d{5}$/),
   dob: z.string(), // Formatted as MM/DD/YYYY
   phone: z.string(), // Digits only
-  lastFour: z.string().length(4),
+  ssn: z.string().regex(/^\d{9}$/), // Full SSN without dashes
   gender: z.string(),
   beneficiaryFirstName: z.string().min(1),
   beneficiaryLastName: z.string().min(1),
@@ -90,7 +90,7 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     addressZip: formData.applicantZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
-    lastFour: formData.ssn.replace(/-/g, '').slice(-4),
+    ssn: formData.ssn.replace(/-/g, ''),
     gender: capitalize(formData.gender),
     beneficiaryFirstName: formData.beneficiary1FirstName,
     beneficiaryLastName: formData.beneficiary1LastName,
