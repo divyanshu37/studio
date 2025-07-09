@@ -31,6 +31,16 @@ export const additionalQuestionsFormSchema = z.object({
   healthQuestion3: z.string().min(1, { message: "This question is required." }),
   tobaccoUse: z.string().min(1, { message: 'This question is required.' }),
   existingPolicies: z.string().min(1, { message: 'This question is required.' }),
+  otherHealthIssues: z.string().min(1, { message: 'This question is required.' }),
+  otherHealthIssuesDetails: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['otherHealthIssuesDetails'],
+      message: 'Please provide details about your other health issues.',
+    });
+  }
 });
 export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsFormSchema>;
 
