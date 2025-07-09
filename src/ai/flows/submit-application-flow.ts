@@ -73,12 +73,8 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
   };
   
   const getFullStreet = (street: string, apt?: string) => {
-    if (!apt || apt.trim() === '') {
-      return street;
-    }
-    // Simple check to avoid duplication if user enters street again in apt field
-    if (apt.trim() !== '' && !street.toLowerCase().includes(apt.toLowerCase())) {
-        return `${street}, ${apt}`;
+    if (apt && apt.trim() !== '') {
+      return `${street}, ${apt}`;
     }
     return street;
   };
