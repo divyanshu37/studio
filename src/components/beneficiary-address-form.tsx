@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, formatPhoneNumber } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { usStates } from '@/lib/states';
 
 const relationshipOptions = [
   "Aunt", "Brother", "Child", "Civil Union/Partner", "Cousin", "Dependent", 
@@ -152,9 +153,18 @@ export default function BeneficiaryAddressForm() {
             name="beneficiaryState"
             render={({ field }) => (
               <FormItem>
-                <FormControl>
-                  <Input placeholder="State" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryState && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryState && "border-destructive focus-visible:border-destructive animate-shake")}>
+                      <SelectValue placeholder="State" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {usStates.map(state => (
+                      <SelectItem key={state.abbreviation} value={state.abbreviation}>{state.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />

@@ -10,7 +10,9 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { usStates } from '@/lib/states';
 
 export default function BeneficiaryForm() {
   const { control, formState: { errors } } = useFormContext<BeneficiaryFormValues>();
@@ -79,9 +81,18 @@ export default function BeneficiaryForm() {
             name="applicantState"
             render={({ field }) => (
               <FormItem>
-                <FormControl>
-                  <Input placeholder="State" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantState && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantState && "border-destructive focus-visible:border-destructive animate-shake")}>
+                      <SelectValue placeholder="State" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {usStates.map(state => (
+                      <SelectItem key={state.abbreviation} value={state.abbreviation}>{state.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />
