@@ -55,7 +55,13 @@ export const beneficiaryFormSchema = z.object({
   beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
   beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
   beneficiaryMobile: z.string().optional(),
-  beneficiaryDob: z.string().optional(),
+  beneficiaryDob: z.string().optional().refine((dob) => {
+    if (!dob || dob === "") return true; // Optional field is valid if empty
+    // If a value is present, it must be a complete and valid date
+    return dob.length === 10 && isValid(parse(dob, 'MM/dd/yyyy', new Date()));
+  }, {
+    message: "Invalid date. Please use MM/DD/YYYY format.",
+  }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
   effectiveDate: z.string()
     .min(10, { message: "Please enter a complete effective date." })
