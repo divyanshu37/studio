@@ -229,7 +229,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
             if (currentStep === 'sms-verification' || currentStep === 'CONTRACT_READY') {
               changeStep(8);
-            } else if (currentStep === 'ENROLLMENT_COMPLETE') {
+            } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing') {
               changeStep(9);
             } else if (currentStep === 'RESULT_FAILED' || (isError && error)) {
                 toast({
