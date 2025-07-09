@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -54,7 +55,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const { toast } = useToast();
   
   const [isLayoutCentered, setIsLayoutCentered] = useState(false);
-  const [isAnimatingToStep8, setIsAnimatingToStep8] = useState(false);
+  const [isAnimatingToFinalSteps, setIsAnimatingToFinalSteps] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(fullFormSchema),
@@ -137,13 +138,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
     
-    if (newStep >= 8 && step < 8) {
+    if (newStep >= 6 && step < 6) {
       setHeaderAnimationClass('animate-fade-out-down');
-      setIsAnimatingToStep8(true);
+      setIsAnimatingToFinalSteps(true);
     }
 
     setTimeout(() => {
-      if (newStep < 8 && step >= 8) {
+      if (newStep < 6 && step >= 6) {
         setIsHeaderRendered(true);
         setHeaderAnimationClass('animate-fade-in-up');
         setIsLayoutCentered(false);
@@ -153,17 +154,17 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       setIsAnimatingOut(false);
       setAnimationClass('animate-fade-in-up');
       
-      if (isAnimatingToStep8) {
+      if (isAnimatingToFinalSteps) {
         setIsHeaderRendered(false);
         setIsLayoutCentered(true);
-        setIsAnimatingToStep8(false);
-      } else if (newStep >= 8) {
+        setIsAnimatingToFinalSteps(false);
+      } else if (newStep >= 6) {
         setIsHeaderRendered(false);
         setIsLayoutCentered(true);
       }
 
     }, 300);
-  }, [step, isAnimatingToStep8]);
+  }, [step, isAnimatingToFinalSteps]);
 
   useEffect(() => {
     const stepParam = searchParams.get('step');
