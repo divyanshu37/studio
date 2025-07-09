@@ -47,6 +47,16 @@ export const additionalQuestionsFormSchema = additionalQuestionsObjectSchema.sup
 export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsFormSchema>;
 
 export const beneficiaryFormSchema = z.object({
+  applicantAddress: z.string().min(1, { message: "Address is required." }),
+  applicantApt: z.string().optional(),
+  applicantCity: z.string().min(1, { message: "City is required." }),
+  applicantState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
+  applicantZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
+  beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
+  beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
+  beneficiaryMobile: z.string().optional(),
+  beneficiaryDob: z.string().optional(),
+  beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
   effectiveDate: z.string()
     .min(10, { message: "Please enter a complete effective date." })
     .refine((date) => isValid(parse(date, 'MM/dd/yyyy', new Date())), {
@@ -61,14 +71,6 @@ export const beneficiaryFormSchema = z.object({
     }, {
         message: "Effective date must be today or a future date."
     }),
-  applicantAddress: z.string().min(1, { message: "Address is required." }),
-  applicantApt: z.string().optional(),
-  applicantCity: z.string().min(1, { message: "City is required." }),
-  applicantState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
-  applicantZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
-  beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
-  beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
-  beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 

@@ -27,6 +27,10 @@ export default function BeneficiaryForm() {
     field.onChange(formatDateInput(e.target.value));
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+    field.onChange(formatPhoneNumber(e.target.value));
+  };
+
   return (
     <div className="w-full max-w-2xl space-y-6">
       
@@ -121,6 +125,41 @@ export default function BeneficiaryForm() {
                 <FormItem>
                 <FormControl>
                     <Input placeholder="Beneficiary Last Name" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1LastName && "border-destructive focus-visible:border-destructive animate-shake")} />
+                </FormControl>
+                </FormItem>
+            )}
+            />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+            control={control}
+            name="beneficiaryMobile"
+            render={({ field }) => (
+                <FormItem>
+                <FormControl>
+                    <Input 
+                        placeholder="Beneficiary Mobile (Optional)" 
+                        autoComplete="off" 
+                        {...field} 
+                        onChange={(e) => handlePhoneChange(e, field)}
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryMobile && "border-destructive focus-visible:border-destructive animate-shake")} />
+                </FormControl>
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={control}
+            name="beneficiaryDob"
+            render={({ field }) => (
+                <FormItem>
+                <FormControl>
+                    <Input 
+                        placeholder="Beneficiary Birthdate (Optional)" 
+                        autoComplete="off" 
+                        {...field} 
+                        onChange={(e) => handleDateChange(e, field)}
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryDob && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
                 </FormItem>
             )}
