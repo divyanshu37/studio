@@ -7,13 +7,10 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, formatPhoneNumber } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
-import { usStates } from '@/lib/states';
 
 const relationshipOptions = [
   "Aunt", "Brother", "Child", "Civil Union/Partner", "Cousin", "Dependent", 
@@ -56,22 +53,6 @@ export default function BeneficiaryAddressForm() {
           )}
         />
       </div>
-      <FormField
-        control={control}
-        name="beneficiary1Dob"
-        render={({ field }) => (
-          <FormItem className="flex flex-col text-left">
-            <FormLabel>Date of Birth</FormLabel>
-            <FormControl>
-              <Input
-                type="date"
-                {...field}
-                className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Dob && "border-destructive focus-visible:border-destructive animate-shake")}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
 
       <h3 className="text-base font-semibold text-foreground text-left pt-4">Primary Beneficiary 1 Details</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -106,80 +87,6 @@ export default function BeneficiaryAddressForm() {
             </FormItem>
           )}
         />
-      </div>
-
-      <Separator className="my-8" />
-
-      <div className="space-y-4">
-        <h3 className="text-base font-semibold text-foreground text-left">Beneficiary Address</h3>
-        <FormField
-          control={control}
-          name="beneficiaryAddress"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input placeholder="Street Address" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryAddress && "border-destructive focus-visible:border-destructive animate-shake")} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-           <FormField
-              control={control}
-              name="beneficiaryApt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Apt, suite, etc. (optional)" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryApt && "border-destructive focus-visible:border-destructive animate-shake")} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          <FormField
-            control={control}
-            name="beneficiaryCity"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="City" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryCity && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={control}
-            name="beneficiaryState"
-            render={({ field }) => (
-              <FormItem>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryState && "border-destructive focus-visible:border-destructive animate-shake")}>
-                      <SelectValue placeholder="State" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {usStates.map(state => (
-                      <SelectItem key={state.abbreviation} value={state.abbreviation}>{state.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="beneficiaryZip"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Zip Code" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryZip && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
       </div>
     </div>
   );

@@ -60,16 +60,8 @@ export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 export const beneficiaryAddressFormSchema = z.object({
   beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
   beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
-  beneficiary1Dob: z.string().min(1, { message: "Date of birth is required." }).refine((dob) => isValid(parse(dob, 'yyyy-MM-dd', new Date())), {
-    message: "Invalid date of birth.",
-  }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
   beneficiary1Phone: z.string().min(14, { message: "Please enter a complete phone number." }),
-  beneficiaryAddress: z.string().min(1, { message: "Beneficiary address is required." }),
-  beneficiaryApt: z.string().optional(),
-  beneficiaryCity: z.string().min(1, { message: "Beneficiary city is required." }),
-  beneficiaryState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
-  beneficiaryZip: z.string().regex(/^\d{5}$/, { message: "A valid 5-digit zip code is required." }),
 });
 export type BeneficiaryAddressFormValues = z.infer<typeof beneficiaryAddressFormSchema>;
 

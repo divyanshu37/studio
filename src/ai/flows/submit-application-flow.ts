@@ -35,11 +35,6 @@ const FinalPayloadSchema = z.object({
   gender: z.string(),
   beneficiaryFirstName: z.string().min(1),
   beneficiaryLastName: z.string().min(1),
-  beneficiaryDob: z.string(), // Formatted as MM/DD/YYYY
-  beneficiaryAddressStreet: z.string().min(1),
-  beneficiaryAddressCity: z.string().min(1),
-  beneficiaryAddressState: z.string().length(2),
-  beneficiaryAddressZip: z.string().regex(/^\d{5}$/),
   beneficiaryPhone: z.string(), // Digits only
   beneficiaryRelation: z.string().min(1),
   beneficiaryPercentage: z.string(),
@@ -94,11 +89,6 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     gender: capitalize(formData.gender),
     beneficiaryFirstName: formData.beneficiary1FirstName,
     beneficiaryLastName: formData.beneficiary1LastName,
-    beneficiaryDob: formatDate(formData.beneficiary1Dob),
-    beneficiaryAddressStreet: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
-    beneficiaryAddressCity: formData.beneficiaryCity,
-    beneficiaryAddressState: formData.beneficiaryState,
-    beneficiaryAddressZip: formData.beneficiaryZip,
     beneficiaryPhone: formatPhone(formData.beneficiary1Phone),
     beneficiaryRelation: formData.beneficiary1Relationship,
     beneficiaryPercentage: "100",
