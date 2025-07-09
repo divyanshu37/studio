@@ -137,6 +137,16 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   }, [step, isAnimatingToStep9]);
 
   useEffect(() => {
+    const postSubmissionStep = sessionStorage.getItem('postSubmissionStep');
+    if (postSubmissionStep) {
+      const stepNumber = parseInt(postSubmissionStep, 10);
+      if (!isNaN(stepNumber)) {
+        changeStep(stepNumber);
+        sessionStorage.removeItem('postSubmissionStep');
+        return;
+      }
+    }
+    
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
@@ -174,7 +184,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(7); // Move to loading page
+        sessionStorage.setItem('postSubmissionStep', '7');
+        window.location.reload();
       } else {
         toast({
           variant: "destructive",
