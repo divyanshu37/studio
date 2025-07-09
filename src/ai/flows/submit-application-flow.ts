@@ -124,8 +124,12 @@ const SubmitApplicationOutputSchema = z.object({
 export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSchema>;
 
 // 5. Public-facing function remains the same.
-export async function submitApplication(input: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
-  return submitApplicationFlow(input);
+export async function submitApplication(input: SubmitApplicationInput | SubmitApplicationInput[]): Promise<SubmitApplicationOutput> {
+  const formData = Array.isArray(input) ? input[0] : input;
+  if (!formData) {
+    return { success: false, message: 'Invalid application data provided.' };
+  }
+  return submitApplicationFlow(formData);
 }
 
 // 6. The flow itself is now updated to send the correct flat structure nested in `customData`.

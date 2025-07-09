@@ -77,6 +77,7 @@ export default function InsuranceForm() {
               <FormItem>
                 <FormControl>
                   <Input 
+                    id="email"
                     placeholder="Email" 
                     type="email" 
                     {...field} 
