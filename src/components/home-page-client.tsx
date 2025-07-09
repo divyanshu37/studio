@@ -52,6 +52,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const [isHeaderRendered, setIsHeaderRendered] = useState(true);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pin, setPin] = useState('');
+  const [phoneLastFour, setPhoneLastFour] = useState('');
   const searchParams = useSearchParams();
   const { toast } = useToast();
   
@@ -219,11 +221,22 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
        return;
     }
     
-    const status = data.status;
+    const { status, pin, phoneLastFour } = data;
+
+    if (pin) setPin(pin);
+    if (phoneLastFour) setPhoneLastFour(phoneLastFour);
+
     if (status === 'CONTRACT_READY') {
       changeStep(8);
     } else if (status === 'ENROLLMENT_COMPLETE') {
       changeStep(9);
+    } else if (status === 'RESULT_FAILED' || (data.isError && data.error)) {
+        toast({
+            variant: "destructive",
+            title: "Enrollment Failed",
+            description: data.error || "An error occurred during enrollment.",
+        });
+        changeStep(6);
     }
   }, [changeStep, toast]);
 
@@ -251,7 +264,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       case 7:
         return <SelfEnrollLoading />;
       case 8:
-        return <SelfEnrollContract phoneNumber={form.getValues('phone')} />;
+        return <SelfEnrollContract pin={pin} phoneLastFour={phoneLastFour} />;
       case 9:
         return <SelfEnrollComplete />;
       default:

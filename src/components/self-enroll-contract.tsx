@@ -1,23 +1,13 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-
 interface SelfEnrollContractProps {
-  phoneNumber?: string;
+  pin?: string;
+  phoneLastFour?: string;
 }
 
-export default function SelfEnrollContract({ phoneNumber }: SelfEnrollContractProps) {
-  const [generatedPin, setGeneratedPin] = useState('');
-
-  useEffect(() => {
-    // Generate a random 4-digit PIN on the client to avoid hydration mismatch
-    const newPin = Math.floor(1000 + Math.random() * 9000).toString();
-    setGeneratedPin(newPin);
-  }, []);
-
-  const last4Digits = phoneNumber ? phoneNumber.replace(/[^\d]/g, '').slice(-4) : '2523';
-  const maskedPhoneNumber = `***-***-${last4Digits}`;
+export default function SelfEnrollContract({ pin, phoneLastFour }: SelfEnrollContractProps) {
+  const maskedPhoneNumber = `***-***-${phoneLastFour || 'XXXX'}`;
 
   return (
     <div className="w-full max-w-sm flex flex-col items-center text-center space-y-6">
@@ -34,7 +24,7 @@ export default function SelfEnrollContract({ phoneNumber }: SelfEnrollContractPr
         
         <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
           <p className="text-sm text-primary">Access PIN:</p>
-          <p className="text-4xl font-bold tracking-widest text-primary mt-1">{generatedPin || '----'}</p>
+          <p className="text-4xl font-bold tracking-widest text-primary mt-1">{pin || '----'}</p>
         </div>
       </div>
        <p className="text-sm text-foreground/60 max-w-xs">
