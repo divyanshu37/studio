@@ -87,27 +87,27 @@ export default function AdditionalQuestionsForm() {
                 </Button>
               </div>
             </FormControl>
+            
+            {otherHealthIssuesValue === 'yes' && (
+              <FormField
+                control={control}
+                name="otherHealthIssuesDetails"
+                render={({ field }) => (
+                  <FormItem className="animate-fade-in-up">
+                    <FormControl>
+                      <Textarea
+                        placeholder="Please provide details about your other health issues..."
+                        {...field}
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.otherHealthIssuesDetails && "border-destructive focus-visible:border-destructive animate-shake")}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
           </FormItem>
         )}
       />
-      
-      {otherHealthIssuesValue === 'yes' && (
-        <FormField
-          control={control}
-          name="otherHealthIssuesDetails"
-          render={({ field }) => (
-            <FormItem className="animate-fade-in-up">
-              <FormControl>
-                <Textarea
-                  placeholder="Please provide details about your other health issues..."
-                  {...field}
-                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.otherHealthIssuesDetails && "border-destructive focus-visible:border-destructive animate-shake")}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      )}
     </div>
   );
 }
