@@ -77,8 +77,8 @@ export const beneficiaryFormSchema = z.object({
   applicantAddress: z.string().min(1, { message: "Address is required." }),
   applicantApt: z.string().optional(),
   applicantCity: z.string().min(1, { message: "City is required." }),
-  applicantState: z.string().min(1, { message: "State is required." }),
-  applicantZip: z.string().min(5, { message: "A valid zip code is required." }),
+  applicantState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
+  applicantZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
@@ -93,8 +93,8 @@ export const beneficiaryAddressFormSchema = z.object({
   beneficiaryAddress: z.string().min(1, { message: "Beneficiary address is required." }),
   beneficiaryApt: z.string().optional(),
   beneficiaryCity: z.string().min(1, { message: "Beneficiary city is required." }),
-  beneficiaryState: z.string().min(1, { message: "Beneficiary state is required." }),
-  beneficiaryZip: z.string().min(5, { message: "A valid beneficiary zip code is required." }),
+  beneficiaryState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
+  beneficiaryZip: z.string().regex(/^\d{5}$/, { message: "A valid 5-digit zip code is required." }),
 });
 export type BeneficiaryAddressFormValues = z.infer<typeof beneficiaryAddressFormSchema>;
 
