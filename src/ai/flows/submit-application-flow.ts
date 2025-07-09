@@ -19,33 +19,33 @@ const SubmitApplicationInputSchema = fullFormSchema.extend({
 });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
-// 2. Define the exact shape the API expects.
+// 2. Define the exact shape the API expects with robust validation.
 const ApplicantDataSchema = z.object({
-  referenceId: z.string(),
-  email: z.string(),
+  referenceId: z.string().uuid(),
+  email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
   addressStreet: z.string(),
   addressCity: z.string(),
-  addressState: z.string(),
-  addressZip: z.string(),
+  addressState: z.string().length(2),
+  addressZip: z.string().regex(/^\d{5}$/),
   dob: z.string(), // Formatted as MM/DD/YYYY
   phone: z.string(), // Formatted as digits only
-  lastFour: z.string(),
+  lastFour: z.string().length(4),
   gender: z.string(),
   beneficiaryFirstName: z.string(),
   beneficiaryLastName: z.string(),
   beneficiaryDob: z.string(), // Formatted as MM/DD/YYYY
   beneficiaryAddressStreet: z.string(),
   beneficiaryAddressCity: z.string(),
-  beneficiaryAddressState: z.string(),
-  beneficiaryAddressZip: z.string(),
+  beneficiaryAddressState: z.string().length(2),
+  beneficiaryAddressZip: z.string().regex(/^\d{5}$/),
   beneficiaryPhone: z.string(), // Formatted as digits only
   beneficiaryRelation: z.string(),
   beneficiaryPercentage: z.string(),
   faceAmount: z.string(),
   paymentAccountHolderName: z.string(),
-  paymentRoutingNumber: z.string(),
+  paymentRoutingNumber: z.string().length(9),
   paymentAccountNumber: z.string(),
 });
 type ApplicantData = z.infer<typeof ApplicantDataSchema>;
