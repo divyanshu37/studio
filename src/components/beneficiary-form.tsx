@@ -151,7 +151,7 @@ export default function BeneficiaryForm() {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 pt-4">
         <FormField
           control={control}
           name="effectiveDate"
