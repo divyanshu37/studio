@@ -102,7 +102,7 @@ export const paymentFormSchema = z.object({
   coverage: z.string().min(1, { message: "Coverage amount is required." }),
   accountHolderName: z.string().min(1, { message: "Account holder name is required." }),
   accountNumber: z.string().min(1, { message: "Account number is required." }),
-  routingNumber: z.string().min(8, { message: "A valid 8-digit routing number is required." }).max(8, { message: "A valid 8-digit routing number is required." }),
+  routingNumber: z.string().length(9, { message: "A valid 9-digit routing number is required." }),
 });
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 

@@ -45,7 +45,7 @@ const ApplicantDataSchema = z.object({
   beneficiaryPercentage: z.string(),
   faceAmount: z.string(),
   paymentAccountHolderName: z.string(),
-  paymentRoutingNumber: z.string().length(8),
+  paymentRoutingNumber: z.string().length(9),
   paymentAccountNumber: z.string(),
 });
 type ApplicantData = z.infer<typeof ApplicantDataSchema>;
