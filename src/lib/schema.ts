@@ -47,7 +47,6 @@ export const additionalQuestionsFormSchema = additionalQuestionsObjectSchema.sup
 export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsFormSchema>;
 
 export const beneficiaryFormSchema = z.object({
-  coverage: z.string().min(1, { message: "Coverage amount is required." }),
   applicantAddress: z.string().min(1, { message: "Address is required." }),
   applicantApt: z.string().optional(),
   applicantCity: z.string().min(1, { message: "City is required." }),
@@ -64,10 +63,11 @@ export const beneficiaryFormSchema = z.object({
     message: "Invalid date. Please use MM/DD/YYYY format.",
   }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
+  coverage: z.string().min(1, { message: "Coverage amount is required." }),
   effectiveDate: z.string().optional().refine((date) => {
     if (!date || date === "") return true; // Optional field
     if (date.length !== 10) return false; // Must be full date if entered
-    const parsedDate = parse(date, 'MM/dd/yyyy', new Date());
+    const parsedDate = parse(date, 'MM/DD/YYYY', new Date());
     if (!isValid(parsedDate)) return false; // Must be a valid date
     const today = new Date();
     today.setHours(0, 0, 0, 0);

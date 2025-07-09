@@ -38,27 +38,6 @@ export default function BeneficiaryForm() {
   return (
     <div className="w-full max-w-2xl space-y-6">
       
-      <FormField
-        control={control}
-        name="coverage"
-        render={({ field }) => (
-          <FormItem>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.coverage && "border-destructive focus-visible:border-destructive animate-shake")}>
-                  <SelectValue placeholder="Select Coverage Amount" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {coverageOptions.map(option => (
-                  <SelectItem key={option} value={option}>{option}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormItem>
-        )}
-      />
-
       <div className="space-y-4">
         <FormField
           control={control}
@@ -216,6 +195,26 @@ export default function BeneficiaryForm() {
       </div>
 
       <div className="space-y-4 pt-8">
+        <FormField
+          control={control}
+          name="coverage"
+          render={({ field }) => (
+            <FormItem>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.coverage && "border-destructive focus-visible:border-destructive animate-shake")}>
+                    <SelectValue placeholder="Select Coverage Amount" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {coverageOptions.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
         <FormField
           control={control}
           name="effectiveDate"
