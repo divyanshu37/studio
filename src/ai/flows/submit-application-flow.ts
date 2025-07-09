@@ -19,40 +19,51 @@ const SubmitApplicationInputSchema = fullFormSchema.extend({
 });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
-// 2. Define the exact FLAT shape the backend's `customData` object expects.
-const WebhookBodySchema = z.object({
+// 2. Define the exact NESTED shape the backend's `customData` object expects.
+const AddressSchema = z.object({
+  street: z.string().min(1),
+  city: z.string().min(1),
+  state: z.string().length(2),
+  zip: z.string().regex(/^\d{5}$/),
+});
+
+const BeneficiarySchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  dob: z.string(), // Formatted as MM/DD/YYYY
+  address: AddressSchema,
+  phone: z.string(), // Formatted as digits only
+  relation: z.string().min(1),
+  percentage: z.string(),
+});
+
+const PaymentSchema = z.object({
+    accountHolderName: z.string().min(1),
+    accountHolderPhone: z.string(), // Digits only
+    routingNumber: z.string().length(9),
+    accountNumber: z.string().min(1),
+});
+
+const FinalPayloadSchema = z.object({
   referenceId: z.string().uuid(),
   email: z.string().email(),
-  firstName: z.string(),
-  lastName: z.string(),
-  addressStreet: z.string(),
-  addressCity: z.string(),
-  addressState: z.string(),
-  addressZip: z.string(),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  state: z.string().length(2),
+  address: AddressSchema,
   dob: z.string(), // Formatted as MM/DD/YYYY
-  phone: z.string(), // Formatted as digits only
+  phone: z.string(), // Digits only
   lastFour: z.string().length(4),
   gender: z.string(),
-  beneficiaryFirstName: z.string(),
-  beneficiaryLastName: z.string(),
-  beneficiaryDob: z.string(), // Formatted as MM/DD/YYYY
-  beneficiaryAddressStreet: z.string(),
-  beneficiaryAddressCity: z.string(),
-  beneficiaryAddressState: z.string(),
-  beneficiaryAddressZip: z.string(),
-  beneficiaryPhone: z.string(), // Formatted as digits only
-  beneficiaryRelation: z.string(),
-  beneficiaryPercentage: z.string(),
+  beneficiary: BeneficiarySchema,
   faceAmount: z.string(),
-  paymentAccountHolderName: z.string(),
-  paymentRoutingNumber: z.string(),
-  paymentAccountNumber: z.string(),
+  payment: PaymentSchema,
 });
-type WebhookBody = z.infer<typeof WebhookBodySchema>;
+type FinalPayload = z.infer<typeof FinalPayloadSchema>;
 
 
 // 3. Create the dedicated, pure transformation function.
-function transformDataForApi(formData: SubmitApplicationInput): WebhookBody {
+function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
   const formatDate = (dateString: string) => {
     // Input format from <input type="date"> is YYYY-MM-DD
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
@@ -77,44 +88,54 @@ function transformDataForApi(formData: SubmitApplicationInput): WebhookBody {
       return street;
     }
     // Simple check to avoid duplication if user enters street again in apt field
-    if (street.toLowerCase().includes(apt.toLowerCase())) {
-      return street;
+    if (apt.trim() !== '' && !street.toLowerCase().includes(apt.toLowerCase())) {
+        return `${street}, ${apt}`;
     }
-    return `${street}, ${apt}`;
+    return street;
   };
 
-  const transformedData: WebhookBody = {
+  const transformedData: FinalPayload = {
     referenceId: formData.referenceId,
     email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
-    addressStreet: getFullStreet(formData.applicantAddress, formData.applicantApt),
-    addressCity: formData.applicantCity,
-    addressState: formData.applicantState,
-    addressZip: formData.applicantZip,
+    state: formData.applicantState,
+    address: {
+      street: getFullStreet(formData.applicantAddress, formData.applicantApt),
+      city: formData.applicantCity,
+      state: formData.applicantState,
+      zip: formData.applicantZip,
+    },
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
     lastFour: formData.ssn.replace(/-/g, '').slice(-4),
     gender: capitalize(formData.gender),
-    beneficiaryFirstName: formData.beneficiary1FirstName,
-    beneficiaryLastName: formData.beneficiary1LastName,
-    beneficiaryDob: formatDate(formData.beneficiary1Dob),
-    beneficiaryAddressStreet: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
-    beneficiaryAddressCity: formData.beneficiaryCity,
-    beneficiaryAddressState: formData.beneficiaryState,
-    beneficiaryAddressZip: formData.beneficiaryZip,
-    beneficiaryPhone: formatPhone(formData.beneficiary1Phone),
-    beneficiaryRelation: formData.beneficiary1Relationship,
-    beneficiaryPercentage: "100",
+    beneficiary: {
+      firstName: formData.beneficiary1FirstName,
+      lastName: formData.beneficiary1LastName,
+      dob: formatDate(formData.beneficiary1Dob),
+      address: {
+        street: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
+        city: formData.beneficiaryCity,
+        state: formData.beneficiaryState,
+        zip: formData.beneficiaryZip,
+      },
+      phone: formatPhone(formData.beneficiary1Phone),
+      relation: formData.beneficiary1Relationship,
+      percentage: "100",
+    },
     faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
-    paymentAccountHolderName: formData.accountHolderName,
-    paymentRoutingNumber: formData.routingNumber,
-    paymentAccountNumber: formData.accountNumber,
+    payment: {
+      accountHolderName: formData.accountHolderName,
+      accountHolderPhone: formatPhone(formData.phone), // Mapping applicant's phone
+      routingNumber: formData.routingNumber,
+      accountNumber: formData.accountNumber,
+    },
   };
   
   // This is the "test" that validates the data *after* transformation.
   // If it fails, something is wrong with the transformation logic, and it will throw an error.
-  return WebhookBodySchema.parse(transformedData);
+  return FinalPayloadSchema.parse(transformedData);
 }
 
 // 4. Define the output of the flow.
@@ -151,16 +172,13 @@ const submitApplicationFlow = ai.defineFlow(
     }
 
     try {
-      const webhookBody = transformDataForApi(formData);
+      // The backend expects the data to be nested inside a `customData` object.
+      // However, the final schema is a different one. We now transform to a new payload.
+      const finalPayload = transformDataForApi(formData);
       
-      // IMPORTANT: Nest the flat webhookBody inside the `customData` object.
-      const finalPayload = {
-        customData: webhookBody
-      };
-
       const response = await axios.post(
         `${backendUrl}/insurance-webhook`, 
-        finalPayload,
+        { customData: finalPayload }, // Nesting the final transformed payload
         { headers: { 'insurance-api-key': apiKey } }
       );
       
@@ -186,8 +204,10 @@ const submitApplicationFlow = ai.defineFlow(
       
       if (error instanceof z.ZodError) {
         const flattenedErrors = error.flatten();
-        const errorMessages = Object.values(flattenedErrors.fieldErrors).flat();
-        return { success: false, message: `Data validation failed: ${errorMessages.join(', ')}` || 'Invalid data provided.' };
+        const errorMessages = Object.entries(flattenedErrors.fieldErrors)
+            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .join('; ');
+        return { success: false, message: `Data validation failed: ${errorMessages}` || 'Invalid data provided.' };
       }
 
       console.error('An unknown error occurred during submission:', error);
