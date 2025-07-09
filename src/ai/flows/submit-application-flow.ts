@@ -45,7 +45,7 @@ const ApplicantDataSchema = z.object({
   beneficiaryPercentage: z.string(),
   faceAmount: z.string(),
   paymentAccountHolderName: z.string(),
-  paymentRoutingNumber: z.string().length(9),
+  paymentRoutingNumber: z.string().length(8),
   paymentAccountNumber: z.string(),
 });
 type ApplicantData = z.infer<typeof ApplicantDataSchema>;
@@ -161,7 +161,7 @@ const submitApplicationFlow = ai.defineFlow(
       if (error instanceof z.ZodError) {
         const flattenedErrors = error.flatten();
         const errorMessages = Object.values(flattenedErrors.fieldErrors).flat();
-        console.error('--- submitApplicationFlow: FAILED - Data validation failed ---', flattenedErrors);
+        console.error('--- submitApplicationFlow: FAILED - Data transformation failed ---', flattenedErrors);
         return { success: false, message: errorMessages.join(', ') || 'Invalid data provided.' };
       }
 
