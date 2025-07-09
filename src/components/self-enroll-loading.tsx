@@ -9,7 +9,7 @@ export default function SelfEnrollLoading() {
       <Badge variant="secondary" className="px-6 py-2 text-base font-semibold rounded-full bg-black text-white hover:bg-black/90">
         Self-Enrolling
       </Badge>
-      <p className="text-base text-foreground/80 max-w-md">
+      <p className="text-base text-foreground/80 max-w-xl">
         We've started the process of completing your application!
         Keep this page open. You will be advanced to the next step automatically.
         Please have your phone ready.
