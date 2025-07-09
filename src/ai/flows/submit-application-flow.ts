@@ -70,13 +70,24 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
     if (typeof s !== 'string' || s.length === 0) return '';
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
+  
+  const getFullStreet = (street: string, apt?: string) => {
+    if (!apt) {
+      return street;
+    }
+    // Simple check to avoid duplication if user enters street again in apt field
+    if (street.toLowerCase().includes(apt.toLowerCase())) {
+      return street;
+    }
+    return `${street} ${apt}`;
+  };
 
   const transformedData: ApplicantData = {
     referenceId: formData.referenceId,
     email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
-    addressStreet: [formData.applicantAddress, formData.applicantApt].filter(Boolean).join(' '),
+    addressStreet: getFullStreet(formData.applicantAddress, formData.applicantApt),
     addressCity: formData.applicantCity,
     addressState: formData.applicantState,
     addressZip: formData.applicantZip,
@@ -87,7 +98,7 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
     beneficiaryFirstName: formData.beneficiary1FirstName,
     beneficiaryLastName: formData.beneficiary1LastName,
     beneficiaryDob: formatDate(formData.beneficiary1Dob),
-    beneficiaryAddressStreet: [formData.beneficiaryAddress, formData.beneficiaryApt].filter(Boolean).join(' '),
+    beneficiaryAddressStreet: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
     beneficiaryAddressCity: formData.beneficiaryCity,
     beneficiaryAddressState: formData.beneficiaryState,
     beneficiaryAddressZip: formData.beneficiaryZip,
