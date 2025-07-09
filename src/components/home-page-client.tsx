@@ -229,7 +229,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
             if (currentStep === 'sms-verification' || currentStep === 'CONTRACT_READY') {
               changeStep(8);
-            } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing') {
+            } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing' || currentStep === 'RESULT_SUCCESS') {
               changeStep(9);
             } else if (currentStep === 'RESULT_FAILED' || (isError && error)) {
                 toast({
@@ -251,7 +251,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     }
   }, [changeStep, toast]);
 
-  const subscribeId = step === 7 ? uuid : null;
+  const subscribeId = (step === 7 || step === 8) ? uuid : null;
   useSocket(subscribeId, handleSocketUpdate);
 
   const handleStepChange = (newStep: number) => {
