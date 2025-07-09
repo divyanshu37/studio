@@ -45,8 +45,6 @@ const stepFields: (keyof FormValues)[][] = [
 export default function HomePageClient({ uuid }: { uuid: string }) {
   const [step, setStep] = useState(1);
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
-  const [headerAnimationClass, setHeaderAnimationClass] = useState('animate-fade-in-up');
-  const [isHeaderRendered, setIsHeaderRendered] = useState(true);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pin, setPin] = useState('');
@@ -54,9 +52,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   
-  const [isLayoutCentered, setIsLayoutCentered] = useState(false);
-  const [isAnimatingToFinalSteps, setIsAnimatingToFinalSteps] = useState(false);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(fullFormSchema),
     mode: 'onTouched',
@@ -137,34 +132,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
-    
-    if (newStep >= 6 && step < 6) {
-      setHeaderAnimationClass('animate-fade-out-down');
-      setIsAnimatingToFinalSteps(true);
-    }
 
     setTimeout(() => {
-      if (newStep < 6 && step >= 6) {
-        setIsHeaderRendered(true);
-        setHeaderAnimationClass('animate-fade-in-up');
-        setIsLayoutCentered(false);
-      }
-      
       setStep(newStep);
       setIsAnimatingOut(false);
       setAnimationClass('animate-fade-in-up');
-      
-      if (isAnimatingToFinalSteps) {
-        setIsHeaderRendered(false);
-        setIsLayoutCentered(true);
-        setIsAnimatingToFinalSteps(false);
-      } else if (newStep >= 6) {
-        setIsHeaderRendered(false);
-        setIsLayoutCentered(true);
-      }
-
     }, 300);
-  }, [step, isAnimatingToFinalSteps]);
+  }, [step]);
 
   useEffect(() => {
     const stepParam = searchParams.get('step');
@@ -368,15 +342,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       )}
 
       <main className="flex-1 flex flex-col items-center w-full px-8 sm:px-12 text-center">
-        <div className={cn(
-          "max-w-4xl w-full flex flex-col items-center flex-1 pt-24",
-          isLayoutCentered && "justify-center pt-0"
-        )}>
-            <div className={cn(
-              "flex flex-col items-center",
-              headerAnimationClass,
-              !isHeaderRendered && "hidden"
-            )}>
+        <div className="max-w-4xl w-full flex flex-col items-center flex-1 pt-24">
+            <div className="flex flex-col items-center">
               <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
               <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                   State and Congress Approved Final Expense Benefits Emergency Funds
@@ -391,10 +358,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
               </p>
             </div>
 
-            <div className={cn(
-              "w-full flex justify-center",
-              isLayoutCentered && "flex-1 items-center",
-            )}>
+            <div className="w-full flex justify-center">
               <FormProvider {...form}>
                 <form onSubmit={form.handleSubmit(processForm)} className={cn("w-full flex flex-col items-center", animationClass)}>
                   {renderStep()}
