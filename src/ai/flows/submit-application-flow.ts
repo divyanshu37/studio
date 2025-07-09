@@ -116,11 +116,10 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
   return FinalPayloadSchema.parse(transformedData);
 }
 
-// 4. Define the output of the flow.
+// 4. Define the output of the flow. A policyId is not returned by the async webhook.
 const SubmitApplicationOutputSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  policyId: z.string().optional(),
 });
 export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSchema>;
 
@@ -141,11 +140,9 @@ const submitApplicationFlow = ai.defineFlow(
     const apiKey = process.env.INSURANCE_API_KEY;
 
     if (!backendUrl) {
-      console.error('BACKEND_URL environment variable is not set.');
       return { success: false, message: 'Server configuration error: Missing backend URL.' };
     }
      if (!apiKey) {
-      console.error('INSURANCE_API_KEY environment variable is not set.');
       return { success: false, message: 'Server configuration error: Missing API Key.' };
     }
 
@@ -160,15 +157,15 @@ const submitApplicationFlow = ai.defineFlow(
       );
       
       const result = response.data;
-      // Stricter success check: ensure a policyId is returned.
-      if (response.status >= 200 && response.status < 300 && result?.policyId) {
+      // If we get a 2xx status, the webhook accepted the request.
+      // The actual processing result will come via WebSocket.
+      if (response.status >= 200 && response.status < 300) {
         return {
           success: true,
-          message: 'Application submitted successfully!',
-          policyId: result.policyId,
+          message: 'Application submitted successfully! Waiting for backend processing.',
         };
       } else {
-        const errorMessage = result?.message || 'Backend processed the request, but the submission was not successful.';
+        const errorMessage = result?.message || 'Backend rejected the request.';
         return {
           success: false,
           message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage,
