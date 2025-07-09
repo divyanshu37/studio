@@ -138,21 +138,24 @@ const submitApplicationFlow = ai.defineFlow(
     outputSchema: SubmitApplicationOutputSchema,
   },
   async (formData) => {
+    console.log('--- submitApplicationFlow: Started ---');
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     if (!backendUrl) {
-      console.error('BACKEND_URL environment variable is not set.');
+      console.error('--- submitApplicationFlow: FAILED - BACKEND_URL environment variable is not set. ---');
       return { success: false, message: 'Server configuration error.' };
     }
 
     try {
       // Step 1: Transform the data using our new, reliable function.
       const applicantData = transformDataForApi(formData);
+      console.log('--- submitApplicationFlow: Data transformation successful. ---');
       
       // Step 2: Send it to the backend.
       console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance`);
       const response = await axios.post(`${backendUrl}/insurance`, applicantData);
       const result = response.data;
+      console.log('--- submitApplicationFlow: API submission successful. ---');
 
       return {
         success: true,
@@ -161,18 +164,18 @@ const submitApplicationFlow = ai.defineFlow(
       };
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        console.error('API submission failed:', error.response.status, error.response.data);
+        console.error('--- submitApplicationFlow: FAILED - API submission failed ---', error.response.status, error.response.data);
         const errorMessage = error.response.data.message || 'API submission failed.';
         return { success: false, message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage };
       }
       
       // This will catch Zod errors from the transform function as well.
       if (error instanceof z.ZodError) {
-        console.error('Data transformation failed:', error.flatten());
+        console.error('--- submitApplicationFlow: FAILED - Data transformation failed ---', error.flatten());
         return { success: false, message: 'Data transformation failed. Please check the inputs.' };
       }
 
-      console.error('API submission error:', error);
+      console.error('--- submitApplicationFlow: FAILED - Unknown error ---', error);
       return { success: false, message: 'Failed to connect to the server.' };
     }
   }
