@@ -2,7 +2,7 @@
 import { Suspense } from 'react';
 import HomePageClient from '@/components/home-page-client';
 
-export default async function UuidPage({ params }: { params: { uuid: string } }) {
+export default function UuidPage({ params }: { params: { uuid: string } }) {
   return (
     <Suspense fallback={
       <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body items-center justify-center">
