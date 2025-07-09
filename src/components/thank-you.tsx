@@ -8,11 +8,11 @@ interface ThankYouProps {
 
 export default function ThankYou({ onSelfEnroll }: ThankYouProps) {
   return (
-    <div className="w-full max-w-4xl flex flex-col md:flex-row justify-center items-stretch gap-8 text-center">
+    <div className="w-full max-w-4xl flex flex-col md:flex-row-reverse justify-center items-stretch gap-8 text-center">
       {/* Self-Enroll Card */}
       <div 
         onClick={onSelfEnroll}
-        className="w-full md:w-1/2 p-8 bg-primary text-primary-foreground rounded-lg shadow-xl flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
+        className="w-full md:w-1/2 p-8 bg-primary text-primary-foreground rounded-lg shadow-xl flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer border-2 border-white"
       >
         <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">Self-Enroll</h2>
         <Separator className="bg-primary-foreground/50 my-2 w-full" />
