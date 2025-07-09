@@ -134,18 +134,31 @@ const submitApplicationFlow = ai.defineFlow(
     }
 
     try {
-      // Step 1: Transform and validate the data using our new, reliable function.
+      console.log('--- submitApplicationFlow: Started ---');
       const applicantData = transformDataForApi(formData);
+      console.log('--- submitApplicationFlow: Data transformation successful. ---');
       
-      // Step 2: Send it to the backend.
+      console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance`);
       const response = await axios.post(`${backendUrl}/insurance`, applicantData);
+      
+      console.log('--- submitApplicationFlow: Received response from backend ---', 'Status:', response.status, 'Data:', JSON.stringify(response.data, null, 2));
+      
       const result = response.data;
-
-      return {
-        success: true,
-        message: 'Application submitted successfully!',
-        policyId: result.policyId,
-      };
+      if (response.status >= 200 && response.status < 300 && result && result.policyId) {
+        console.log('--- submitApplicationFlow: API submission successful. ---');
+        return {
+          success: true,
+          message: 'Application submitted successfully!',
+          policyId: result.policyId,
+        };
+      } else {
+        const errorMessage = result?.message || 'Backend processed the request, but the submission was not successful.';
+        console.error('--- submitApplicationFlow: FAILED - Backend indicated failure ---', errorMessage);
+        return {
+          success: false,
+          message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage,
+        };
+      }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         console.error('--- submitApplicationFlow: FAILED - API submission failed ---', error.response.status, error.response.data);
