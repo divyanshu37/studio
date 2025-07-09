@@ -149,8 +149,8 @@ const submitApplicationFlow = ai.defineFlow(
       const applicantData = transformDataForApi(formData);
       console.log('--- submitApplicationFlow: Data transformation successful. ---');
       
-      console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance`);
-      const response = await axios.post(`${backendUrl}/insurance`, applicantData);
+      console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance-webhook`);
+      const response = await axios.post(`${backendUrl}/insurance-webhook`, applicantData);
       
       console.log('--- submitApplicationFlow: Received response from backend ---', 'Status:', response.status, 'Data:', JSON.stringify(response.data, null, 2));
       
