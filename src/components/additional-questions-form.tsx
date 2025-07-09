@@ -4,180 +4,55 @@
 import type { AdditionalQuestionsFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function AdditionalQuestionsForm() {
   const { control, formState: { errors } } = useFormContext<AdditionalQuestionsFormValues>();
 
+  const questions = [
+    { name: 'differentOwner', label: 'Is the policy owner different than the insured?' },
+    { name: 'healthQuestion1', label: 'Have you ever been diagnosed or treated for HIV, AIDS, bipolar, schizophrenia, dementia, or any progressive neurological disorder?' },
+    { name: 'healthQuestion2', label: 'Have you ever used oxygen or dialysis for any condition?' },
+    { name: 'healthQuestion3', label: 'In the last 5 years, have you had cancer (non-skin), stroke, heart attack, insulin-treated diabetes, COPD, hepatitis, cirrhosis, drug/alcohol abuse, PAH, hereditary angioedema, or pending tests for any of these?' },
+    { name: 'tobaccoUse', label: 'Have you used any nicotine products in the past 12 months?' },
+    { name: 'existingPolicies', label: 'Do you have any existing life or annuity policies with this or another company?' },
+  ] as const;
+
   return (
     <div className="w-full max-w-2xl space-y-6">
-      <FormField
-        control={control}
-        name="differentOwner"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.differentOwner && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Is the policy owner different than the insured?</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="no" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-       <FormField
-        control={control}
-        name="healthQuestion1"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.healthQuestion1 && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Have you ever been diagnosed, treated, tested positive for, or been given any medical advice by a member of the medical profession for AIDS or HIV, Bipolar Disorder, Schizophrenia, Alzheimer's, Dementia, or other progressive neurological disorder? *</FormLabel>
-             <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="no" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-       <FormField
-        control={control}
-        name="healthQuestion2"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.healthQuestion2 && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Have you ever been diagnosed, treated, tested positive for, or been given any medical advice by a member of the medical profession for any condition that requires the use of oxygen or dialysis? *</FormLabel>
-             <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="no" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="healthQuestion3"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.healthQuestion3 && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Within the last 5 years, have you been diagnosed with, hospitalized, treated by a licensed member of the medical profession for Cancer (except basal/squamous cell of the skin), Stroke, Heart Attack, Diabetes requiring insulin, Chronic Obstructive Pulmonary Disease (COPD), Chronic Hepatitis, Cirrhosis of the Liver, Alcohol or Drug Abuse, Pulmonary Arterial Hypertension or Hereditary Angioedema except those related to the Human Immunodeficiency Virus (HIV) or have you had any diagnostic testing that has not been completed for any of the conditions listed above? *</FormLabel>
-             <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="yes" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="no" className="border-foreground/80 border-2" />
-                  </FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="tobaccoUse"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.tobaccoUse && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Has the proposed applicant used tobacco or nicotine in the last 12 months including cigarettes, cigars, chewing tobacco, vape, nicotine gum, or nicotine patch? *</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="yes" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="no" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="existingPolicies"
-        render={({ field }) => (
-          <FormItem className={cn("space-y-3 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors.existingPolicies && "border-destructive animate-shake")}>
-            <FormLabel className="text-base font-semibold text-foreground">Does the proposed applicant have any existing life or annuity policies with Combined Insurance or any other company? *</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="yes" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">Yes</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl><RadioGroupItem value="no" className="border-foreground/80 border-2" /></FormControl>
-                  <FormLabel className="font-normal">No</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-          </FormItem>
-        )}
-      />
+      {questions.map((q) => (
+        <FormField
+          key={q.name}
+          control={control}
+          name={q.name}
+          render={({ field }) => (
+            <FormItem className={cn("space-y-4 p-6 bg-card/50 rounded-lg shadow-lg text-left border-2 border-transparent", errors[q.name] && "border-destructive animate-shake")}>
+              <FormLabel className="text-base font-semibold text-foreground text-center block">{q.label}</FormLabel>
+              <FormControl>
+                <div className="flex justify-center items-center gap-4">
+                  <Button
+                    type="button"
+                    variant={field.value === 'yes' ? 'default' : 'outline'}
+                    className="w-32"
+                    onClick={() => field.onChange('yes')}
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={field.value === 'no' ? 'default' : 'outline'}
+                    className="w-32"
+                    onClick={() => field.onChange('no')}
+                  >
+                    No
+                  </Button>
+                </div>
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      ))}
     </div>
   );
 }

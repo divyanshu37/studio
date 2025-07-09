@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -71,12 +70,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       dob: '',
       ssn: '',
       gender: '',
-      differentOwner: '',
-      healthQuestion1: '',
-      healthQuestion2: '',
-      healthQuestion3: '',
-      tobaccoUse: "",
-      existingPolicies: "",
+      differentOwner: 'no',
+      healthQuestion1: 'no',
+      healthQuestion2: 'no',
+      healthQuestion3: 'no',
+      tobaccoUse: 'no',
+      existingPolicies: 'no',
       effectiveDate: "",
       applicantAddress: "",
       applicantApt: "",
