@@ -29,6 +29,7 @@ export default function InsuranceForm() {
                 <FormControl>
                   <Input 
                     placeholder="First Name" 
+                    autoComplete="given-name"
                     {...field} 
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.firstName && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
@@ -44,6 +45,7 @@ export default function InsuranceForm() {
                 <FormControl>
                   <Input 
                     placeholder="Last Name" 
+                    autoComplete="family-name"
                     {...field} 
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.lastName && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
@@ -61,6 +63,7 @@ export default function InsuranceForm() {
                 <FormControl>
                   <Input 
                     placeholder="Valid Phone Number" 
+                    autoComplete="tel"
                     {...field} 
                     onChange={(e) => handlePhoneChange(e, field)} 
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.phone && "border-destructive focus-visible:border-destructive animate-shake")} 
@@ -79,6 +82,7 @@ export default function InsuranceForm() {
                     id="email"
                     placeholder="Email" 
                     type="email" 
+                    autoComplete="email"
                     {...field} 
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.email && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
@@ -97,6 +101,7 @@ export default function InsuranceForm() {
                   <Input
                     type="text"
                     placeholder="Birthdate"
+                    autoComplete="bday"
                     {...field}
                     onChange={(e) => handleDateChange(e, field)}
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.dob && "border-destructive focus-visible:border-destructive animate-shake")} 
