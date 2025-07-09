@@ -4,11 +4,12 @@ import { Separator } from "@/components/ui/separator";
 
 interface ThankYouProps {
   onSelfEnroll: () => void;
+  onSpeakToAgent: () => void;
 }
 
-export default function ThankYou({ onSelfEnroll }: ThankYouProps) {
+export default function ThankYou({ onSelfEnroll, onSpeakToAgent }: ThankYouProps) {
   return (
-    <div className="w-full max-w-4xl flex flex-col md:flex-row-reverse justify-center items-stretch gap-8 text-center">
+    <div className="w-full max-w-4xl flex flex-col-reverse md:flex-row justify-center items-stretch gap-8 text-center">
       {/* Self-Enroll Card */}
       <div 
         onClick={onSelfEnroll}
@@ -27,7 +28,10 @@ export default function ThankYou({ onSelfEnroll }: ThankYouProps) {
       </div>
 
       {/* Speak to an Agent Card */}
-      <div className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1">
+      <div
+        onClick={onSpeakToAgent}
+        className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
+      >
         <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">Speak to an Agent</h2>
         <Separator className="bg-primary/50 my-2 w-full" />
         <div className="my-4 h-8 flex items-center">

@@ -32,6 +32,7 @@ import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
+import AgentHandoffComplete from '@/components/agent-handoff-complete';
 import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
 
@@ -118,7 +119,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         beneficiaryMobile: "(123) 456-7890",
         beneficiaryDob: "01/01/1980",
         beneficiary1Relationship: "Brother",
-        coverage: "$$ 10,000",
+        coverage: "$ 10,000",
         accountHolderName: "Jerry",
         accountNumber: "498534875873465",
         routingNumber: "566576578",
@@ -144,7 +145,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 8) {
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
         changeStep(stepNumber);
       }
     }
@@ -212,6 +213,10 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       changeStep(stepWithError + 1);
     }
   };
+
+  const handleSpeakToAgent = () => {
+    changeStep(9);
+  };
   
   const handleSocketUpdate = useCallback((data: any) => {
     if (data.error) {
@@ -274,19 +279,21 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       case 4:
         return <PaymentForm />;
       case 5:
-        return <ThankYou onSelfEnroll={() => form.handleSubmit(handleSelfEnrollSubmit, handleSelfEnrollError)()} />;
+        return <ThankYou onSelfEnroll={() => form.handleSubmit(handleSelfEnrollSubmit, handleSelfEnrollError)()} onSpeakToAgent={handleSpeakToAgent} />;
       case 6:
         return <SelfEnrollLoading />;
       case 7:
         return <SelfEnrollContract pin={pin} phoneLastFour={phoneLastFour} />;
       case 8:
         return <SelfEnrollComplete />;
+      case 9:
+        return <AgentHandoffComplete />;
       default:
         return <InsuranceForm />;
     }
   };
 
-  const showSubheading = step <= 5;
+  const showHeader = step <= 5;
   const showNavigation = step >= 1 && step <= 4;
 
   const getErrorMessage = () => {
@@ -314,7 +321,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
         <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
           <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button
               key={num}
               onClick={() => handleStepChange(num)}
@@ -341,22 +348,21 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         </div>
       )}
 
-      <main className="flex-1 flex flex-col items-center w-full px-8 sm:px-12 text-center">
-        <div className="max-w-4xl w-full flex flex-col items-center flex-1 pt-24">
-            <div className="flex flex-col items-center">
-              <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
-              <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
-                  State and Congress Approved Final Expense Benefits Emergency Funds
-              </h1>
-              <p className={cn(
-                "text-base text-foreground/80 mb-8 max-w-[55rem]",
-                !showSubheading && "invisible"
-              )}>
-                {step === 5
-                  ? "We have all of the information necessary. How would you like to complete your application?"
-                  : "Amounts between $5,000 - $25,000 / Available to anyone ages 45-80"}
-              </p>
-            </div>
+      <main className="flex-1 flex flex-col items-center justify-center w-full px-8 sm:px-12 text-center">
+        <div className="max-w-4xl w-full flex flex-col items-center">
+            {showHeader && (
+              <div className="flex flex-col items-center pt-24">
+                <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
+                <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
+                    State and Congress Approved Final Expense Benefits Emergency Funds
+                </h1>
+                <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
+                  {step === 5
+                    ? "We have all of the information necessary. How would you like to complete your application?"
+                    : "Amounts between $5,000 - $25,000 / Available to anyone ages 45-80"}
+                </p>
+              </div>
+            )}
 
             <div className="w-full flex justify-center">
               <FormProvider {...form}>
