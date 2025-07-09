@@ -62,22 +62,6 @@ export default function PaymentForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={control}
-          name="ssn"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input 
-                  placeholder="Last 4 Digits of SSN" 
-                  {...field} 
-                  onChange={(e) => handleSsnChange(e, field)}
-                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.ssn && "border-destructive focus-visible:border-destructive animate-shake")} 
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={control}
@@ -102,6 +86,22 @@ export default function PaymentForm() {
             )}
           />
         </div>
+        <FormField
+          control={control}
+          name="ssn"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input 
+                  placeholder="Last 4 Digits of SSN" 
+                  {...field} 
+                  onChange={(e) => handleSsnChange(e, field)}
+                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.ssn && "border-destructive focus-visible:border-destructive animate-shake")} 
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </div>
     </div>
   );
