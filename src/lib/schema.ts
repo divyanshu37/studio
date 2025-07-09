@@ -47,6 +47,7 @@ export const additionalQuestionsFormSchema = additionalQuestionsObjectSchema.sup
 export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsFormSchema>;
 
 export const beneficiaryFormSchema = z.object({
+  coverage: z.string().min(1, { message: "Coverage amount is required." }),
   applicantAddress: z.string().min(1, { message: "Address is required." }),
   applicantApt: z.string().optional(),
   applicantCity: z.string().min(1, { message: "City is required." }),
@@ -81,7 +82,6 @@ export const beneficiaryFormSchema = z.object({
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
 export const paymentFormSchema = z.object({
-  coverage: z.string().min(1, { message: "Coverage amount is required." }),
   accountHolderName: z.string().min(1, { message: "Account holder name is required." }),
   accountNumber: z.string().min(1, { message: "Account number is required." }),
   routingNumber: z.string().length(9, { message: "A valid 9-digit routing number is required." }),

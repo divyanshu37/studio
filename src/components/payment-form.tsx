@@ -9,12 +9,7 @@ import {
   FormItem,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, formatLastFour } from '@/lib/utils';
-
-const coverageOptions = [
-  "$ 10,000", "$ 12,000", "$ 14,000", "$ 16,000", "$ 18,000", "$ 20,000", "$ 25,000"
-];
 
 export default function PaymentForm() {
   const { control, formState: { errors } } = useFormContext<PaymentFormValues>();
@@ -24,31 +19,7 @@ export default function PaymentForm() {
   };
 
   return (
-    <div className="w-full max-w-2xl space-y-8">
-      <div className="space-y-4">
-        <h3 className="text-base font-semibold text-foreground text-left">Coverage and Premium</h3>
-        <FormField
-          control={control}
-          name="coverage"
-          render={({ field }) => (
-            <FormItem>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.coverage && "border-destructive focus-visible:border-destructive animate-shake")}>
-                    <SelectValue placeholder="Select Coverage Amount" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {coverageOptions.map(option => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-      </div>
-
+    <div className="w-full max-w-2xl">
       <div className="space-y-4">
         <h3 className="text-base font-semibold text-foreground text-left">Payment Details</h3>
         <FormField

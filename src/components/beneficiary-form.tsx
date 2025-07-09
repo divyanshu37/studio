@@ -13,6 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
 import { usStates } from '@/lib/states';
 
+const coverageOptions = [
+  "$ 10,000", "$ 12,000", "$ 14,000", "$ 16,000", "$ 18,000", "$ 20,000", "$ 25,000"
+];
+
 const relationshipOptions = [
   "Aunt", "Brother", "Child", "Civil Union/Partner", "Cousin", "Dependent", 
   "Father", "Friend", "Grandfather", "Grandmother", "Guardian", "Mother", 
@@ -34,6 +38,27 @@ export default function BeneficiaryForm() {
   return (
     <div className="w-full max-w-2xl space-y-6">
       
+      <FormField
+        control={control}
+        name="coverage"
+        render={({ field }) => (
+          <FormItem>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.coverage && "border-destructive focus-visible:border-destructive animate-shake")}>
+                  <SelectValue placeholder="Select Coverage Amount" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {coverageOptions.map(option => (
+                  <SelectItem key={option} value={option}>{option}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormItem>
+        )}
+      />
+
       <div className="space-y-4">
         <FormField
           control={control}
