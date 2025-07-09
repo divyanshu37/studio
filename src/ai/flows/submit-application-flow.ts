@@ -126,7 +126,6 @@ const submitApplicationFlow = ai.defineFlow(
     outputSchema: SubmitApplicationOutputSchema,
   },
   async (formData) => {
-    console.log('--- submitApplicationFlow: Started ---');
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     if (!backendUrl) {
@@ -135,15 +134,12 @@ const submitApplicationFlow = ai.defineFlow(
     }
 
     try {
-      // Step 1: Transform the data using our new, reliable function.
+      // Step 1: Transform and validate the data using our new, reliable function.
       const applicantData = transformDataForApi(formData);
-      console.log('--- submitApplicationFlow: Data transformation successful. ---');
       
       // Step 2: Send it to the backend.
-      console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance`);
       const response = await axios.post(`${backendUrl}/insurance`, applicantData);
       const result = response.data;
-      console.log('--- submitApplicationFlow: API submission successful. ---');
 
       return {
         success: true,
@@ -157,7 +153,6 @@ const submitApplicationFlow = ai.defineFlow(
         return { success: false, message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage };
       }
       
-      // This will catch Zod errors from the transform function as well.
       if (error instanceof z.ZodError) {
         const flattenedErrors = error.flatten();
         const errorMessages = Object.values(flattenedErrors.fieldErrors).flat();
