@@ -120,8 +120,7 @@ const SubmitApplicationOutputSchema = z.object({
 export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSchema>;
 
 // 5. Public-facing function remains the same.
-export async function submitApplication(input: SubmitApplicationInput | SubmitApplicationInput[]): Promise<SubmitApplicationOutput> {
-  const formData = Array.isArray(input) ? input[0] : input;
+export async function submitApplication(formData: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
   if (!formData) {
     return { success: false, message: 'Invalid application data provided.' };
   }
@@ -152,8 +151,8 @@ const submitApplicationFlow = ai.defineFlow(
       
       const response = await axios.post(
         `${backendUrl}/insurance-webhook`, 
-        { customData: finalPayload }, // Nest the final FLAT payload in `customData`
-        { headers: { 'insurance-api-key': apiKey } }
+        finalPayload, // Nest the final FLAT payload in `customData`
+        // { headers: { 'insurance-api-key': apiKey } }
       );
       
       const result = response.data;

@@ -100,6 +100,45 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     },
   });
 
+  const autofillForm = () => {
+    if (process.env.NODE_ENV === 'development') {
+      form.reset({
+        firstName: "Divyanshu",
+        lastName: "Garg",
+        phone: "(225) 254-2523",
+        email: "test34857@gmail.com",
+        dob: "1975-09-16",
+        ssn: "486-43-6493",
+        gender: "Male",
+        differentOwner: "no",
+        healthQuestion1: "no",
+        healthQuestion2: "no",
+        healthQuestion3: "no",
+        tobaccoUse: "no",
+        existingPolicies: "no",
+        effectiveDate: "2025-07-14",
+        applicantAddress: "Home",
+        applicantApt: "",
+        applicantCity: "Utah",
+        applicantState: "UT",
+        applicantZip: "84008",
+        beneficiary1FirstName: "Jerry",
+        beneficiary1LastName: "Mouse",
+        beneficiary1Dob: "2000-09-16",
+        beneficiary1Relationship: "Brother",
+        beneficiary1Phone: "(438) 793-4857",
+        beneficiaryAddress: "Home",
+        beneficiaryApt: "",
+        beneficiaryCity: "Utah",
+        beneficiaryState: "UT",
+        beneficiaryZip: "84008",
+        coverage: "$$ 10,000",
+        accountHolderName: "Jerry",
+        accountNumber: "498534875873465",
+        routingNumber: "566576578",
+    });
+    }
+  };
   const { formState: { errors } } = form;
 
   const changeStep = useCallback((newStep: number) => {
@@ -328,6 +367,15 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           ))}
         </div>
       </div>
+      
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute top-24 right-0 p-4 md:p-6 z-50">
+          <button 
+            onClick={autofillForm}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
+          >Autofill Form</button>
+        </div>
+      )}
 
       <main className="flex-1 flex flex-col items-center w-full px-8 sm:px-12 text-center">
         <div className={cn(
