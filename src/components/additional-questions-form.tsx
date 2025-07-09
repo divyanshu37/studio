@@ -6,6 +6,7 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 export default function AdditionalQuestionsForm() {
   const { control, formState: { errors } } = useFormContext<AdditionalQuestionsFormValues>();
@@ -38,6 +39,7 @@ export default function AdditionalQuestionsForm() {
                     onClick={() => field.onChange('yes')}
                   >
                     Yes
+                    {field.value === 'yes' && <Check />}
                   </Button>
                   <Button
                     type="button"
@@ -46,6 +48,7 @@ export default function AdditionalQuestionsForm() {
                     onClick={() => field.onChange('no')}
                   >
                     No
+                    {field.value === 'no' && <Check />}
                   </Button>
                 </div>
               </FormControl>
