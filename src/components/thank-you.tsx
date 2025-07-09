@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Separator } from "@/components/ui/separator";
@@ -9,7 +10,7 @@ interface ThankYouProps {
 
 export default function ThankYou({ onSelfEnroll, onSpeakToAgent }: ThankYouProps) {
   return (
-    <div className="w-full max-w-4xl flex flex-col-reverse md:flex-row justify-center items-stretch gap-8 text-center">
+    <div className="w-full max-w-4xl flex flex-col md:flex-row-reverse justify-center items-stretch gap-8 text-center">
       {/* Self-Enroll Card */}
       <div 
         onClick={onSelfEnroll}
