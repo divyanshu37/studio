@@ -64,20 +64,17 @@ export const beneficiaryFormSchema = z.object({
     message: "Invalid date. Please use MM/DD/YYYY format.",
   }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
-  effectiveDate: z.string()
-    .min(10, { message: "Please enter a complete effective date." })
-    .refine((date) => isValid(parse(date, 'MM/dd/yyyy', new Date())), {
-      message: "Invalid date. Please use MM/DD/YYYY format.",
-    })
-    .refine((date) => {
-        const parsedDate = parse(date, 'MM/dd/yyyy', new Date());
-        if (!isValid(parsedDate)) return false;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return parsedDate >= today;
-    }, {
-        message: "Effective date must be today or a future date."
-    }),
+  effectiveDate: z.string().optional().refine((date) => {
+    if (!date || date === "") return true; // Optional field
+    if (date.length !== 10) return false; // Must be full date if entered
+    const parsedDate = parse(date, 'MM/dd/yyyy', new Date());
+    if (!isValid(parsedDate)) return false; // Must be a valid date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return parsedDate >= today; // Must be today or future
+  }, {
+    message: "Date must be valid (MM/DD/YYYY) and not in the past.",
+  }),
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 

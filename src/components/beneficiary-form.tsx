@@ -215,7 +215,7 @@ export default function BeneficiaryForm() {
         </div>
       </div>
 
-      <div className="space-y-4 pt-4">
+      <div className="space-y-4 pt-8">
         <FormField
           control={control}
           name="effectiveDate"
@@ -224,7 +224,7 @@ export default function BeneficiaryForm() {
                 <FormControl>
                 <Input 
                   type="text"
-                  placeholder="Desired effective date of this policy"
+                  placeholder="Desired effective date of this policy (Default is Today)"
                   autoComplete="off"
                   {...field}
                   onChange={(e) => handleDateChange(e, field)}
