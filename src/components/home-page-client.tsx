@@ -11,13 +11,11 @@ import {
   insuranceFormSchema, 
   additionalQuestionsFormSchema, 
   beneficiaryFormSchema, 
-  beneficiaryAddressFormSchema, 
   paymentFormSchema,
   type FormValues,
   type InsuranceFormValues,
   type AdditionalQuestionsFormValues,
   type BeneficiaryFormValues,
-  type BeneficiaryAddressFormValues,
   type PaymentFormValues
 } from '@/lib/schema';
 import { submitApplication } from '@/ai/flows/submit-application-flow';
@@ -28,7 +26,6 @@ import { Logo, Icon } from '@/components/logo';
 import InsuranceForm from '@/components/insurance-form';
 import AdditionalQuestionsForm from '@/components/additional-questions-form';
 import BeneficiaryForm from '@/components/beneficiary-form';
-import BeneficiaryAddressForm from '@/components/beneficiary-address-form';
 import PaymentForm from '@/components/payment-form';
 import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
@@ -41,7 +38,6 @@ const stepFields: (keyof FormValues)[][] = [
   Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
   Object.keys(additionalQuestionsFormSchema.shape) as (keyof AdditionalQuestionsFormValues)[],
   Object.keys(beneficiaryFormSchema.shape) as (keyof BeneficiaryFormValues)[],
-  Object.keys(beneficiaryAddressFormSchema.shape) as (keyof BeneficiaryAddressFormValues)[],
   Object.keys(paymentFormSchema.shape) as (keyof PaymentFormValues)[],
 ];
 
@@ -58,7 +54,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const { toast } = useToast();
   
   const [isLayoutCentered, setIsLayoutCentered] = useState(false);
-  const [isAnimatingToStep9, setIsAnimatingToStep9] = useState(false);
+  const [isAnimatingToStep8, setIsAnimatingToStep8] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(fullFormSchema),
@@ -110,7 +106,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         healthQuestion3: "no",
         tobaccoUse: "no",
         existingPolicies: "no",
-        effectiveDate: "2025-07-14",
+        effectiveDate: "07/14/2025",
         applicantAddress: "Home",
         applicantApt: "",
         applicantCity: "Utah",
@@ -135,13 +131,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
     
-    if (newStep >= 9 && step < 9) {
+    if (newStep >= 8 && step < 8) {
       setHeaderAnimationClass('animate-fade-out-down');
-      setIsAnimatingToStep9(true);
+      setIsAnimatingToStep8(true);
     }
 
     setTimeout(() => {
-      if (newStep < 9 && step >= 9) {
+      if (newStep < 8 && step >= 8) {
         setIsHeaderRendered(true);
         setHeaderAnimationClass('animate-fade-in-up');
         setIsLayoutCentered(false);
@@ -151,23 +147,23 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       setIsAnimatingOut(false);
       setAnimationClass('animate-fade-in-up');
       
-      if (isAnimatingToStep9) {
+      if (isAnimatingToStep8) {
         setIsHeaderRendered(false);
         setIsLayoutCentered(true);
-        setIsAnimatingToStep9(false);
-      } else if (newStep >= 9) {
+        setIsAnimatingToStep8(false);
+      } else if (newStep >= 8) {
         setIsHeaderRendered(false);
         setIsLayoutCentered(true);
       }
 
     }, 300);
-  }, [step, isAnimatingToStep9]);
+  }, [step, isAnimatingToStep8]);
 
   useEffect(() => {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 8) {
         changeStep(stepNumber);
       }
     }
@@ -179,7 +175,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     
     if (!output) return;
     
-    if (step === 5) {
+    if (step === 4) {
       form.handleSubmit(processForm)();
     } else {
       changeStep(step + 1);
@@ -191,8 +187,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
   
   const processForm = async (data: FormValues) => {
-    // This is called on step 5's submit, after validation
-    changeStep(6); // Go to Thank You page
+    changeStep(5);
   };
   
   const handleSelfEnrollSubmit = async (data: FormValues) => {
@@ -201,14 +196,14 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(7); // Directly go to the loading step
+        changeStep(6);
       } else {
         toast({
           variant: "destructive",
           title: "Submission Failed",
           description: result.message,
         });
-        changeStep(6); // Go back to the Thank You page
+        changeStep(5);
       }
     } catch (error) {
       toast({
@@ -216,7 +211,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         title: "An unexpected error occurred.",
         description: "Please try again later.",
       });
-      changeStep(6);
+      changeStep(5);
     } finally {
       setIsSubmitting(false);
     }
@@ -244,7 +239,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           title: data.error.title,
           description: data.error.message,
        });
-       changeStep(6);
+       changeStep(5);
        return;
     }
 
@@ -257,16 +252,16 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             if (phoneLastFour) setPhoneLastFour(phoneLastFour);
 
             if (currentStep === 'sms-verification' || currentStep === 'CONTRACT_READY') {
-              changeStep(8);
+              changeStep(7);
             } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing' || currentStep === 'RESULT_SUCCESS') {
-              changeStep(9);
+              changeStep(8);
             } else if (currentStep === 'RESULT_FAILED' || (isError && error)) {
                 toast({
                     variant: "destructive",
                     title: "Enrollment Failed",
                     description: error || "An error occurred during enrollment.",
                 });
-                changeStep(6);
+                changeStep(5);
             }
         } catch (e) {
             console.error("Error parsing socket message", e);
@@ -275,12 +270,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                 title: "Error",
                 description: "Received an invalid message from the server."
             });
-            changeStep(6);
+            changeStep(5);
         }
     }
   }, [changeStep, toast]);
 
-  const subscribeId = (step >= 7 && step <= 8) ? uuid : null;
+  const subscribeId = (step >= 6 && step <= 7) ? uuid : null;
   useSocket(subscribeId, handleSocketUpdate);
 
   const handleStepChange = (newStep: number) => {
@@ -296,24 +291,22 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       case 3:
         return <BeneficiaryForm />;
       case 4:
-        return <BeneficiaryAddressForm />;
-      case 5:
         return <PaymentForm />;
-      case 6:
+      case 5:
         return <ThankYou onSelfEnroll={() => form.handleSubmit(handleSelfEnrollSubmit, handleSelfEnrollError)()} />;
-      case 7:
+      case 6:
         return <SelfEnrollLoading />;
-      case 8:
+      case 7:
         return <SelfEnrollContract pin={pin} phoneLastFour={phoneLastFour} />;
-      case 9:
+      case 8:
         return <SelfEnrollComplete />;
       default:
         return <InsuranceForm />;
     }
   };
 
-  const showSubheading = step <= 6;
-  const showNavigation = step >= 1 && step <= 5;
+  const showSubheading = step <= 5;
+  const showNavigation = step >= 1 && step <= 4;
 
   const getErrorMessage = () => {
     if (step < 1 || step > stepFields.length) return null;
@@ -340,7 +333,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
         <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
           <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
             <button
               key={num}
               onClick={() => handleStepChange(num)}
@@ -385,7 +378,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                 "text-base text-foreground/80 mb-8 max-w-[55rem]",
                 !showSubheading && "invisible"
               )}>
-                {step === 6
+                {step === 5
                   ? "We have all of the information necessary. How would you like to complete your application?"
                   : "Amounts between $5,000 - $25,000 / Available to anyone ages 45-80"}
               </p>
@@ -405,8 +398,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                         onBack={handleBack}
                         onNext={handleNext}
                         backButton={step > 1}
-                        isSubmit={step === 5}
-                        actionLabel={step === 5 ? "SUBMIT" : "NEXT"}
+                        isSubmit={step === 4}
+                        actionLabel={step === 4 ? "SUBMIT" : "NEXT"}
                         disabled={isSubmitting}
                         >
                         {errorMessage && (

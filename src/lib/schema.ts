@@ -36,13 +36,13 @@ export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsFo
 
 export const beneficiaryFormSchema = z.object({
   effectiveDate: z.string()
-    .min(1, { message: "An effective date is required." })
-    .refine((date) => isValid(parse(date, 'yyyy-MM-dd', new Date())), {
-      message: "Invalid effective date.",
+    .min(10, { message: "Please enter a complete effective date." })
+    .refine((date) => isValid(parse(date, 'MM/dd/yyyy', new Date())), {
+      message: "Invalid date. Please use MM/DD/YYYY format.",
     })
     .refine((date) => {
-        const [year, month, day] = date.split('-').map(Number);
-        const parsedDate = new Date(year, month - 1, day);
+        const parsedDate = parse(date, 'MM/dd/yyyy', new Date());
+        if (!isValid(parsedDate)) return false;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return parsedDate >= today;
@@ -54,16 +54,12 @@ export const beneficiaryFormSchema = z.object({
   applicantCity: z.string().min(1, { message: "City is required." }),
   applicantState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
   applicantZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
-});
-export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
-
-export const beneficiaryAddressFormSchema = z.object({
   beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
   beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
   beneficiary1Phone: z.string().min(14, { message: "Please enter a complete phone number." }),
 });
-export type BeneficiaryAddressFormValues = z.infer<typeof beneficiaryAddressFormSchema>;
+export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
 export const paymentFormSchema = z.object({
   coverage: z.string().min(1, { message: "Coverage amount is required." }),
@@ -77,7 +73,6 @@ export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 export const fullFormSchema = insuranceFormSchema
   .merge(additionalQuestionsFormSchema)
   .merge(beneficiaryFormSchema)
-  .merge(beneficiaryAddressFormSchema)
   .merge(paymentFormSchema);
 
 export type FormValues = z.infer<typeof fullFormSchema>;
