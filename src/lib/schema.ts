@@ -2,26 +2,6 @@
 import { z } from 'zod';
 import { differenceInYears, parse, isValid } from 'date-fns';
 
-const isValidSsn = (ssn: string) => {
-    const ssnParts = ssn.replace(/-/g, '');
-    if (ssnParts.length !== 9) return true;
-
-    const area = ssnParts.substring(0, 3);
-    const group = ssnParts.substring(3, 5);
-    const serial = ssnParts.substring(5, 9);
-    
-    if (area === "000" || area === "666" || parseInt(area, 10) >= 900) {
-        return false;
-    }
-    if (group === "00") {
-        return false;
-    }
-    if (serial === "0000") {
-        return false;
-    }
-    return true;
-};
-
 export const insuranceFormSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required." }),
   lastName: z.string().min(1, { message: "Last name is required." }),
@@ -39,11 +19,6 @@ export const insuranceFormSchema = z.object({
         return age >= 45 && age <= 80;
     }, {
         message: "You must be between 45 and 80 years old to be eligible."
-    }),
-  ssn: z.string()
-    .min(11, { message: "Please enter a complete social security number." })
-    .refine(isValidSsn, {
-        message: "Please enter a valid social security number."
     }),
   gender: z.string().min(1, { message: "Please select a gender." }),
 });
@@ -103,6 +78,7 @@ export const paymentFormSchema = z.object({
   accountHolderName: z.string().min(1, { message: "Account holder name is required." }),
   accountNumber: z.string().min(1, { message: "Account number is required." }),
   routingNumber: z.string().length(9, { message: "A valid 9-digit routing number is required." }),
+  ssn: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
 });
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 

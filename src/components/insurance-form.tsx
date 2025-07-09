@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { InsuranceFormValues } from '@/lib/schema';
@@ -6,17 +5,13 @@ import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { FormField, FormItem, FormControl } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn, formatPhoneNumber, formatSsn } from '@/lib/utils';
+import { cn, formatPhoneNumber } from '@/lib/utils';
 
 export default function InsuranceForm() {
   const { control, formState: { errors } } = useFormContext<InsuranceFormValues>();
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
     field.onChange(formatPhoneNumber(e.target.value));
-  };
-
-  const handleSSNChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    field.onChange(formatSsn(e.target.value));
   };
 
   return (
@@ -124,27 +119,6 @@ export default function InsuranceForm() {
             )}
           />
         </div>
-        <FormField
-          control={control}
-          name="ssn"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input 
-                  placeholder="Social Security Number" 
-                  {...field} 
-                  onChange={(e) => handleSSNChange(e, field)} 
-                  className={cn(
-                    "h-auto py-4 bg-card shadow-xl focus-visible:ring-0 focus-visible:ring-offset-0",
-                    errors.ssn
-                        ? "border-destructive focus-visible:border-destructive animate-shake"
-                        : "focus-visible:border-primary"
-                )}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
     </div>
   );
 }

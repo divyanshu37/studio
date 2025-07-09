@@ -20,14 +20,6 @@ export const formatPhoneNumber = (value: string) => {
   return formattedValue;
 };
 
-export const formatSsn = (value: string) => {
-  const rawValue = value.replace(/[^\d]/g, '');
-  let formattedValue = rawValue.substring(0, 3);
-  if (rawValue.length > 3) {
-    formattedValue += '-' + rawValue.substring(3, 5);
-  }
-  if (rawValue.length > 5) {
-    formattedValue += '-' + rawValue.substring(5, 9);
-  }
-  return formattedValue;
+export const formatLastFour = (value: string) => {
+  return value.replace(/[^\d]/g, "").substring(0, 4);
 };

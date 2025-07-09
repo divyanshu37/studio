@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import { cn, formatLastFour } from '@/lib/utils';
 
 const coverageOptions = [
   "$ 10,000", "$ 12,000", "$ 14,000", "$ 16,000", "$ 18,000", "$ 20,000", "$ 25,000"
@@ -18,6 +18,10 @@ const coverageOptions = [
 
 export default function PaymentForm() {
   const { control, formState: { errors } } = useFormContext<PaymentFormValues>();
+
+  const handleSsnChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+    field.onChange(formatLastFour(e.target.value));
+  };
 
   return (
     <div className="w-full max-w-2xl space-y-8">
@@ -54,6 +58,22 @@ export default function PaymentForm() {
             <FormItem>
               <FormControl>
                 <Input placeholder="Account Holder Name" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.accountHolderName && "border-destructive focus-visible:border-destructive animate-shake")} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="ssn"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input 
+                  placeholder="Last 4 Digits of SSN" 
+                  {...field} 
+                  onChange={(e) => handleSsnChange(e, field)}
+                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.ssn && "border-destructive focus-visible:border-destructive animate-shake")} 
+                />
               </FormControl>
             </FormItem>
           )}
