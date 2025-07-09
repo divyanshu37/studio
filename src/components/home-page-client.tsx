@@ -183,7 +183,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         });
       }
     } catch (error) {
-      console.error('Submission error:', error);
       toast({
         variant: "destructive",
         title: "An unexpected error occurred.",
@@ -195,7 +194,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
 
   const handleSelfEnrollError = (formErrors: FieldErrors<FormValues>) => {
-    console.error('Form validation failed on self-enroll:', formErrors);
     toast({
       variant: "destructive",
       title: "Incomplete Application",
@@ -220,23 +218,36 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
        changeStep(6);
        return;
     }
-    
-    const { status, pin, phoneLastFour } = data;
 
-    if (pin) setPin(pin);
-    if (phoneLastFour) setPhoneLastFour(phoneLastFour);
+    if (data.msg && typeof data.msg === 'string') {
+        try {
+            const payload = JSON.parse(data.msg);
+            const { currentStep, pin, phoneLastFour, isError, error } = payload;
+            
+            if (pin) setPin(pin);
+            if (phoneLastFour) setPhoneLastFour(phoneLastFour);
 
-    if (status === 'CONTRACT_READY') {
-      changeStep(8);
-    } else if (status === 'ENROLLMENT_COMPLETE') {
-      changeStep(9);
-    } else if (status === 'RESULT_FAILED' || (data.isError && data.error)) {
-        toast({
-            variant: "destructive",
-            title: "Enrollment Failed",
-            description: data.error || "An error occurred during enrollment.",
-        });
-        changeStep(6);
+            if (currentStep === 'sms-verification' || currentStep === 'CONTRACT_READY') {
+              changeStep(8);
+            } else if (currentStep === 'ENROLLMENT_COMPLETE') {
+              changeStep(9);
+            } else if (currentStep === 'RESULT_FAILED' || (isError && error)) {
+                toast({
+                    variant: "destructive",
+                    title: "Enrollment Failed",
+                    description: error || "An error occurred during enrollment.",
+                });
+                changeStep(6);
+            }
+        } catch (e) {
+            console.error("Error parsing socket message", e);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Received an invalid message from the server."
+            });
+            changeStep(6);
+        }
     }
   }, [changeStep, toast]);
 
