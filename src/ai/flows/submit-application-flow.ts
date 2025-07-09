@@ -19,36 +19,42 @@ const SubmitApplicationInputSchema = fullFormSchema.extend({
 });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
-// 2. Define the exact shape the API expects with robust validation.
+// 2. Define the exact NESTED shape the API expects.
+const AddressSchema = z.object({
+  street: z.string(),
+  city: z.string(),
+  state: z.string().length(2),
+  zip: z.string().regex(/^\d{5}$/),
+});
+
+const BeneficiarySchema = z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    dob: z.string(), // Formatted as MM/DD/YYYY
+    address: AddressSchema,
+    phone: z.string(), // Formatted as digits only
+    relation: z.string(),
+    percentage: z.string(),
+});
+
 const ApplicantDataSchema = z.object({
   referenceId: z.string().uuid(),
   email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
-  addressStreet: z.string(),
-  addressCity: z.string(),
-  addressState: z.string().length(2),
-  addressZip: z.string().regex(/^\d{5}$/),
+  address: AddressSchema,
   dob: z.string(), // Formatted as MM/DD/YYYY
   phone: z.string(), // Formatted as digits only
   lastFour: z.string().length(4),
   gender: z.string(),
-  beneficiaryFirstName: z.string(),
-  beneficiaryLastName: z.string(),
-  beneficiaryDob: z.string(), // Formatted as MM/DD/YYYY
-  beneficiaryAddressStreet: z.string(),
-  beneficiaryAddressCity: z.string(),
-  beneficiaryAddressState: z.string().length(2),
-  beneficiaryAddressZip: z.string().regex(/^\d{5}$/),
-  beneficiaryPhone: z.string(), // Formatted as digits only
-  beneficiaryRelation: z.string(),
-  beneficiaryPercentage: z.string(),
+  beneficiary: BeneficiarySchema,
   faceAmount: z.string(),
   paymentAccountHolderName: z.string(),
   paymentRoutingNumber: z.string().length(9),
   paymentAccountNumber: z.string(),
 });
 type ApplicantData = z.infer<typeof ApplicantDataSchema>;
+
 
 // 3. Create the dedicated, pure transformation function.
 function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
@@ -72,14 +78,14 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
   };
   
   const getFullStreet = (street: string, apt?: string) => {
-    if (!apt) {
+    if (!apt || apt.trim() === '') {
       return street;
     }
     // Simple check to avoid duplication if user enters street again in apt field
     if (street.toLowerCase().includes(apt.toLowerCase())) {
       return street;
     }
-    return `${street} ${apt}`;
+    return `${street}, ${apt}`;
   };
 
   const transformedData: ApplicantData = {
@@ -87,24 +93,30 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
     email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
-    addressStreet: getFullStreet(formData.applicantAddress, formData.applicantApt),
-    addressCity: formData.applicantCity,
-    addressState: formData.applicantState,
-    addressZip: formData.applicantZip,
+    address: {
+      street: getFullStreet(formData.applicantAddress, formData.applicantApt),
+      city: formData.applicantCity,
+      state: formData.applicantState,
+      zip: formData.applicantZip,
+    },
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
     lastFour: formData.ssn.replace(/-/g, '').slice(-4),
     gender: capitalize(formData.gender),
-    beneficiaryFirstName: formData.beneficiary1FirstName,
-    beneficiaryLastName: formData.beneficiary1LastName,
-    beneficiaryDob: formatDate(formData.beneficiary1Dob),
-    beneficiaryAddressStreet: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
-    beneficiaryAddressCity: formData.beneficiaryCity,
-    beneficiaryAddressState: formData.beneficiaryState,
-    beneficiaryAddressZip: formData.beneficiaryZip,
-    beneficiaryPhone: formatPhone(formData.beneficiary1Phone),
-    beneficiaryRelation: formData.beneficiary1Relationship,
-    beneficiaryPercentage: "100", // Hardcoded as per original logic
+    beneficiary: {
+      firstName: formData.beneficiary1FirstName,
+      lastName: formData.beneficiary1LastName,
+      dob: formatDate(formData.beneficiary1Dob),
+      address: {
+        street: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
+        city: formData.beneficiaryCity,
+        state: formData.beneficiaryState,
+        zip: formData.beneficiaryZip,
+      },
+      phone: formatPhone(formData.beneficiary1Phone),
+      relation: formData.beneficiary1Relationship,
+      percentage: "100", // Hardcoded as per original logic
+    },
     faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
     paymentAccountHolderName: formData.accountHolderName,
     paymentRoutingNumber: formData.routingNumber,
@@ -150,6 +162,7 @@ const submitApplicationFlow = ai.defineFlow(
       console.log('--- submitApplicationFlow: Data transformation successful. ---');
       
       console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance-webhook`);
+      console.log('--- submitApplicationFlow: Request Payload ---', JSON.stringify(applicantData, null, 2));
       const response = await axios.post(`${backendUrl}/insurance-webhook`, applicantData);
       
       console.log('--- submitApplicationFlow: Received response from backend ---', 'Status:', response.status, 'Data:', JSON.stringify(response.data, null, 2));
@@ -172,7 +185,7 @@ const submitApplicationFlow = ai.defineFlow(
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        console.error('--- submitApplicationFlow: FAILED - API submission failed ---', error.response.status, error.response.data);
+        console.error('--- submitApplicationFlow: FAILED - API submission failed ---', error.response.status, JSON.stringify(error.response.data, null, 2));
         const errorMessage = error.response.data.message || 'API submission failed.';
         return { success: false, message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage };
       }
@@ -181,7 +194,7 @@ const submitApplicationFlow = ai.defineFlow(
         const flattenedErrors = error.flatten();
         const errorMessages = Object.values(flattenedErrors.fieldErrors).flat();
         console.error('--- submitApplicationFlow: FAILED - Data transformation failed ---', flattenedErrors);
-        return { success: false, message: errorMessages.join(', ') || 'Invalid data provided.' };
+        return { success: false, message: `Data validation failed: ${errorMessages.join(', ')}` || 'Invalid data provided.' };
       }
 
       console.error('--- submitApplicationFlow: FAILED - Unknown error ---', error);
