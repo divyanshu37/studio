@@ -159,8 +159,10 @@ const submitApplicationFlow = ai.defineFlow(
       
       // This will catch Zod errors from the transform function as well.
       if (error instanceof z.ZodError) {
-        console.error('--- submitApplicationFlow: FAILED - Data transformation failed ---', error.flatten());
-        return { success: false, message: 'Data transformation failed. Please check the inputs.' };
+        const flattenedErrors = error.flatten();
+        const errorMessages = Object.values(flattenedErrors.fieldErrors).flat();
+        console.error('--- submitApplicationFlow: FAILED - Data validation failed ---', flattenedErrors);
+        return { success: false, message: errorMessages.join(', ') || 'Invalid data provided.' };
       }
 
       console.error('--- submitApplicationFlow: FAILED - Unknown error ---', error);
