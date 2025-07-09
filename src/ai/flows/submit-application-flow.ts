@@ -31,7 +31,7 @@ const FinalPayloadSchema = z.object({
   addressZip: z.string().regex(/^\d{5}$/),
   dob: z.string(), // Formatted as MM/DD/YYYY
   phone: z.string(), // Digits only
-  ssn: z.string().regex(/^\d{9}$/), // Full SSN without dashes
+  lastFour: z.string().regex(/^\d{4}$/), // Full SSN without dashes
   gender: z.string(),
   beneficiaryFirstName: z.string().min(1),
   beneficiaryLastName: z.string().min(1),
@@ -90,7 +90,7 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     addressZip: formData.applicantZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
-    ssn: formData.ssn.replace(/-/g, ''),
+    lastFour: formData.ssn.replace(/-/g, '').slice(-4),
     gender: capitalize(formData.gender),
     beneficiaryFirstName: formData.beneficiary1FirstName,
     beneficiaryLastName: formData.beneficiary1LastName,
@@ -151,8 +151,8 @@ const submitApplicationFlow = ai.defineFlow(
       
       const response = await axios.post(
         `${backendUrl}/insurance-webhook`, 
-        finalPayload, // Nest the final FLAT payload in `customData`
-        // { headers: { 'insurance-api-key': apiKey } }
+        {customData: finalPayload}, // Nest the final FLAT payload in `customData`
+        { headers: { 'insurance-api-key': apiKey } }
       );
       
       const result = response.data;
