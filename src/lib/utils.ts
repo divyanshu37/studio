@@ -23,3 +23,18 @@ export const formatPhoneNumber = (value: string) => {
 export const formatLastFour = (value: string) => {
   return value.replace(/[^\d]/g, "").substring(0, 4);
 };
+
+export const formatDateInput = (value: string) => {
+  const rawValue = value.replace(/\D/g, '').slice(0, 8); // only digits, max 8
+  const month = rawValue.slice(0, 2);
+  const day = rawValue.slice(2, 4);
+  const year = rawValue.slice(4, 8);
+
+  if (rawValue.length > 4) {
+    return `${month}/${day}/${year}`;
+  } else if (rawValue.length > 2) {
+    return `${month}/${day}`;
+  } else {
+    return month;
+  }
+};

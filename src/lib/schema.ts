@@ -8,12 +8,12 @@ export const insuranceFormSchema = z.object({
   phone: z.string().min(14, { message: "Please enter a complete phone number." }),
   email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
   dob: z.string()
-    .min(1, { message: "Date of birth is required." })
-    .refine((dob) => isValid(parse(dob, 'yyyy-MM-dd', new Date())), {
-      message: "Invalid date format.",
+    .min(10, { message: "Please enter a complete date of birth." })
+    .refine((dob) => isValid(parse(dob, 'MM/dd/yyyy', new Date())), {
+      message: "Invalid date. Please use MM/DD/YYYY format.",
     })
     .refine((dob) => {
-        const parsedDate = parse(dob, 'yyyy-MM-dd', new Date());
+        const parsedDate = parse(dob, 'MM/dd/yyyy', new Date());
         if (!isValid(parsedDate)) return false;
         const age = differenceInYears(new Date(), parsedDate);
         return age >= 45 && age <= 80;

@@ -5,13 +5,17 @@ import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { FormField, FormItem, FormControl } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn, formatPhoneNumber } from '@/lib/utils';
+import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
 
 export default function InsuranceForm() {
   const { control, formState: { errors } } = useFormContext<InsuranceFormValues>();
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
     field.onChange(formatPhoneNumber(e.target.value));
+  };
+  
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+    field.onChange(formatDateInput(e.target.value));
   };
 
   return (
@@ -90,9 +94,11 @@ export default function InsuranceForm() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input 
-                    type="date"
+                  <Input
+                    type="text"
+                    placeholder="Birthdate"
                     {...field}
+                    onChange={(e) => handleDateChange(e, field)}
                     className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.dob && "border-destructive focus-visible:border-destructive animate-shake")} 
                   />
                 </FormControl>
@@ -104,9 +110,13 @@ export default function InsuranceForm() {
             name="gender"
             render={({ field }) => (
               <FormItem>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.gender && "border-destructive focus-visible:border-destructive animate-shake")}>
+                    <SelectTrigger className={cn(
+                      "h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0",
+                      !field.value && "text-muted-foreground",
+                      errors.gender && "border-destructive focus-visible:border-destructive animate-shake"
+                    )}>
                       <SelectValue placeholder="Gender" />
                     </SelectTrigger>
                   </FormControl>
