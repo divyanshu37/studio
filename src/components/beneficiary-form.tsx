@@ -23,10 +23,6 @@ const relationshipOptions = [
 export default function BeneficiaryForm() {
   const { control, formState: { errors } } = useFormContext<BeneficiaryFormValues>();
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    field.onChange(formatPhoneNumber(e.target.value));
-  };
-
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
     field.onChange(formatDateInput(e.target.value));
   };
@@ -150,7 +146,7 @@ export default function BeneficiaryForm() {
             />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
             <FormField
             control={control}
             name="beneficiary1Relationship"
@@ -168,17 +164,6 @@ export default function BeneficiaryForm() {
                     ))}
                     </SelectContent>
                 </Select>
-                </FormItem>
-            )}
-            />
-            <FormField
-            control={control}
-            name="beneficiary1Phone"
-            render={({ field }) => (
-                <FormItem>
-                <FormControl>
-                    <Input placeholder="Mobile Number" {...field} onChange={(e) => handlePhoneChange(e, field)} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Phone && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
                 </FormItem>
             )}
             />

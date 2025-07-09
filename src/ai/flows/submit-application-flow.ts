@@ -35,7 +35,6 @@ const FinalPayloadSchema = z.object({
   gender: z.string(),
   beneficiaryFirstName: z.string().min(1),
   beneficiaryLastName: z.string().min(1),
-  beneficiaryPhone: z.string(), // Digits only
   beneficiaryRelation: z.string().min(1),
   beneficiaryPercentage: z.string(),
   faceAmount: z.string(),
@@ -89,7 +88,6 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     gender: capitalize(formData.gender),
     beneficiaryFirstName: formData.beneficiary1FirstName,
     beneficiaryLastName: formData.beneficiary1LastName,
-    beneficiaryPhone: formatPhone(formData.beneficiary1Phone),
     beneficiaryRelation: formData.beneficiary1Relationship,
     beneficiaryPercentage: "100",
     faceAmount: formData.coverage.replace(/[^0-9]/g, ''),

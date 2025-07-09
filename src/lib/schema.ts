@@ -57,7 +57,6 @@ export const beneficiaryFormSchema = z.object({
   beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
   beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
-  beneficiary1Phone: z.string().min(14, { message: "Please enter a complete phone number." }),
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
