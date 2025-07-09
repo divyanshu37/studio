@@ -29,25 +29,6 @@ export default function BeneficiaryForm() {
 
   return (
     <div className="w-full max-w-2xl space-y-6">
-      <div className="space-y-4">
-        <FormField
-          control={control}
-          name="effectiveDate"
-          render={({ field }) => (
-            <FormItem>
-                <FormControl>
-                <Input 
-                  type="text"
-                  placeholder="Desired effective date of this policy"
-                  {...field}
-                  onChange={(e) => handleDateChange(e, field)}
-                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      </div>
       
       <div className="space-y-4">
         <FormField
@@ -168,6 +149,26 @@ export default function BeneficiaryForm() {
             )}
             />
         </div>
+      </div>
+
+      <div className="space-y-4">
+        <FormField
+          control={control}
+          name="effectiveDate"
+          render={({ field }) => (
+            <FormItem>
+                <FormControl>
+                <Input 
+                  type="text"
+                  placeholder="Desired effective date of this policy"
+                  {...field}
+                  onChange={(e) => handleDateChange(e, field)}
+                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </div>
     </div>
   );
