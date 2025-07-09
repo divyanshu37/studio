@@ -107,9 +107,9 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         lastName: "Garg",
         phone: "(225) 254-2523",
         email: "test34857@gmail.com",
-        dob: "1975-09-16",
-        ssn: "486-43-6493",
-        gender: "Male",
+        dob: "09/16/1975",
+        ssn: "6493",
+        gender: "male",
         differentOwner: "no",
         healthQuestion1: "no",
         healthQuestion2: "no",
@@ -213,13 +213,14 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(7); // Directly go to the loading step without reloading
+        changeStep(7); // Directly go to the loading step
       } else {
         toast({
           variant: "destructive",
           title: "Submission Failed",
           description: result.message,
         });
+        changeStep(6); // Go back to the Thank You page
       }
     } catch (error) {
       toast({
@@ -227,6 +228,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         title: "An unexpected error occurred.",
         description: "Please try again later.",
       });
+      changeStep(6);
     } finally {
       setIsSubmitting(false);
     }
@@ -290,7 +292,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     }
   }, [changeStep, toast]);
 
-  const subscribeId = (step === 7 || step === 8) ? uuid : null;
+  const subscribeId = (step >= 7 && step <= 8) ? uuid : null;
   useSocket(subscribeId, handleSocketUpdate);
 
   const handleStepChange = (newStep: number) => {
@@ -406,26 +408,26 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
               isLayoutCentered && "flex-1 items-center",
             )}>
               <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(processForm)} className={cn("w-full", animationClass)}>
-                  <div className={cn("w-full flex justify-center")}>
-                    {renderStep()}
-                  </div>
+                <form onSubmit={form.handleSubmit(processForm)} className={cn("w-full flex flex-col items-center", animationClass)}>
+                  {renderStep()}
 
                   {showNavigation && (
-                    <FormNavigation
-                      onBack={handleBack}
-                      onNext={handleNext}
-                      backButton={step > 1}
-                      isSubmit={step === 5}
-                      actionLabel={step === 5 ? "SUBMIT" : "NEXT"}
-                      disabled={isSubmitting}
-                    >
-                      {errorMessage && (
-                        <p className="text-[10px] font-medium leading-tight text-destructive">
-                          {errorMessage}
-                        </p>
-                      )}
-                    </FormNavigation>
+                    <div className="w-full max-w-2xl">
+                        <FormNavigation
+                        onBack={handleBack}
+                        onNext={handleNext}
+                        backButton={step > 1}
+                        isSubmit={step === 5}
+                        actionLabel={step === 5 ? "SUBMIT" : "NEXT"}
+                        disabled={isSubmitting}
+                        >
+                        {errorMessage && (
+                            <p className="text-[10px] font-medium leading-tight text-destructive">
+                            {errorMessage}
+                            </p>
+                        )}
+                        </FormNavigation>
+                    </div>
                   )}
                 </form>
               </FormProvider>

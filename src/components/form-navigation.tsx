@@ -29,8 +29,7 @@ export default function FormNavigation({
         <Button
           type="button"
           onClick={onBack}
-          variant="outline"
-          className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-foreground/80 shadow-xl tracking-widest bg-black text-white hover:bg-black/90"
+          className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
         >
           <ArrowLeft className="h-5 w-5" />
           <span>BACK</span>
