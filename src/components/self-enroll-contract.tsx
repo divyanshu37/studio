@@ -10,7 +10,7 @@ export default function SelfEnrollContract({ pin, phoneLastFour }: SelfEnrollCon
   const maskedPhoneNumber = `***-***-${phoneLastFour || 'XXXX'}`;
 
   return (
-    <div className="w-full max-w-md flex flex-col items-center text-center space-y-6">
+    <div className="w-full max-w-2xl flex flex-col items-center text-center space-y-4">
       <h2 className="text-2xl font-bold tracking-tight">Phone Verification</h2>
       <p className="text-base text-foreground/80 max-w-xs">
         A text with a link to sign has been sent. Please use the PIN below to access it.
