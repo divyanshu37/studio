@@ -19,50 +19,39 @@ const SubmitApplicationInputSchema = fullFormSchema.extend({
 });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
-// 2. Define the exact NESTED shape the backend's `customData` object expects.
-const AddressSchema = z.object({
-  street: z.string().min(1),
-  city: z.string().min(1),
-  state: z.string().length(2),
-  zip: z.string().regex(/^\d{5}$/),
-});
-
-const BeneficiarySchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  dob: z.string(), // Formatted as MM/DD/YYYY
-  address: AddressSchema,
-  phone: z.string(), // Formatted as digits only
-  relation: z.string().min(1),
-  percentage: z.string(),
-});
-
-const PaymentSchema = z.object({
-    accountHolderName: z.string().min(1),
-    accountHolderPhone: z.string(), // Digits only
-    routingNumber: z.string().length(9),
-    accountNumber: z.string().min(1),
-});
-
+// 2. Define the FLAT payload schema that the webhook's `customData` expects.
 const FinalPayloadSchema = z.object({
   referenceId: z.string().uuid(),
   email: z.string().email(),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  state: z.string().length(2),
-  address: AddressSchema,
+  addressStreet: z.string().min(1),
+  addressCity: z.string().min(1),
+  addressState: z.string().length(2),
+  addressZip: z.string().regex(/^\d{5}$/),
   dob: z.string(), // Formatted as MM/DD/YYYY
   phone: z.string(), // Digits only
   lastFour: z.string().length(4),
   gender: z.string(),
-  beneficiary: BeneficiarySchema,
+  beneficiaryFirstName: z.string().min(1),
+  beneficiaryLastName: z.string().min(1),
+  beneficiaryDob: z.string(), // Formatted as MM/DD/YYYY
+  beneficiaryAddressStreet: z.string().min(1),
+  beneficiaryAddressCity: z.string().min(1),
+  beneficiaryAddressState: z.string().length(2),
+  beneficiaryAddressZip: z.string().regex(/^\d{5}$/),
+  beneficiaryPhone: z.string(), // Digits only
+  beneficiaryRelation: z.string().min(1),
+  beneficiaryPercentage: z.string(),
   faceAmount: z.string(),
-  payment: PaymentSchema,
+  paymentAccountHolderName: z.string().min(1),
+  paymentRoutingNumber: z.string().length(9),
+  paymentAccountNumber: z.string().min(1),
 });
 type FinalPayload = z.infer<typeof FinalPayloadSchema>;
 
 
-// 3. Create the dedicated, pure transformation function.
+// 3. Create the dedicated, pure transformation function to build the FLAT payload.
 function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
   const formatDate = (dateString: string) => {
     // Input format from <input type="date"> is YYYY-MM-DD
@@ -99,42 +88,31 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
-    state: formData.applicantState,
-    address: {
-      street: getFullStreet(formData.applicantAddress, formData.applicantApt),
-      city: formData.applicantCity,
-      state: formData.applicantState,
-      zip: formData.applicantZip,
-    },
+    addressStreet: getFullStreet(formData.applicantAddress, formData.applicantApt),
+    addressCity: formData.applicantCity,
+    addressState: formData.applicantState,
+    addressZip: formData.applicantZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
     lastFour: formData.ssn.replace(/-/g, '').slice(-4),
     gender: capitalize(formData.gender),
-    beneficiary: {
-      firstName: formData.beneficiary1FirstName,
-      lastName: formData.beneficiary1LastName,
-      dob: formatDate(formData.beneficiary1Dob),
-      address: {
-        street: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
-        city: formData.beneficiaryCity,
-        state: formData.beneficiaryState,
-        zip: formData.beneficiaryZip,
-      },
-      phone: formatPhone(formData.beneficiary1Phone),
-      relation: formData.beneficiary1Relationship,
-      percentage: "100",
-    },
+    beneficiaryFirstName: formData.beneficiary1FirstName,
+    beneficiaryLastName: formData.beneficiary1LastName,
+    beneficiaryDob: formatDate(formData.beneficiary1Dob),
+    beneficiaryAddressStreet: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
+    beneficiaryAddressCity: formData.beneficiaryCity,
+    beneficiaryAddressState: formData.beneficiaryState,
+    beneficiaryAddressZip: formData.beneficiaryZip,
+    beneficiaryPhone: formatPhone(formData.beneficiary1Phone),
+    beneficiaryRelation: formData.beneficiary1Relationship,
+    beneficiaryPercentage: "100",
     faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
-    payment: {
-      accountHolderName: formData.accountHolderName,
-      accountHolderPhone: formatPhone(formData.phone), // Mapping applicant's phone
-      routingNumber: formData.routingNumber,
-      accountNumber: formData.accountNumber,
-    },
+    paymentAccountHolderName: formData.accountHolderName,
+    paymentRoutingNumber: formData.routingNumber,
+    paymentAccountNumber: formData.accountNumber,
   };
   
-  // This is the "test" that validates the data *after* transformation.
-  // If it fails, something is wrong with the transformation logic, and it will throw an error.
+  // This validates the data *after* transformation against our flat schema.
   return FinalPayloadSchema.parse(transformedData);
 }
 
@@ -151,7 +129,7 @@ export async function submitApplication(input: SubmitApplicationInput): Promise<
   return submitApplicationFlow(input);
 }
 
-// 6. The flow itself is now updated to send the correct nested structure.
+// 6. The flow itself is now updated to send the correct flat structure nested in `customData`.
 const submitApplicationFlow = ai.defineFlow(
   {
     name: 'submitApplicationFlow',
@@ -172,18 +150,18 @@ const submitApplicationFlow = ai.defineFlow(
     }
 
     try {
-      // The backend expects the data to be nested inside a `customData` object.
-      // However, the final schema is a different one. We now transform to a new payload.
+      // Transform the form data into the flat payload the webhook expects.
       const finalPayload = transformDataForApi(formData);
       
       const response = await axios.post(
         `${backendUrl}/insurance-webhook`, 
-        { customData: finalPayload }, // Nesting the final transformed payload
+        { customData: finalPayload }, // Nest the final FLAT payload in `customData`
         { headers: { 'insurance-api-key': apiKey } }
       );
       
       const result = response.data;
-      if (response.status >= 200 && response.status < 300 && (result?.success || result?.policyId)) {
+      // Stricter success check: ensure a policyId is returned.
+      if (response.status >= 200 && response.status < 300 && result?.policyId) {
         return {
           success: true,
           message: 'Application submitted successfully!',
