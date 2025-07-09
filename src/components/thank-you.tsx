@@ -32,7 +32,7 @@ export default function ThankYou({ onSelfEnroll }: ThankYouProps) {
         <Separator className="bg-primary/50 my-2 w-full" />
         <div className="my-4 h-8 flex items-center">
           <span className="bg-primary text-primary-foreground text-xs font-bold px-4 py-2 rounded-full">
-            5-10 MINUTES
+            1-5 days
           </span>
         </div>
         <p className="text-base px-4">
