@@ -47,12 +47,6 @@ const ApplicantDataSchema = z.object({
   paymentAccountHolderName: z.string(),
   paymentRoutingNumber: z.string(),
   paymentAccountNumber: z.string(),
-  differentOwner: z.string(),
-  healthQuestion1: z.string(),
-  healthQuestion2: z.string(),
-  healthQuestion3: z.string(),
-  tobaccoUse: z.string(),
-  existingPolicies: z.string(),
 });
 type ApplicantData = z.infer<typeof ApplicantDataSchema>;
 
@@ -104,12 +98,6 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
     paymentAccountHolderName: formData.accountHolderName,
     paymentRoutingNumber: formData.routingNumber,
     paymentAccountNumber: formData.accountNumber,
-    differentOwner: formData.differentOwner,
-    healthQuestion1: formData.healthQuestion1,
-    healthQuestion2: formData.healthQuestion2,
-    healthQuestion3: formData.healthQuestion3,
-    tobaccoUse: formData.tobaccoUse,
-    existingPolicies: formData.existingPolicies,
   };
   
   // This is the "test" that validates the data *after* transformation.
