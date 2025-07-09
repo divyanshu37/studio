@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -29,6 +28,7 @@ export default function FormNavigation({
         <Button
           type="button"
           onClick={onBack}
+          variant="black"
           className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
         >
           <ArrowLeft className="h-5 w-5" />
