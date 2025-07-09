@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -39,16 +40,15 @@ export const useSocket = (subscribeId: string | null, callback: (data: any) => v
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('Socket.IO Connected!', socket.id);
       socket.emit('subscribe', { id: subscribeId });
     });
 
     socket.on('subscribed', (data) => {
-      console.log('Socket.IO Subscribed:', data.message);
+      // Optional: Handle subscription confirmation
     });
 
     socket.on('initialData', (data) => {
-      console.log('Socket.IO Initial data:', data);
+      // Optional: Handle initial data if needed
     });
 
     socket.on('customUpdate', (data) => {

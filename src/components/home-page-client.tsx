@@ -163,14 +163,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   
   const processForm = async (data: FormValues) => {
     // This is called on step 5's submit, after validation
-    console.log('Form data collected:', data);
     changeStep(6); // Go to Thank You page
   };
   
   const handleSelfEnrollSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      console.log('Submitting self-enroll with validated data:', data);
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
