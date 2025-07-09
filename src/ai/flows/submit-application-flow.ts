@@ -13,51 +13,46 @@ import { fullFormSchema } from '@/lib/schema';
 import { z } from 'zod';
 import axios from 'axios';
 
-// 1. Define the input from the form. This is the raw data.
+// 1. Define the input from the form. This is the raw data from the UI.
 const SubmitApplicationInputSchema = fullFormSchema.extend({
   referenceId: z.string().uuid(),
 });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
-// 2. Define the exact NESTED shape the API expects.
-const AddressSchema = z.object({
-  street: z.string(),
-  city: z.string(),
-  state: z.string().length(2),
-  zip: z.string().regex(/^\d{5}$/),
-});
-
-const BeneficiarySchema = z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    dob: z.string(), // Formatted as MM/DD/YYYY
-    address: AddressSchema,
-    phone: z.string(), // Formatted as digits only
-    relation: z.string(),
-    percentage: z.string(),
-});
-
-const ApplicantDataSchema = z.object({
+// 2. Define the exact FLAT shape the backend's `customData` object expects.
+const WebhookBodySchema = z.object({
   referenceId: z.string().uuid(),
   email: z.string().email(),
   firstName: z.string(),
   lastName: z.string(),
-  address: AddressSchema,
+  addressStreet: z.string(),
+  addressCity: z.string(),
+  addressState: z.string(),
+  addressZip: z.string(),
   dob: z.string(), // Formatted as MM/DD/YYYY
   phone: z.string(), // Formatted as digits only
   lastFour: z.string().length(4),
   gender: z.string(),
-  beneficiary: BeneficiarySchema,
+  beneficiaryFirstName: z.string(),
+  beneficiaryLastName: z.string(),
+  beneficiaryDob: z.string(), // Formatted as MM/DD/YYYY
+  beneficiaryAddressStreet: z.string(),
+  beneficiaryAddressCity: z.string(),
+  beneficiaryAddressState: z.string(),
+  beneficiaryAddressZip: z.string(),
+  beneficiaryPhone: z.string(), // Formatted as digits only
+  beneficiaryRelation: z.string(),
+  beneficiaryPercentage: z.string(),
   faceAmount: z.string(),
   paymentAccountHolderName: z.string(),
-  paymentRoutingNumber: z.string().length(9),
+  paymentRoutingNumber: z.string(),
   paymentAccountNumber: z.string(),
 });
-type ApplicantData = z.infer<typeof ApplicantDataSchema>;
+type WebhookBody = z.infer<typeof WebhookBodySchema>;
 
 
 // 3. Create the dedicated, pure transformation function.
-function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
+function transformDataForApi(formData: SubmitApplicationInput): WebhookBody {
   const formatDate = (dateString: string) => {
     // Input format from <input type="date"> is YYYY-MM-DD
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
@@ -88,35 +83,29 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
     return `${street}, ${apt}`;
   };
 
-  const transformedData: ApplicantData = {
+  const transformedData: WebhookBody = {
     referenceId: formData.referenceId,
     email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
-    address: {
-      street: getFullStreet(formData.applicantAddress, formData.applicantApt),
-      city: formData.applicantCity,
-      state: formData.applicantState,
-      zip: formData.applicantZip,
-    },
+    addressStreet: getFullStreet(formData.applicantAddress, formData.applicantApt),
+    addressCity: formData.applicantCity,
+    addressState: formData.applicantState,
+    addressZip: formData.applicantZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
     lastFour: formData.ssn.replace(/-/g, '').slice(-4),
     gender: capitalize(formData.gender),
-    beneficiary: {
-      firstName: formData.beneficiary1FirstName,
-      lastName: formData.beneficiary1LastName,
-      dob: formatDate(formData.beneficiary1Dob),
-      address: {
-        street: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
-        city: formData.beneficiaryCity,
-        state: formData.beneficiaryState,
-        zip: formData.beneficiaryZip,
-      },
-      phone: formatPhone(formData.beneficiary1Phone),
-      relation: formData.beneficiary1Relationship,
-      percentage: "100", // Hardcoded as per original logic
-    },
+    beneficiaryFirstName: formData.beneficiary1FirstName,
+    beneficiaryLastName: formData.beneficiary1LastName,
+    beneficiaryDob: formatDate(formData.beneficiary1Dob),
+    beneficiaryAddressStreet: getFullStreet(formData.beneficiaryAddress, formData.beneficiaryApt),
+    beneficiaryAddressCity: formData.beneficiaryCity,
+    beneficiaryAddressState: formData.beneficiaryState,
+    beneficiaryAddressZip: formData.beneficiaryZip,
+    beneficiaryPhone: formatPhone(formData.beneficiary1Phone),
+    beneficiaryRelation: formData.beneficiary1Relationship,
+    beneficiaryPercentage: "100",
     faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
     paymentAccountHolderName: formData.accountHolderName,
     paymentRoutingNumber: formData.routingNumber,
@@ -125,7 +114,7 @@ function transformDataForApi(formData: SubmitApplicationInput): ApplicantData {
   
   // This is the "test" that validates the data *after* transformation.
   // If it fails, something is wrong with the transformation logic, and it will throw an error.
-  return ApplicantDataSchema.parse(transformedData);
+  return WebhookBodySchema.parse(transformedData);
 }
 
 // 4. Define the output of the flow.
@@ -141,7 +130,7 @@ export async function submitApplication(input: SubmitApplicationInput): Promise<
   return submitApplicationFlow(input);
 }
 
-// 6. The flow itself is now much simpler.
+// 6. The flow itself is now updated to send the correct nested structure.
 const submitApplicationFlow = ai.defineFlow(
   {
     name: 'submitApplicationFlow',
@@ -150,26 +139,33 @@ const submitApplicationFlow = ai.defineFlow(
   },
   async (formData) => {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const apiKey = process.env.INSURANCE_API_KEY;
 
     if (!backendUrl) {
-      console.error('--- submitApplicationFlow: FAILED - BACKEND_URL environment variable is not set. ---');
-      return { success: false, message: 'Server configuration error.' };
+      console.error('BACKEND_URL environment variable is not set.');
+      return { success: false, message: 'Server configuration error: Missing backend URL.' };
+    }
+     if (!apiKey) {
+      console.error('INSURANCE_API_KEY environment variable is not set.');
+      return { success: false, message: 'Server configuration error: Missing API Key.' };
     }
 
     try {
-      console.log('--- submitApplicationFlow: Started ---');
-      const applicantData = transformDataForApi(formData);
-      console.log('--- submitApplicationFlow: Data transformation successful. ---');
+      const webhookBody = transformDataForApi(formData);
       
-      console.log(`Submitting application for referenceId: ${applicantData.referenceId} to ${backendUrl}/insurance-webhook`);
-      console.log('--- submitApplicationFlow: Request Payload ---', JSON.stringify(applicantData, null, 2));
-      const response = await axios.post(`${backendUrl}/insurance-webhook`, applicantData);
-      
-      console.log('--- submitApplicationFlow: Received response from backend ---', 'Status:', response.status, 'Data:', JSON.stringify(response.data, null, 2));
+      // IMPORTANT: Nest the flat webhookBody inside the `customData` object.
+      const finalPayload = {
+        customData: webhookBody
+      };
+
+      const response = await axios.post(
+        `${backendUrl}/insurance-webhook`, 
+        finalPayload,
+        { headers: { 'insurance-api-key': apiKey } }
+      );
       
       const result = response.data;
-      if (response.status >= 200 && response.status < 300 && result && result.policyId) {
-        console.log('--- submitApplicationFlow: API submission successful. ---');
+      if (response.status >= 200 && response.status < 300 && (result?.success || result?.policyId)) {
         return {
           success: true,
           message: 'Application submitted successfully!',
@@ -177,7 +173,6 @@ const submitApplicationFlow = ai.defineFlow(
         };
       } else {
         const errorMessage = result?.message || 'Backend processed the request, but the submission was not successful.';
-        console.error('--- submitApplicationFlow: FAILED - Backend indicated failure ---', errorMessage);
         return {
           success: false,
           message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage,
@@ -185,19 +180,17 @@ const submitApplicationFlow = ai.defineFlow(
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        console.error('--- submitApplicationFlow: FAILED - API submission failed ---', error.response.status, JSON.stringify(error.response.data, null, 2));
-        const errorMessage = error.response.data.message || 'API submission failed.';
+        const errorMessage = error.response.data?.message || 'API submission failed.';
         return { success: false, message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage };
       }
       
       if (error instanceof z.ZodError) {
         const flattenedErrors = error.flatten();
         const errorMessages = Object.values(flattenedErrors.fieldErrors).flat();
-        console.error('--- submitApplicationFlow: FAILED - Data transformation failed ---', flattenedErrors);
         return { success: false, message: `Data validation failed: ${errorMessages.join(', ')}` || 'Invalid data provided.' };
       }
 
-      console.error('--- submitApplicationFlow: FAILED - Unknown error ---', error);
+      console.error('An unknown error occurred during submission:', error);
       return { success: false, message: 'Failed to connect to the server.' };
     }
   }
