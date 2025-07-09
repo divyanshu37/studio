@@ -24,7 +24,7 @@ export const insuranceFormSchema = z.object({
 });
 export type InsuranceFormValues = z.infer<typeof insuranceFormSchema>;
 
-export const additionalQuestionsFormSchema = z.object({
+export const additionalQuestionsObjectSchema = z.object({
   differentOwner: z.string().min(1, { message: "Please select an option." }),
   healthQuestion1: z.string().min(1, { message: "This question is required." }),
   healthQuestion2: z.string().min(1, { message: "This question is required." }),
@@ -33,7 +33,9 @@ export const additionalQuestionsFormSchema = z.object({
   existingPolicies: z.string().min(1, { message: 'This question is required.' }),
   otherHealthIssues: z.string().min(1, { message: 'This question is required.' }),
   otherHealthIssuesDetails: z.string().optional(),
-}).superRefine((data, ctx) => {
+});
+
+export const additionalQuestionsFormSchema = additionalQuestionsObjectSchema.superRefine((data, ctx) => {
   if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

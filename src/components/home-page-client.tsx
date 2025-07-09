@@ -10,6 +10,7 @@ import {
   fullFormSchema, 
   insuranceFormSchema, 
   additionalQuestionsFormSchema, 
+  additionalQuestionsObjectSchema,
   beneficiaryFormSchema, 
   paymentFormSchema,
   type FormValues,
@@ -36,7 +37,7 @@ import { cn } from '@/lib/utils';
 
 const stepFields: (keyof FormValues)[][] = [
   Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
-  Object.keys(additionalQuestionsFormSchema.shape) as (keyof AdditionalQuestionsFormValues)[],
+  Object.keys(additionalQuestionsObjectSchema.shape) as (keyof AdditionalQuestionsFormValues)[],
   Object.keys(beneficiaryFormSchema.shape) as (keyof BeneficiaryFormValues)[],
   Object.keys(paymentFormSchema.shape) as (keyof PaymentFormValues)[],
 ];
