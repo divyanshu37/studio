@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import { FormValues, fullFormSchema } from '@/lib/schema';
+import { FormValues, fullFormSchema, transformDataForApi } from '@/lib/schema';
 import { z } from 'zod';
 import axios from 'axios';
 
@@ -32,103 +32,14 @@ const SubmitApplicationInputSchema = fullFormSchema
   });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
-
-// 2. Define the FLAT payload schema that the webhook's `customData` expects.
-// This should now match our form schema more closely.
-const FinalPayloadSchema = z.object({
-  referenceId: z.string().uuid(),
-  email: z.string().email(),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  addressStreet: z.string().min(1),
-  addressCity: z.string().min(1),
-  addressState: z.string().length(2),
-  addressZip: z.string().regex(/^\d{5}$/),
-  dob: z.string(), // Formatted as MM/dd/yyyy
-  phone: z.string(), // Digits only
-  lastFour: z.string().regex(/^\d{4}$/), // Last 4 of SSN
-  gender: z.string(),
-  beneficiaryFirstName: z.string().min(1),
-  beneficiaryLastName: z.string().min(1),
-  beneficiaryRelation: z.string().min(1),
-  beneficiaryDob: z.string(), // Formatted as MM/dd/yyyy
-  beneficiaryPhone: z.string(), // Digits only
-  beneficiaryPercentage: z.string(),
-  faceAmount: z.string(),
-  paymentAccountHolderName: z.string().min(1),
-  paymentRoutingNumber: z.string().length(9),
-  paymentAccountNumber: z.string().min(1),
-});
-type FinalPayload = z.infer<typeof FinalPayloadSchema>;
-
-
-// 3. Create the dedicated, pure transformation function to build the FLAT payload.
-// This is now much simpler since form field names match the API.
-function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
-  const formatDate = (dateString: string) => {
-    // Input format from <input type="date"> is YYYY-MM-DD
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString) && !/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) return dateString;
-    if (dateString.includes('/')) return dateString; // Already in MM/dd/yyyy
-    const [year, month, day] = dateString.split('-');
-    const formatted = `${month}/${day}/${year}`;
-    return formatted;
-  };
-
-  const formatPhone = (phoneString: string) => {
-    // Remove all non-digit characters
-    const formatted = phoneString.replace(/\D/g, '');
-    return formatted;
-  };
-
-  const capitalize = (s: string) => {
-    if (typeof s !== 'string' || s.length === 0) return '';
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  };
-  
-  const getFullStreet = (street: string, apt?: string) => {
-    if (apt && apt.trim() !== '') {
-      return `${street}, ${apt}`;
-    }
-    return street;
-  };
-
-  const transformedData: FinalPayload = {
-    referenceId: formData.referenceId,
-    email: formData.email,
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    addressStreet: getFullStreet(formData.addressStreet, formData.addressApt),
-    addressCity: formData.addressCity,
-    addressState: formData.addressState,
-    addressZip: formData.addressZip,
-    dob: formatDate(formData.dob),
-    phone: formatPhone(formData.phone),
-    lastFour: formData.lastFour,
-    gender: capitalize(formData.gender),
-    beneficiaryFirstName: formData.beneficiaryFirstName,
-    beneficiaryLastName: formData.beneficiaryLastName,
-    beneficiaryDob: formData.beneficiaryDob ? formatDate(formData.beneficiaryDob) : '',
-    beneficiaryPhone: formData.beneficiaryPhone ? formatPhone(formData.beneficiaryPhone) : '',
-    beneficiaryRelation: formData.beneficiaryRelation,
-    beneficiaryPercentage: "100",
-    faceAmount: formData.faceAmount.replace(/[^0-9]/g, ''),
-    paymentAccountHolderName: formData.paymentAccountHolderName,
-    paymentRoutingNumber: formData.paymentRoutingNumber,
-    paymentAccountNumber: formData.paymentAccountNumber,
-  };
-  
-  // This validates the data *after* transformation against our flat schema.
-  return FinalPayloadSchema.parse(transformedData);
-}
-
-// 4. Define the output of the flow. A policyId is not returned by the async webhook.
+// 2. Define the output of the flow. A policyId is not returned by the async webhook.
 const SubmitApplicationOutputSchema = z.object({
   success: z.boolean(),
   message: z.string(),
 });
 export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSchema>;
 
-// 5. Public-facing function remains the same.
+// 3. Public-facing function remains the same.
 export async function submitApplication(formData: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
   if (!formData) {
     return { success: false, message: 'Invalid application data provided.' };
@@ -136,7 +47,7 @@ export async function submitApplication(formData: SubmitApplicationInput): Promi
   return submitApplicationFlow(formData);
 }
 
-// 6. The flow itself is now updated to send the correct flat structure nested in `customData`.
+// 4. The flow itself is now updated to send the correct flat structure.
 const submitApplicationFlow = ai.defineFlow(
   {
     name: 'submitApplicationFlow',

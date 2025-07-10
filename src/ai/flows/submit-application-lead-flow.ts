@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow to submit application lead data to the backend.
@@ -8,12 +9,12 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {fullFormSchema} from '@/lib/schema';
+import {fullFormSchema, transformDataForApi} from '@/lib/schema';
 import {z} from 'zod';
 import axios from 'axios';
 
-// We use a partial schema because not all fields might be relevant,
-// but we will receive all of them up to this point.
+// We use a partial schema because not all fields might be filled,
+// but the transformation function can handle missing optional fields.
 const SubmitApplicationLeadInputSchema = fullFormSchema.partial();
 export type SubmitApplicationLeadInput = z.infer<typeof SubmitApplicationLeadInputSchema>;
 
@@ -45,8 +46,8 @@ const submitApplicationLeadFlow = ai.defineFlow(
     }
 
     try {
-      // The data is sent as-is.
-      await axios.post(applicationLeadUrl, formData);
+      const finalPayload = transformDataForApi(formData);
+      await axios.post(applicationLeadUrl, finalPayload);
       return {success: true, message: 'Application lead submitted successfully.'};
     } catch (error) {
       let errorMessage = 'An unknown error occurred during application lead submission.';

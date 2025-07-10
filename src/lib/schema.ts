@@ -83,3 +83,92 @@ export const fullFormSchema = insuranceFormSchema
  .merge(paymentFormSchema);
 
 export type FormValues = z.infer<typeof fullFormSchema>;
+
+
+// Centralized API Payload Logic
+
+// 1. Define the FLAT payload schema that the API expects.
+export const FinalPayloadSchema = z.object({
+  referenceId: z.string().uuid().optional(),
+  email: z.string().email().optional(),
+  firstName: z.string().min(1).optional(),
+  lastName: z.string().min(1).optional(),
+  addressStreet: z.string().min(1).optional(),
+  addressCity: z.string().min(1).optional(),
+  addressState: z.string().length(2).optional(),
+  addressZip: z.string().regex(/^\d{5}$/).optional(),
+  dob: z.string().optional(), // Formatted as MM/dd/yyyy
+  phone: z.string().optional(), // Digits only
+  lastFour: z.string().regex(/^\d{4}$/).optional(), // Last 4 of SSN
+  gender: z.string().optional(),
+  beneficiaryFirstName: z.string().min(1).optional(),
+  beneficiaryLastName: z.string().min(1).optional(),
+  beneficiaryRelation: z.string().min(1).optional(),
+  beneficiaryDob: z.string().optional(), // Formatted as MM/dd/yyyy
+  beneficiaryPhone: z.string().optional(), // Digits only
+  beneficiaryPercentage: z.string().optional(),
+  faceAmount: z.string().optional(),
+  paymentAccountHolderName: z.string().min(1).optional(),
+  paymentRoutingNumber: z.string().length(9).optional(),
+  paymentAccountNumber: z.string().min(1).optional(),
+}).partial(); // Make all fields optional to handle partial form data
+export type FinalPayload = z.infer<typeof FinalPayloadSchema>;
+
+
+// 2. Create the dedicated, pure transformation function to build the FLAT payload.
+export function transformDataForApi(formData: Partial<FormValues>): FinalPayload {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString) && !/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) return dateString;
+    if (dateString.includes('/')) return dateString; // Already in MM/dd/yyyy
+    const [year, month, day] = dateString.split('-');
+    const formatted = `${month}/${day}/${year}`;
+    return formatted;
+  };
+
+  const formatPhone = (phoneString?: string) => {
+    if (!phoneString) return '';
+    return phoneString.replace(/\D/g, '');
+  };
+
+  const capitalize = (s?: string) => {
+    if (!s || s.length === 0) return '';
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  
+  const getFullStreet = (street?: string, apt?: string) => {
+    if (!street) return '';
+    if (apt && apt.trim() !== '') {
+      return `${street}, ${apt}`;
+    }
+    return street;
+  };
+
+  const transformedData: FinalPayload = {
+    referenceId: (formData as any).referenceId, // For final submission
+    email: formData.email,
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    addressStreet: getFullStreet(formData.addressStreet, formData.addressApt),
+    addressCity: formData.addressCity,
+    addressState: formData.addressState,
+    addressZip: formData.addressZip,
+    dob: formatDate(formData.dob),
+    phone: formatPhone(formData.phone),
+    lastFour: formData.lastFour,
+    gender: capitalize(formData.gender),
+    beneficiaryFirstName: formData.beneficiaryFirstName,
+    beneficiaryLastName: formData.beneficiaryLastName,
+    beneficiaryDob: formatDate(formData.beneficiaryDob),
+    beneficiaryPhone: formatPhone(formData.beneficiaryPhone),
+    beneficiaryRelation: formData.beneficiaryRelation,
+    beneficiaryPercentage: "100",
+    faceAmount: formData.faceAmount ? formData.faceAmount.replace(/[^0-9]/g, '') : '',
+    paymentAccountHolderName: formData.paymentAccountHolderName,
+    paymentRoutingNumber: formData.paymentRoutingNumber,
+    paymentAccountNumber: formData.paymentAccountNumber,
+  };
+  
+  // This validates the data *after* transformation against our flat schema.
+  return FinalPayloadSchema.parse(transformedData);
+}

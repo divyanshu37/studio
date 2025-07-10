@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow to submit lead data to the backend.
@@ -8,12 +9,12 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {fullFormSchema, type FormValues} from '@/lib/schema';
+import {fullFormSchema, transformDataForApi} from '@/lib/schema';
 import {z} from 'zod';
 import axios from 'axios';
 
-// We can reuse the full form schema for input, as we'll have all the data up to this point.
-// We make it partial because fields from later steps won't be filled yet.
+// We use a partial schema because fields from later steps won't be filled yet.
+// The transformation function can handle missing optional fields.
 const SubmitLeadInputSchema = fullFormSchema.partial();
 export type SubmitLeadInput = z.infer<typeof SubmitLeadInputSchema>;
 
@@ -45,9 +46,8 @@ const submitLeadFlow = ai.defineFlow(
     }
 
     try {
-      // Unlike the final submission, we can send the data as-is.
-      // If a specific format is needed later, we can add a transformation function.
-      await axios.post(leadUrl, formData);
+      const finalPayload = transformDataForApi(formData);
+      await axios.post(leadUrl, finalPayload);
       return {success: true, message: 'Lead submitted successfully.'};
     } catch (error) {
       let errorMessage = 'An unknown error occurred during lead submission.';
