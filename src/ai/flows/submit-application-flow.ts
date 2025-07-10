@@ -144,7 +144,7 @@ const submitApplicationFlow = ai.defineFlow(
       
       const response = await axios.post(
         `${backendUrl}/insurance`, 
-        {customData: finalPayload}, // Nest the final FLAT payload in `customData`
+        finalPayload,
         { headers: { 'insurance-api-key': apiKey } }
       );
       
@@ -177,6 +177,7 @@ const submitApplicationFlow = ai.defineFlow(
         return { success: false, message: `Data validation failed: ${errorMessages}` || 'Invalid data provided.' };
       }
 
+      console.error(error);
       console.error('An unknown error occurred during submission:', error);
       return { success: false, message: 'Failed to connect to the server.' };
     }
