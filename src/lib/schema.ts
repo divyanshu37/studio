@@ -77,16 +77,7 @@ export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
 export const fullFormSchema = insuranceFormSchema
  .merge(additionalQuestionsObjectSchema)
-  .merge(beneficiaryFormSchema)
- .merge(paymentFormSchema)
- .superRefine((data, ctx) => {
-    if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['otherHealthIssuesDetails'],
-        message: 'Please provide details about your other health issues.',
-      });
-    }
- });
+ .merge(beneficiaryFormSchema)
+ .merge(paymentFormSchema);
 
 export type FormValues = z.infer<typeof fullFormSchema>;

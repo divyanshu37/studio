@@ -14,9 +14,22 @@ import { z } from 'zod';
 import axios from 'axios';
 
 // 1. Define the input from the form. This is the raw data from the UI.
-const SubmitApplicationInputSchema = fullFormSchema.extend({
-  referenceId: z.string().uuid(),
-});
+const SubmitApplicationInputSchema = fullFormSchema
+  .extend({
+    referenceId: z.string().uuid(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.otherHealthIssues === 'yes' &&
+      (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['otherHealthIssuesDetails'],
+        message: 'Please provide details about your other health issues.',
+      });
+    }
+  });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
 
