@@ -142,7 +142,7 @@ const submitApplicationFlow = ai.defineFlow(
     outputSchema: SubmitApplicationOutputSchema,
   },
   async (formData) => {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3400';
     const apiKey = process.env.INSURANCE_API_KEY;
 
     if (!backendUrl) {
