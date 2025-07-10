@@ -111,6 +111,16 @@ export const FinalPayloadSchema = z.object({
   paymentAccountHolderName: z.string().min(1).optional(),
   paymentRoutingNumber: z.string().length(9).optional(),
   paymentAccountNumber: z.string().min(1).optional(),
+  // Health and Policy Questions
+  differentOwner: z.string().optional(),
+  healthQuestion1: z.string().optional(),
+  healthQuestion2: z.string().optional(),
+  healthQuestion3: z.string().optional(),
+  tobaccoUse: z.string().optional(),
+  existingPolicies: z.string().optional(),
+  otherHealthIssues: z.string().optional(),
+  otherHealthIssuesDetails: z.string().optional(),
+  effectiveDate: z.string().optional(), // Formatted as MM/dd/yyyy
 }).partial(); // Make all fields optional to handle partial form data
 export type FinalPayload = z.infer<typeof FinalPayloadSchema>;
 
@@ -167,6 +177,16 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     paymentAccountHolderName: formData.paymentAccountHolderName,
     paymentRoutingNumber: formData.paymentRoutingNumber,
     paymentAccountNumber: formData.paymentAccountNumber,
+    // Add the missing fields
+    differentOwner: formData.differentOwner,
+    healthQuestion1: formData.healthQuestion1,
+    healthQuestion2: formData.healthQuestion2,
+    healthQuestion3: formData.healthQuestion3,
+    tobaccoUse: formData.tobaccoUse,
+    existingPolicies: formData.existingPolicies,
+    otherHealthIssues: formData.otherHealthIssues,
+    otherHealthIssuesDetails: formData.otherHealthIssuesDetails,
+    effectiveDate: formatDate(formData.effectiveDate),
   };
   
   // This validates the data *after* transformation against our flat schema.
