@@ -35,17 +35,6 @@ export const additionalQuestionsObjectSchema = z.object({
   otherHealthIssuesDetails: z.string().optional(),
 });
 
-export const additionalQuestionsFormSchema = additionalQuestionsObjectSchema.superRefine((data, ctx) => {
-  if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['otherHealthIssuesDetails'],
-      message: 'Please provide details about your other health issues.',
-    });
-  }
-});
-export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsFormSchema>;
-
 export const beneficiaryFormSchema = z.object({
   applicantAddress: z.string().min(1, { message: "Address is required." }),
   applicantApt: z.string().optional(),
@@ -87,15 +76,17 @@ export const paymentFormSchema = z.object({
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
 export const fullFormSchema = insuranceFormSchema
-  .merge(additionalQuestionsObjectSchema)
+ .merge(additionalQuestionsObjectSchema)
   .merge(beneficiaryFormSchema)
-  .merge(paymentFormSchema).superRefine((data, ctx) => { if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
+ .merge(paymentFormSchema)
+ .superRefine((data, ctx) => {
+    if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['otherHealthIssuesDetails'],
         message: 'Please provide details about your other health issues.',
       });
     }
-  });
+ });
 
 export type FormValues = z.infer<typeof fullFormSchema>;

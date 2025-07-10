@@ -19,6 +19,7 @@ const SubmitApplicationInputSchema = fullFormSchema.extend({
 });
 export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema>;
 
+
 // 2. Define the FLAT payload schema that the webhook's `customData` expects.
 const FinalPayloadSchema = z.object({
   referenceId: z.string().uuid(),
