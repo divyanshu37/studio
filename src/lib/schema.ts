@@ -82,7 +82,7 @@ export const paymentFormSchema = z.object({
   accountHolderName: z.string().min(1, { message: "Account holder name is required." }),
   accountNumber: z.string().min(1, { message: "Account number is required." }),
   routingNumber: z.string().length(9, { message: "A valid 9-digit routing number is required." }),
-  ssn: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
+  lastFour: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
 });
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 

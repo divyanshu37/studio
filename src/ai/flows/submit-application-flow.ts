@@ -87,7 +87,7 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     addressZip: formData.applicantZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
-    lastFour: formData.ssn.replace(/\D/g, ''), // The form only collects the last 4 digits
+    lastFour: formData.lastFour.replace(/\D/g, ''), // The form only collects the last 4 digits
     gender: capitalize(formData.gender),
     beneficiaryFirstName: formData.beneficiary1FirstName,
     beneficiaryLastName: formData.beneficiary1LastName,

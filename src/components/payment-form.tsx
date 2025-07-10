@@ -59,7 +59,7 @@ export default function PaymentForm() {
         </div>
         <FormField
           control={control}
-          name="ssn"
+          name="lastFour"
           render={({ field }) => (
             <FormItem>
               <FormControl>
@@ -68,7 +68,7 @@ export default function PaymentForm() {
                   autoComplete="off"
                   {...field} 
                   onChange={(e) => handleSsnChange(e, field)}
-                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.ssn && "border-destructive focus-visible:border-destructive animate-shake")} 
+                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.lastFour && "border-destructive focus-visible:border-destructive animate-shake")} 
                 />
               </FormControl>
             </FormItem>
