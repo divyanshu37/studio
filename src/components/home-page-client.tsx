@@ -19,6 +19,7 @@ import {
   type PaymentFormValues
 } from '@/lib/schema';
 import { submitApplication } from '@/ai/flows/submit-application-flow';
+import { submitLead } from '@/ai/flows/submit-lead-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useSocket } from '@/hooks/use-socket';
 
@@ -156,6 +157,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     
     if (!output) return;
     
+    if (step === 3) {
+      // This is the new integration point for LEAD_URL
+      // We don't await this or handle errors in the UI, it's a "fire-and-forget" call
+      submitLead(form.getValues());
+    }
+
     if (step === 4) {
       form.handleSubmit(processForm)();
     } else {
