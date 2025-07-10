@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import { differenceInYears, parse, isValid } from 'date-fns';
+import { differenceInYears, parse, isValid, format } from 'date-fns';
 
 export const insuranceFormSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required." }),
@@ -135,6 +135,13 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     const formatted = `${month}/${day}/${year}`;
     return formatted;
   };
+  
+  const formatEffectiveDate = (dateString?: string) => {
+    if (dateString) {
+      return formatDate(dateString);
+    }
+    return format(new Date(), 'MM/dd/yyyy');
+  };
 
   const formatPhone = (phoneString?: string) => {
     if (!phoneString) return '';
@@ -186,7 +193,7 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     existingPolicies: formData.existingPolicies,
     otherHealthIssues: formData.otherHealthIssues,
     otherHealthIssuesDetails: formData.otherHealthIssuesDetails,
-    effectiveDate: formatDate(formData.effectiveDate),
+    effectiveDate: formatEffectiveDate(formData.effectiveDate),
   };
   
   // This validates the data *after* transformation against our flat schema.
