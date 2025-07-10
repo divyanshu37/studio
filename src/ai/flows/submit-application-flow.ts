@@ -92,13 +92,13 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
 
   const transformedData: FinalPayload = {
     referenceId: formData.referenceId,
-    email: formData.email,
+ email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
-    addressStreet: getFullStreet(formData.applicantAddress, formData.applicantApt),
-    addressCity: formData.applicantCity,
-    addressState: formData.applicantState,
-    addressZip: formData.applicantZip,
+ addressStreet: getFullStreet(formData.addressHome, formData.addressApt),
+ addressCity: formData.addressCity,
+ addressState: formData.addressState,
+ addressZip: formData.addressZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
     lastFour: formData.lastFour,
@@ -186,7 +186,7 @@ const submitApplicationFlow = ai.defineFlow(
       if (error instanceof z.ZodError) {
         const flattenedErrors = error.flatten();
         const errorMessages = Object.entries(flattenedErrors.fieldErrors)
-            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .map(([field, messages]) => `${field}: ${(messages as any).join(', ')}`)
             .join('; ');
         return { success: false, message: `Data validation failed: ${errorMessages}` || 'Invalid data provided.' };
       }

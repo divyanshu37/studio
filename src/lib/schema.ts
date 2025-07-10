@@ -36,11 +36,11 @@ export const additionalQuestionsObjectSchema = z.object({
 });
 
 export const beneficiaryFormSchema = z.object({
-  applicantAddress: z.string().min(1, { message: "Address is required." }),
-  applicantApt: z.string().optional(),
-  applicantCity: z.string().min(1, { message: "City is required." }),
-  applicantState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
-  applicantZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
+  addressHome: z.string().min(1, { message: "Address is required." }),
+  addressApt: z.string().optional(),
+  addressCity: z.string().min(1, { message: "City is required." }),
+  addressState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
+  addressZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
   beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
   beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
   beneficiaryMobile: z.string().optional(),
