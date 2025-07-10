@@ -10,7 +10,7 @@ export const insuranceFormSchema = z.object({
   dob: z.string()
     .min(10, { message: "Please enter a complete date of birth." })
     .refine((dob) => isValid(parse(dob, 'MM/dd/yyyy', new Date())), {
-      message: "Invalid date. Please use MM/DD/YYYY format.",
+      message: "Invalid date. Please use MM/dd/yyyy format.",
     })
     .refine((dob) => {
         const parsedDate = parse(dob, 'MM/dd/yyyy', new Date());
@@ -60,20 +60,20 @@ export const beneficiaryFormSchema = z.object({
     // If a value is present, it must be a complete and valid date
     return dob.length === 10 && isValid(parse(dob, 'MM/dd/yyyy', new Date()));
   }, {
-    message: "Invalid date. Please use MM/DD/YYYY format.",
+    message: "Invalid date. Please use MM/dd/yyyy format.",
   }),
   beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
   coverage: z.string().min(1, { message: "Coverage amount is required." }),
   effectiveDate: z.string().optional().refine((date) => {
     if (!date || date === "") return true; // Optional field
     if (date.length !== 10) return false; // Must be full date if entered
-    const parsedDate = parse(date, 'MM/DD/YYYY', new Date());
+    const parsedDate = parse(date, 'MM/dd/yyyy', new Date());
     if (!isValid(parsedDate)) return false; // Must be a valid date
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return parsedDate >= today; // Must be today or future
   }, {
-    message: "Date must be valid (MM/DD/YYYY) and not in the past.",
+    message: "Date must be valid (MM/dd/yyyy) and not in the past.",
   }),
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
