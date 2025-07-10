@@ -24,11 +24,11 @@ export default function PaymentForm() {
         <h3 className="text-base font-semibold text-foreground text-left">Payment Details</h3>
         <FormField
           control={control}
-          name="accountHolderName"
+          name="paymentAccountHolderName"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Account Holder Name" autoComplete="name" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.accountHolderName && "border-destructive focus-visible:border-destructive animate-shake")} />
+                <Input placeholder="Account Holder Name" autoComplete="name" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.paymentAccountHolderName && "border-destructive focus-visible:border-destructive animate-shake")} />
               </FormControl>
             </FormItem>
           )}
@@ -36,22 +36,22 @@ export default function PaymentForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={control}
-            name="accountNumber"
+            name="paymentAccountNumber"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Account Number" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.accountNumber && "border-destructive focus-visible:border-destructive animate-shake")} />
+                  <Input placeholder="Account Number" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.paymentAccountNumber && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={control}
-            name="routingNumber"
+            name="paymentRoutingNumber"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder="Routing Number" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.routingNumber && "border-destructive focus-visible:border-destructive animate-shake")} />
+                  <Input placeholder="Routing Number" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.paymentRoutingNumber && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
               </FormItem>
             )}

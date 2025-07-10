@@ -34,16 +34,18 @@ export const additionalQuestionsObjectSchema = z.object({
   otherHealthIssues: z.string().min(1, { message: 'This question is required.' }),
   otherHealthIssuesDetails: z.string().optional(),
 });
+export type AdditionalQuestionsFormValues = z.infer<typeof additionalQuestionsObjectSchema>;
+
 
 export const beneficiaryFormSchema = z.object({
-  addressHome: z.string().min(1, { message: "Address is required." }),
+  addressStreet: z.string().min(1, { message: "Address is required." }),
   addressApt: z.string().optional(),
   addressCity: z.string().min(1, { message: "City is required." }),
   addressState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
   addressZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
-  beneficiary1FirstName: z.string().min(1, { message: "First name is required." }),
-  beneficiary1LastName: z.string().min(1, { message: "Last name is required." }),
-  beneficiaryMobile: z.string().optional(),
+  beneficiaryFirstName: z.string().min(1, { message: "First name is required." }),
+  beneficiaryLastName: z.string().min(1, { message: "Last name is required." }),
+  beneficiaryPhone: z.string().optional(),
   beneficiaryDob: z.string().optional().refine((dob) => {
     if (!dob || dob === "") return true; // Optional field is valid if empty
     // If a value is present, it must be a complete and valid date
@@ -51,8 +53,8 @@ export const beneficiaryFormSchema = z.object({
   }, {
     message: "Invalid date. Please use MM/dd/yyyy format.",
   }),
-  beneficiary1Relationship: z.string().min(1, { message: "Relationship is required." }),
-  coverage: z.string().min(1, { message: "Coverage amount is required." }),
+  beneficiaryRelation: z.string().min(1, { message: "Relationship is required." }),
+  faceAmount: z.string().min(1, { message: "Coverage amount is required." }),
   effectiveDate: z.string().optional().refine((date) => {
     if (!date || date === "") return true; // Optional field
     if (date.length !== 10) return false; // Must be full date if entered
@@ -68,9 +70,9 @@ export const beneficiaryFormSchema = z.object({
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
 export const paymentFormSchema = z.object({
-  accountHolderName: z.string().min(1, { message: "Account holder name is required." }),
-  accountNumber: z.string().min(1, { message: "Account number is required." }),
-  routingNumber: z.string().length(9, { message: "A valid 9-digit routing number is required." }),
+  paymentAccountHolderName: z.string().min(1, { message: "Account holder name is required." }),
+  paymentAccountNumber: z.string().min(1, { message: "Account number is required." }),
+  paymentRoutingNumber: z.string().length(9, { message: "A valid 9-digit routing number is required." }),
   lastFour: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
 });
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;

@@ -41,11 +41,11 @@ export default function BeneficiaryForm() {
       <div className="space-y-4">
         <FormField
           control={control}
-          name="addressHome"
+          name="addressStreet"
           render={({ field }) => (
             <FormItem>
-              <FormControl className={cn(errors.addressHome && 'animate-shake')}>
-                <Input placeholder="Applicant's Primary Address" autoComplete="street-address" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressHome && "border-destructive focus-visible:border-destructive")} />
+              <FormControl className={cn(errors.addressStreet && 'animate-shake')}>
+                <Input placeholder="Applicant's Primary Address" autoComplete="street-address" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressStreet && "border-destructive focus-visible:border-destructive")} />
               </FormControl>
             </FormItem>
           )}
@@ -82,7 +82,7 @@ export default function BeneficiaryForm() {
               <FormItem>
                 <Select onValueChange={field.onChange} defaultValue={field.value} >
                   <FormControl>
-                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantState && "border-destructive focus-visible:border-destructive animate-shake")}>
+                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressState && "border-destructive focus-visible:border-destructive animate-shake")}>
                       <SelectValue placeholder="State" />
                     </SelectTrigger>
                   </FormControl>
@@ -101,7 +101,7 @@ export default function BeneficiaryForm() {
             render={({ field }) => (
               <FormItem>
                 <FormControl className={cn(errors.addressZip && 'animate-shake')}>
-                  <Input placeholder="Zip Code" autoComplete="postal-code" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.applicantZip && "border-destructive focus-visible:border-destructive animate-shake")} />
+                  <Input placeholder="Zip Code" autoComplete="postal-code" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressZip && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
               </FormItem>
             )}
@@ -113,22 +113,22 @@ export default function BeneficiaryForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
             control={control}
-            name="beneficiary1FirstName"
+            name="beneficiaryFirstName"
             render={({ field }) => (
                 <FormItem>
-                <FormControl className={cn(errors.beneficiary1FirstName && 'animate-shake')}>
-                    <Input placeholder="Beneficiary First Name" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1FirstName && "border-destructive focus-visible:border-destructive animate-shake")} />
+                <FormControl className={cn(errors.beneficiaryFirstName && 'animate-shake')}>
+                    <Input placeholder="Beneficiary First Name" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryFirstName && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
                 </FormItem>
             )}
             />
             <FormField
             control={control}
-            name="beneficiary1LastName"
+            name="beneficiaryLastName"
             render={({ field }) => (
                 <FormItem>
-                <FormControl className={cn(errors.beneficiary1LastName && 'animate-shake')}>
-                    <Input placeholder="Beneficiary Last Name" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1LastName && "border-destructive focus-visible:border-destructive animate-shake")} />
+                <FormControl className={cn(errors.beneficiaryLastName && 'animate-shake')}>
+                    <Input placeholder="Beneficiary Last Name" autoComplete="off" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryLastName && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
                 </FormItem>
             )}
@@ -138,16 +138,16 @@ export default function BeneficiaryForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
             control={control}
-            name="beneficiaryMobile"
+            name="beneficiaryPhone"
             render={({ field }) => (
                 <FormItem>
-                <FormControl className={cn(errors.beneficiaryMobile && 'animate-shake')}>
+                <FormControl className={cn(errors.beneficiaryPhone && 'animate-shake')}>
                     <Input 
                         placeholder="Beneficiary Mobile (Optional)" 
                         autoComplete="off" 
                         {...field} 
                         onChange={(e) => handlePhoneChange(e, field)}
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryMobile && "border-destructive focus-visible:border-destructive animate-shake")} />
+                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryPhone && "border-destructive focus-visible:border-destructive animate-shake")} />
                 </FormControl>
                 </FormItem>
             )}
@@ -173,12 +173,12 @@ export default function BeneficiaryForm() {
         <div className="grid grid-cols-1 gap-4">
             <FormField
             control={control}
-            name="beneficiary1Relationship"
+            name="beneficiaryRelation"
             render={({ field }) => (
                 <FormItem>
                 <Select onValueChange={field.onChange} defaultValue={field.value} >
                     <FormControl>
-                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiary1Relationship && "border-destructive focus-visible:border-destructive animate-shake")}>
+                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.beneficiaryRelation && "border-destructive focus-visible:border-destructive animate-shake")}>
                         <SelectValue placeholder="Relationship to Insured" />
                     </SelectTrigger>
                     </FormControl>
@@ -197,12 +197,12 @@ export default function BeneficiaryForm() {
       <div className="space-y-4 pt-8">
         <FormField
           control={control}
-          name="coverage"
+          name="faceAmount"
           render={({ field }) => (
             <FormItem>
               <Select onValueChange={field.onChange} defaultValue={field.value} >
                 <FormControl>
-                  <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.coverage && "border-destructive focus-visible:border-destructive animate-shake")}>
+                  <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.faceAmount && "border-destructive focus-visible:border-destructive animate-shake")}>
                     <SelectValue placeholder="Select Coverage Amount" />
                   </SelectTrigger>
                 </FormControl>

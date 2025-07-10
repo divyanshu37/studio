@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import { fullFormSchema } from '@/lib/schema';
+import { FormValues, fullFormSchema } from '@/lib/schema';
 import { z } from 'zod';
 import axios from 'axios';
 
@@ -34,6 +34,7 @@ export type SubmitApplicationInput = z.infer<typeof SubmitApplicationInputSchema
 
 
 // 2. Define the FLAT payload schema that the webhook's `customData` expects.
+// This should now match our form schema more closely.
 const FinalPayloadSchema = z.object({
   referenceId: z.string().uuid(),
   email: z.string().email(),
@@ -62,6 +63,7 @@ type FinalPayload = z.infer<typeof FinalPayloadSchema>;
 
 
 // 3. Create the dedicated, pure transformation function to build the FLAT payload.
+// This is now much simpler since form field names match the API.
 function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
   const formatDate = (dateString: string) => {
     // Input format from <input type="date"> is YYYY-MM-DD
@@ -95,7 +97,7 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
-    addressStreet: getFullStreet(formData.addressHome, formData.addressApt),
+    addressStreet: getFullStreet(formData.addressStreet, formData.addressApt),
     addressCity: formData.addressCity,
     addressState: formData.addressState,
     addressZip: formData.addressZip,
@@ -103,16 +105,16 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     phone: formatPhone(formData.phone),
     lastFour: formData.lastFour,
     gender: capitalize(formData.gender),
-    beneficiaryFirstName: formData.beneficiary1FirstName,
-    beneficiaryLastName: formData.beneficiary1LastName,
+    beneficiaryFirstName: formData.beneficiaryFirstName,
+    beneficiaryLastName: formData.beneficiaryLastName,
     beneficiaryDob: formData.beneficiaryDob ? formatDate(formData.beneficiaryDob) : '',
-    beneficiaryPhone: formData.beneficiaryMobile ? formatPhone(formData.beneficiaryMobile) : '',
-    beneficiaryRelation: formData.beneficiary1Relationship,
+    beneficiaryPhone: formData.beneficiaryPhone ? formatPhone(formData.beneficiaryPhone) : '',
+    beneficiaryRelation: formData.beneficiaryRelation,
     beneficiaryPercentage: "100",
-    faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
-    paymentAccountHolderName: formData.accountHolderName,
-    paymentRoutingNumber: formData.routingNumber,
-    paymentAccountNumber: formData.accountNumber,
+    faceAmount: formData.faceAmount.replace(/[^0-9]/g, ''),
+    paymentAccountHolderName: formData.paymentAccountHolderName,
+    paymentRoutingNumber: formData.paymentRoutingNumber,
+    paymentAccountNumber: formData.paymentAccountNumber,
   };
   
   // This validates the data *after* transformation against our flat schema.
