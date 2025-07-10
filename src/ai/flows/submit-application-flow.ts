@@ -92,13 +92,13 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
 
   const transformedData: FinalPayload = {
     referenceId: formData.referenceId,
- email: formData.email,
+    email: formData.email,
     firstName: formData.firstName,
     lastName: formData.lastName,
- addressStreet: getFullStreet(formData.addressHome, formData.addressApt),
- addressCity: formData.addressCity,
- addressState: formData.addressState,
- addressZip: formData.addressZip,
+    addressStreet: getFullStreet(formData.addressHome, formData.addressApt),
+    addressCity: formData.addressCity,
+    addressState: formData.addressState,
+    addressZip: formData.addressZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
     lastFour: formData.lastFour,
@@ -149,7 +149,7 @@ const submitApplicationFlow = ai.defineFlow(
       return { success: false, message: 'Server configuration error: Missing backend URL.' };
     }
      if (!apiKey) {
-      return { success: false, message: 'Server configuration error: Missing API Key.' };
+      return { success: false, message: 'Server configuration error: Missing INSURANCE_API_KEY.' };
     }
 
     try {
