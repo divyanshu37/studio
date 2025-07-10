@@ -29,14 +29,14 @@ const FinalPayloadSchema = z.object({
   addressCity: z.string().min(1),
   addressState: z.string().length(2),
   addressZip: z.string().regex(/^\d{5}$/),
-  dob: z.string(), // Formatted as MM/DD/YYYY
+  dob: z.string(), // Formatted as MM/dd/yyyy
   phone: z.string(), // Digits only
-  lastFour: z.string().regex(/^\d{4}$/), // Full SSN without dashes
+  lastFour: z.string().regex(/^\d{4}$/), // Last 4 of SSN
   gender: z.string(),
   beneficiaryFirstName: z.string().min(1),
   beneficiaryLastName: z.string().min(1),
   beneficiaryRelation: z.string().min(1),
-  beneficiaryDob: z.string(), // Formatted as MM/DD/YYYY
+  beneficiaryDob: z.string(), // Formatted as MM/dd/yyyy
   beneficiaryPhone: z.string(), // Digits only
   beneficiaryPercentage: z.string(),
   faceAmount: z.string(),
@@ -51,7 +51,8 @@ type FinalPayload = z.infer<typeof FinalPayloadSchema>;
 function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
   const formatDate = (dateString: string) => {
     // Input format from <input type="date"> is YYYY-MM-DD
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString) && !/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) return dateString;
+    if (dateString.includes('/')) return dateString; // Already in MM/dd/yyyy
     const [year, month, day] = dateString.split('-');
     const formatted = `${month}/${day}/${year}`;
     return formatted;
@@ -86,12 +87,12 @@ function transformDataForApi(formData: SubmitApplicationInput): FinalPayload {
     addressZip: formData.applicantZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
-    lastFour: formData.ssn.replace(/-/g, '').slice(-4),
+    lastFour: formData.ssn.replace(/\D/g, ''), // The form only collects the last 4 digits
     gender: capitalize(formData.gender),
     beneficiaryFirstName: formData.beneficiary1FirstName,
     beneficiaryLastName: formData.beneficiary1LastName,
-    beneficiaryDob: formData.beneficiary1Dob === '' ? formatDate(formData.dob) : formatDate(formData.beneficiary1Dob),
-    beneficiaryPhone: formData.beneficiary1Mobile === '' ? formatPhone(formData.phone) : formatPhone(formData.beneficiary1Mobile),
+    beneficiaryDob: formData.beneficiaryDob ? formatDate(formData.beneficiaryDob) : '',
+    beneficiaryPhone: formData.beneficiaryMobile ? formatPhone(formData.beneficiaryMobile) : '',
     beneficiaryRelation: formData.beneficiary1Relationship,
     beneficiaryPercentage: "100",
     faceAmount: formData.coverage.replace(/[^0-9]/g, ''),
