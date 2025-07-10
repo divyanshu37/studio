@@ -86,14 +86,10 @@ export const paymentFormSchema = z.object({
 });
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
-// FIX: Merge the raw object schemas first, then apply the refinement.
-// A ZodEffects object (from .superRefine) cannot be merged directly.
 export const fullFormSchema = insuranceFormSchema
-  .merge(additionalQuestionsObjectSchema) // Use the object schema for the merge
+  .merge(additionalQuestionsObjectSchema)
   .merge(beneficiaryFormSchema)
-  .merge(paymentFormSchema)
-  .superRefine((data, ctx) => { // Apply the refinement at the end
-    if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
+  .merge(paymentFormSchema).superRefine((data, ctx) => { if (data.otherHealthIssues === 'yes' && (!data.otherHealthIssuesDetails || data.otherHealthIssuesDetails.trim() === '')) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['otherHealthIssuesDetails'],
