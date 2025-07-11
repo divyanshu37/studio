@@ -124,29 +124,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       }
     }
   }, [searchParams, changeStep]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (process.env.NODE_ENV === 'development') {
-        if (event.ctrlKey && event.shiftKey && event.key === 'R') {
-          event.preventDefault();
-          window.location.reload();
-        }
-      }
-      
-      // Use event.altKey for Option (Mac) or Alt (Windows)
-      if (event.altKey && event.key === '5') {
-        event.preventDefault();
-        router.push('/admin');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [router]);
   
   const handleNext = async () => {
     const fields = stepFields[step - 1];
@@ -321,16 +298,16 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
       <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
-        <Link href="/admin" aria-label="Go to Admin Page">
-            <Logo />
-        </Link>
+        <Logo />
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center w-full px-8 sm:px-12 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
             {showHeader && (
               <div className="flex flex-col items-center pt-24">
-                <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
+                <Link href="/admin" aria-label="Go to Admin Page">
+                  <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
+                </Link>
                 <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                     State and Congress Approved Final Expense Benefits Emergency Funds
                 </h1>
