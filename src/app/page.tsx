@@ -1,10 +1,11 @@
 
-import { redirect } from 'next/navigation';
-import { v4 as uuidv4 } from 'uuid';
-
-export const dynamic = 'force-dynamic';
+import HomeRedirect from '@/components/home-redirect';
+import { Suspense } from 'react';
 
 export default function Home() {
-  const newUuid = uuidv4();
-  redirect(`/${newUuid}`);
+  return (
+    <Suspense fallback={null}>
+      <HomeRedirect />
+    </Suspense>
+  );
 }
