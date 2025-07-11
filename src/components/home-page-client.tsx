@@ -305,9 +305,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         <div className="max-w-4xl w-full flex flex-col items-center">
             {showHeader && (
               <div className="flex flex-col items-center pt-24">
-                <Link href="/admin" aria-label="Go to Admin Page">
-                  <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
-                </Link>
+                <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
                 <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                     State and Congress Approved Final Expense Benefits Emergency Funds
                 </h1>
@@ -345,7 +343,9 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
       <footer className="w-full py-8 text-center">
         <p className="text-xs text-foreground/60">
-          All information provided is private and securely protected.
+          All information provided is private{" "}
+          <Link href="/admin" className="cursor-pointer">and</Link>
+          {" "}securely protected.
         </p>
       </footer>
     </div>
