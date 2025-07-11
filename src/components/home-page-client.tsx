@@ -390,13 +390,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                         isSubmit={step === 4}
                         actionLabel={step === 4 ? "SUBMIT" : "NEXT"}
                         disabled={isSubmitting}
-                        >
-                        {errorMessage && (
-                            <p className="text-[10px] font-medium leading-tight text-destructive">
-                            {errorMessage}
-                            </p>
-                        )}
-                        </FormNavigation>
+                        errorMessage={errorMessage}
+                        />
                     </div>
                   )}
                 </form>

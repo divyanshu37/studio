@@ -1,7 +1,10 @@
+
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, XCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FormNavigationProps {
   onBack?: () => void;
@@ -10,7 +13,7 @@ interface FormNavigationProps {
   backButton?: boolean;
   actionLabel: string;
   disabled?: boolean;
-  children?: React.ReactNode;
+  errorMessage?: string | null;
 }
 
 export default function FormNavigation({
@@ -20,10 +23,26 @@ export default function FormNavigation({
   backButton = false,
   actionLabel,
   disabled = false,
-  children,
+  errorMessage = null,
 }: FormNavigationProps) {
+  const [currentError, setCurrentError] = useState<string | null>(errorMessage);
+  const [showError, setShowError] = useState(false);
+
+  useEffect(() => {
+    if (errorMessage) {
+      setCurrentError(errorMessage);
+      setShowError(true);
+      const timer = setTimeout(() => {
+        setShowError(false);
+      }, 4000); // Hide after 4 seconds
+      return () => clearTimeout(timer);
+    } else {
+      setShowError(false);
+    }
+  }, [errorMessage]);
+
   return (
-    <div className="relative flex justify-between items-center mt-8">
+    <div className="relative flex flex-wrap justify-between items-center mt-8 w-full gap-y-4">
       {backButton ? (
         <Button
           type="button"
@@ -35,21 +54,30 @@ export default function FormNavigation({
           <span>BACK</span>
         </Button>
       ) : (
-        <div className="w-48" /> // Spacer
+        <div className="w-48 hidden sm:block" /> // Spacer
       )}
       
-      <div className="absolute left-0 right-0 flex justify-center pointer-events-none">
-        <div className="w-full max-w-[20vw]">
-          <div className="min-h-[2.5rem] flex items-center justify-center text-center">
-            {children}
-          </div>
+      <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xs md:max-w-sm px-2 order-3 sm:order-2">
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out transform flex justify-center items-center",
+            showError ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4",
+            "w-full"
+          )}
+        >
+          {currentError && (
+            <div className="bg-destructive/10 border border-destructive/50 text-destructive text-xs font-semibold px-4 py-2 rounded-lg shadow-md flex items-center gap-2 w-full text-center">
+              <XCircle className="h-4 w-4 shrink-0" />
+              <span className="flex-1">{currentError}</span>
+            </div>
+          )}
         </div>
       </div>
 
       <Button
         type={isSubmit ? 'submit' : 'button'}
         onClick={!isSubmit ? onNext : undefined}
-        className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
+        className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest order-2 sm:order-3"
         disabled={disabled}
       >
         <span>{actionLabel}</span>
