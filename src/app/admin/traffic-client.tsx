@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import type { TrafficData } from '@/ai/flows/log-traffic-flow';
+import { useState, useEffect, useMemo } from 'react';
+import { getTraffic, type TrafficData } from '@/ai/flows/log-traffic-flow';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { ArrowUpDown } from 'lucide-react';
@@ -22,9 +22,24 @@ const stepDescriptions: { [key: number]: string } = {
   9: 'Agent Handoff Complete',
 };
 
-export default function TrafficClient({ initialData }: { initialData: TrafficData[] }) {
-  const [trafficData, setTrafficData] = useState<TrafficData[]>(initialData);
+export default function TrafficClient() {
+  const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'timestamp', direction: 'descending'});
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await getTraffic();
+        setTrafficData(data);
+      } catch (error) {
+        console.error("Failed to fetch traffic data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const sortedData = useMemo(() => {
     let sortableItems = [...trafficData];
@@ -56,6 +71,10 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
+
+  if (isLoading) {
+    return <p>Loading traffic data...</p>;
+  }
 
   return (
     <div className="bg-card p-4 rounded-lg shadow-lg">
