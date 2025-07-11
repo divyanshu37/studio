@@ -98,7 +98,7 @@ const logTrafficFlow = ai.defineFlow(
 
     if (existingEntryIndex > -1) {
         // Update if the new step is greater than the existing one
-        if (trafficLog[existingEntryyIndex].step < step) {
+        if (trafficLog[existingEntryIndex].step < step) {
             trafficLog[existingEntryIndex] = newEntry;
         }
     } else {
