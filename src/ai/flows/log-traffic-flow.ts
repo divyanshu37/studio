@@ -4,9 +4,6 @@
  * @fileOverview A flow to log user traffic and progress.
  *
  * - logTraffic - Logs a user's progress.
- * @fileOverview A flow to log user traffic and progress.
- *
- * - logTraffic - Logs a user's progress.
  * - getTraffic - Retrieves all logged traffic.
  * - TrafficData - The schema for traffic data.
  */
@@ -43,10 +40,20 @@ async function readLogFile(): Promise<TrafficData[]> {
     try {
         await fs.mkdir(dataDir, { recursive: true });
         const fileContent = await fs.readFile(logFilePath, 'utf-8');
+        // If file is empty, return empty array
+        if (!fileContent.trim()) {
+            return [];
+        }
         return JSON.parse(fileContent) as TrafficData[];
     } catch (error: any) {
         if (error.code === 'ENOENT') {
             // File doesn't exist, so return an empty array
+            return [];
+        }
+        // If there's a JSON parsing error, log it and return an empty array to prevent crashing
+        if (error instanceof SyntaxError) {
+            console.error("Error parsing traffic log JSON, file might be corrupt. Starting fresh.", error);
+            // Optionally, you could try to recover or backup the corrupt file here
             return [];
         }
         console.error("Error reading traffic log:", error);
@@ -82,6 +89,7 @@ const logTrafficFlow = ai.defineFlow(
   async ({ uuid, step }) => {
     const trafficLog = await readLogFile();
     const existingEntryIndex = trafficLog.findIndex(entry => entry.uuid === uuid);
+    
     const newEntry: TrafficData = {
         uuid,
         step,
@@ -90,16 +98,16 @@ const logTrafficFlow = ai.defineFlow(
 
     if (existingEntryIndex > -1) {
         // Update if the new step is greater than the existing one
-        if (trafficLog[existingEntryIndex].step < step) {
+        if (trafficLog[existingEntryyIndex].step < step) {
             trafficLog[existingEntryIndex] = newEntry;
         }
     } else {
+        // Add new entry if UUID does not exist
         trafficLog.push(newEntry);
     }
     
     await writeLogFile(trafficLog);
     
-    console.log(`Logged traffic for ${uuid}: Step ${step}`);
     return { success: true };
   }
 );
