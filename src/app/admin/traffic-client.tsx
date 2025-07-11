@@ -5,8 +5,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { getTraffic, type TrafficData } from '@/ai/flows/log-traffic-flow';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ArrowUpDown } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isThisMonth, parseISO } from 'date-fns';
 
 type SortKey = keyof TrafficData;
 
@@ -22,7 +23,7 @@ const stepDescriptions: { [key: number]: string } = {
   9: 'Agent Handoff Complete',
 };
 
-export default function TrafficClient() {
+export default function TrafficClient({ onDataLoad }: { onDataLoad: (completions: number) => void }) {
   const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'timestamp', direction: 'descending'});
@@ -32,6 +33,12 @@ export default function TrafficClient() {
       try {
         const data = await getTraffic();
         setTrafficData(data);
+        
+        const completedThisMonth = data.filter(item => 
+          item.step >= 8 && isThisMonth(parseISO(item.timestamp))
+        ).length;
+        onDataLoad(completedThisMonth);
+
       } catch (error) {
         console.error("Failed to fetch traffic data:", error);
       } finally {
@@ -39,7 +46,7 @@ export default function TrafficClient() {
       }
     }
     loadData();
-  }, []);
+  }, [onDataLoad]);
 
   const sortedData = useMemo(() => {
     let sortableItems = [...trafficData];
@@ -106,8 +113,17 @@ export default function TrafficClient() {
             <TableRow key={item.uuid}>
               <TableCell className="font-mono text-xs">{item.uuid}</TableCell>
               <TableCell>
-                <div className="font-medium">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
-                <div className="text-muted-foreground text-sm">Step {item.step} of 9</div>
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col">
+                    <div className="font-medium">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
+                    <div className="text-muted-foreground text-sm">Step {item.step} of 9</div>
+                  </div>
+                  {item.step >= 8 && (
+                    <Badge variant="success" className="ml-auto">
+                      COMPLETE
+                    </Badge>
+                  )}
+                </div>
               </TableCell>
               <TableCell>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</TableCell>
             </TableRow>
