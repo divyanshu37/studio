@@ -14,7 +14,7 @@ import {z} from 'zod';
 // This is an in-memory store. In a real application, you would use a database.
 const trafficLog: TrafficData[] = [];
 
-export const TrafficDataSchema = z.object({
+const TrafficDataSchema = z.object({
   uuid: z.string().uuid(),
   step: z.number(),
   timestamp: z.string().datetime(),
