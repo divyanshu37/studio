@@ -126,7 +126,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === '5') {
+      if (event.altKey && event.key === '5') {
         event.preventDefault();
         router.push('/admin');
       }
