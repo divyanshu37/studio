@@ -328,26 +328,28 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         <Logo />
       </header>
 
-      <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
-        <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
-          <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-            <button
-              key={num}
-              onClick={() => handleStepChange(num)}
-              className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors",
-                step === num 
-                  ? "bg-primary text-primary-foreground" 
-                  : "bg-muted text-muted-foreground hover:bg-primary/80 hover:text-primary-foreground"
-              )}
-              aria-label={`Go to step ${num}`}
-            >
-              {num}
-            </button>
-          ))}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
+          <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
+            <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+              <button
+                key={num}
+                onClick={() => handleStepChange(num)}
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors",
+                  step === num 
+                    ? "bg-primary text-primary-foreground" 
+                    : "bg-muted text-muted-foreground hover:bg-primary/80 hover:text-primary-foreground"
+                )}
+                aria-label={`Go to step ${num}`}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       
       {process.env.NODE_ENV === 'development' && (
         <div className="absolute top-24 right-0 p-4 md:p-6 z-50">
