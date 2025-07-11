@@ -34,12 +34,16 @@ export default function FormNavigation({
       setShowError(true);
       const timer = setTimeout(() => {
         setShowError(false);
-      }, 4000); // Hide after 4 seconds
+      }, 5000); // Hide after 5 seconds
       return () => clearTimeout(timer);
     } else {
       setShowError(false);
     }
   }, [errorMessage]);
+
+  const handleCloseError = () => {
+    setShowError(false);
+  };
 
   return (
     <div className="relative flex flex-wrap justify-between items-center mt-8 w-full gap-y-4">
@@ -66,9 +70,12 @@ export default function FormNavigation({
           )}
         >
           {currentError && (
-            <div className="bg-destructive/10 border border-destructive/50 text-destructive text-xs font-semibold px-4 py-2 rounded-lg shadow-md flex items-center gap-2 w-full text-center">
-              <XCircle className="h-4 w-4 shrink-0" />
-              <span className="flex-1">{currentError}</span>
+            <div className="bg-destructive text-destructive-foreground text-xs font-semibold px-4 py-2 rounded-lg shadow-md flex items-center gap-2 w-full text-center">
+              <span className="flex-1 text-left">{currentError}</span>
+              <button type="button" onClick={handleCloseError} className="shrink-0">
+                <XCircle className="h-4 w-4" />
+                <span className="sr-only">Close error message</span>
+              </button>
             </div>
           )}
         </div>
