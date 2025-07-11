@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 
 import { 
   fullFormSchema, 
@@ -126,10 +127,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.altKey && event.key === '5') {
-        event.preventDefault();
-        router.push('/admin');
-      }
       if (process.env.NODE_ENV === 'development') {
         if (event.ctrlKey && event.shiftKey && event.key === 'R') {
           event.preventDefault();
@@ -318,7 +315,9 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
       <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
-        <Logo />
+        <Link href="/admin" aria-label="Go to Admin Page">
+            <Logo />
+        </Link>
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center w-full px-8 sm:px-12 text-center">
