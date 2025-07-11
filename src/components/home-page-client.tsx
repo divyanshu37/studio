@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -21,6 +21,7 @@ import {
 import { submitApplication } from '@/ai/flows/submit-application-flow';
 import { submitLead } from '@/ai/flows/submit-lead-flow';
 import { submitApplicationLead } from '@/ai/flows/submit-application-lead-flow';
+import { logTraffic } from '@/ai/flows/log-traffic-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useSocket } from '@/hooks/use-socket';
 
@@ -52,6 +53,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const [pin, setPin] = useState('');
   const [phoneLastFour, setPhoneLastFour] = useState('');
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { toast } = useToast();
   
   const form = useForm<FormValues>({
@@ -96,6 +98,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const changeStep = useCallback((newStep: number) => {
     if (newStep === step) return;
 
+    logTraffic({ uuid, step: newStep });
+
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
 
@@ -104,7 +108,11 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       setIsAnimatingOut(false);
       setAnimationClass('animate-fade-in-up');
     }, 300);
-  }, [step]);
+  }, [step, uuid]);
+  
+  useEffect(() => {
+    logTraffic({ uuid, step: 1 });
+  }, [uuid]);
 
   useEffect(() => {
     const stepParam = searchParams.get('step');
@@ -117,21 +125,25 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   }, [searchParams, changeStep]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === '5') {
+        event.preventDefault();
+        router.push('/admin');
+      }
+      if (process.env.NODE_ENV === 'development') {
         if (event.ctrlKey && event.shiftKey && event.key === 'R') {
           event.preventDefault();
           window.location.reload();
         }
-      };
+      }
+    };
 
-      window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
 
-      return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-      };
-    }
-  }, []);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [router]);
   
   const handleNext = async () => {
     const fields = stepFields[step - 1];
