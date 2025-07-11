@@ -91,42 +91,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     },
   });
 
-  const autofillForm = () => {
-    if (process.env.NODE_ENV === 'development') {
-      form.reset({
-        firstName: "Divyanshu",
-        lastName: "Garg",
-        phone: "(225) 254-2523",
-        email: "test34857@gmail.com",
-        dob: "09/16/1975",
-        lastFour: "6493",
-        gender: "male",
-        differentOwner: "no",
-        healthQuestion1: "no",
-        healthQuestion2: "no",
-        healthQuestion3: "no",
-        tobaccoUse: "no",
-        existingPolicies: "no",
-        otherHealthIssues: 'no',
-        otherHealthIssuesDetails: '',
-        effectiveDate: "07/14/2025",
-        addressStreet: "Home",
-        addressApt: "",
-        addressCity: "Utah",
-        addressState: "UT",
-        addressZip: "84008",
-        beneficiaryFirstName: "Jerry",
-        beneficiaryLastName: "Mouse",
-        beneficiaryPhone: "(123) 456-7890",
-        beneficiaryDob: "01/01/1980",
-        beneficiaryRelation: "Brother",
-        faceAmount: "$ 10,000",
-        paymentAccountHolderName: "Jerry",
-        paymentAccountNumber: "498534875873465",
-        paymentRoutingNumber: "566576578",
-    });
-    }
-  };
   const { formState: { errors } } = form;
 
   const changeStep = useCallback((newStep: number) => {
@@ -151,6 +115,23 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       }
     }
   }, [searchParams, changeStep]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.ctrlKey && event.shiftKey && event.key === 'R') {
+          event.preventDefault();
+          window.location.reload();
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, []);
   
   const handleNext = async () => {
     const fields = stepFields[step - 1];
@@ -327,38 +308,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
         <Logo />
       </header>
-
-      {process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-0 right-0 p-4 md:p-6 z-50">
-          <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg shadow-lg">
-            <span className="text-xs font-bold mr-2 hidden md:inline">DEV:</span>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-              <button
-                key={num}
-                onClick={() => handleStepChange(num)}
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors",
-                  step === num 
-                    ? "bg-primary text-primary-foreground" 
-                    : "bg-muted text-muted-foreground hover:bg-primary/80 hover:text-primary-foreground"
-                )}
-                aria-label={`Go to step ${num}`}
-              >
-                {num}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-24 right-0 p-4 md:p-6 z-50">
-          <button 
-            onClick={autofillForm}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm"
-          >Autofill Form</button>
-        </div>
-      )}
 
       <main className="flex-1 flex flex-col items-center justify-center w-full px-8 sm:px-12 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
