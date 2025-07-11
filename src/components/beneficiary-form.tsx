@@ -223,7 +223,7 @@ export default function BeneficiaryForm() {
                 <FormControl className={cn(errors.effectiveDate && 'animate-shake')}>
                 <Input 
                   type="text"
-                  placeholder="Default (Today)"
+                  placeholder="Effective Policy Date (Default Today)"
                   autoComplete="off"
                   {...field}
                   onChange={(e) => handleDateChange(e, field)}
