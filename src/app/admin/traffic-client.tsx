@@ -131,12 +131,12 @@ export default function TrafficClient({ onDataLoad }: { onDataLoad: (stats: Mont
         <TableBody>
           {sortedData.map((item) => (
             <TableRow key={item.uuid}>
-              <TableCell className="font-mono text-xs">{item.uuid}</TableCell>
-              <TableCell>
+              <TableCell className="font-mono text-xs p-2">{item.uuid}</TableCell>
+              <TableCell className="p-2">
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col w-64">
-                    <div className="font-medium truncate">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
-                     <div className="text-muted-foreground text-sm">Step {item.step} of {TOTAL_STEPS}</div>
+                    <div className="font-medium truncate text-sm">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
+                     <div className="text-muted-foreground text-xs">Step {item.step} of {TOTAL_STEPS}</div>
                     <Progress value={(item.step / TOTAL_STEPS) * 100} className="h-2 mt-1" indicatorClassName="data-[value='100']:bg-green-500" />
                   </div>
                   {item.step >= 8 && (
@@ -146,7 +146,7 @@ export default function TrafficClient({ onDataLoad }: { onDataLoad: (stats: Mont
                   )}
                 </div>
               </TableCell>
-              <TableCell>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</TableCell>
+              <TableCell className="p-2 text-xs">{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</TableCell>
             </TableRow>
           ))}
         </TableBody>
