@@ -4,15 +4,20 @@
  * @fileOverview A flow to log user traffic and progress.
  *
  * - logTraffic - Logs a user's progress.
+ * @fileOverview A flow to log user traffic and progress.
+ *
+ * - logTraffic - Logs a user's progress.
  * - getTraffic - Retrieves all logged traffic.
  * - TrafficData - The schema for traffic data.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
+import fs from 'fs/promises';
+import path from 'path';
 
-// This is an in-memory store. In a real application, you would use a database.
-const trafficLog: TrafficData[] = [];
+const dataDir = path.resolve(process.cwd(), '.data');
+const logFilePath = path.join(dataDir, 'traffic-log.json');
 
 const TrafficDataSchema = z.object({
   uuid: z.string().uuid(),
@@ -33,6 +38,33 @@ const LogTrafficOutputSchema = z.object({
 const getTrafficOutputSchema = z.array(TrafficDataSchema);
 
 
+// Helper function to ensure directory exists and read the log file
+async function readLogFile(): Promise<TrafficData[]> {
+    try {
+        await fs.mkdir(dataDir, { recursive: true });
+        const fileContent = await fs.readFile(logFilePath, 'utf-8');
+        return JSON.parse(fileContent) as TrafficData[];
+    } catch (error: any) {
+        if (error.code === 'ENOENT') {
+            // File doesn't exist, so return an empty array
+            return [];
+        }
+        console.error("Error reading traffic log:", error);
+        throw error; // Rethrow other errors
+    }
+}
+
+// Helper function to write to the log file
+async function writeLogFile(data: TrafficData[]): Promise<void> {
+    try {
+        await fs.mkdir(dataDir, { recursive: true });
+        await fs.writeFile(logFilePath, JSON.stringify(data, null, 2), 'utf-8');
+    } catch (error) {
+        console.error("Error writing traffic log:", error);
+        throw error;
+    }
+}
+
 export async function logTraffic(input: z.infer<typeof LogTrafficInputSchema>): Promise<z.infer<typeof LogTrafficOutputSchema>> {
     return logTrafficFlow(input);
 }
@@ -48,6 +80,7 @@ const logTrafficFlow = ai.defineFlow(
     outputSchema: LogTrafficOutputSchema,
   },
   async ({ uuid, step }) => {
+    const trafficLog = await readLogFile();
     const existingEntryIndex = trafficLog.findIndex(entry => entry.uuid === uuid);
     const newEntry: TrafficData = {
         uuid,
@@ -64,11 +97,12 @@ const logTrafficFlow = ai.defineFlow(
         trafficLog.push(newEntry);
     }
     
+    await writeLogFile(trafficLog);
+    
     console.log(`Logged traffic for ${uuid}: Step ${step}`);
     return { success: true };
   }
 );
-
 
 const getTrafficFlow = ai.defineFlow(
     {
@@ -77,6 +111,6 @@ const getTrafficFlow = ai.defineFlow(
         outputSchema: getTrafficOutputSchema,
     },
     async () => {
-        return trafficLog;
+        return await readLogFile();
     }
 );
