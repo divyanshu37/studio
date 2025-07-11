@@ -324,7 +324,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
-      <header className="absolute top-0 left-0 p-8 md:p-12">
+      <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
         <Logo />
       </header>
 
