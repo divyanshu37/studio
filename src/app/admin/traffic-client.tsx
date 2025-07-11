@@ -6,6 +6,7 @@ import { getTraffic, type TrafficData } from '@/ai/flows/log-traffic-flow';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { ArrowUpDown } from 'lucide-react';
 import { formatDistanceToNow, isThisMonth, parseISO, subMonths, isSameMonth } from 'date-fns';
 
@@ -28,6 +29,8 @@ const stepDescriptions: { [key: number]: string } = {
   8: 'Self-Enroll Complete',
   9: 'Agent Handoff Complete',
 };
+
+const TOTAL_STEPS = 9;
 
 export default function TrafficClient({ onDataLoad }: { onDataLoad: (stats: MonthlyStats) => void }) {
   const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
@@ -130,10 +133,11 @@ export default function TrafficClient({ onDataLoad }: { onDataLoad: (stats: Mont
             <TableRow key={item.uuid}>
               <TableCell className="font-mono text-xs">{item.uuid}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="flex flex-col">
-                    <div className="font-medium">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
-                    <div className="text-muted-foreground text-sm">Step {item.step} of 9</div>
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col w-64">
+                    <div className="font-medium truncate">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
+                     <div className="text-muted-foreground text-sm">Step {item.step} of {TOTAL_STEPS}</div>
+                    <Progress value={(item.step / TOTAL_STEPS) * 100} className="h-2 mt-1" indicatorClassName="data-[value='100']:bg-green-500" />
                   </div>
                   {item.step >= 8 && (
                     <Badge variant="success" className="ml-auto">
