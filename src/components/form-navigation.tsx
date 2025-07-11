@@ -70,7 +70,7 @@ export default function FormNavigation({
           )}
         >
           {currentError && (
-            <div className="bg-destructive text-destructive-foreground text-xs font-semibold px-4 py-2 rounded-lg shadow-md flex items-center gap-2 w-full text-center">
+            <div className="bg-destructive text-destructive-foreground text-xs font-semibold px-4 py-4 rounded-lg shadow-md flex items-center gap-2 w-full text-center">
               <span className="flex-1 text-left">{currentError}</span>
               <button type="button" onClick={handleCloseError} className="shrink-0">
                 <XCircle className="h-4 w-4" />
