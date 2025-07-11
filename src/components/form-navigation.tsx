@@ -61,7 +61,7 @@ export default function FormNavigation({
         <div className="w-48 hidden sm:block" /> // Spacer
       )}
       
-      <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xs md:max-w-sm px-2 order-3 sm:order-2">
+      <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xs md:max-w-sm px-2 order-3 sm:order-2 z-10">
         <div
           className={cn(
             "transition-all duration-300 ease-in-out transform flex justify-center items-center",
