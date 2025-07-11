@@ -7,9 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowUpDown } from 'lucide-react';
-import { formatDistanceToNow, isThisMonth, parseISO } from 'date-fns';
+import { formatDistanceToNow, isThisMonth, parseISO, subMonths, isSameMonth } from 'date-fns';
 
 type SortKey = keyof TrafficData;
+
+interface MonthlyStats {
+  completions: number;
+  visitsThisMonth: number;
+  visitsLastMonth: number;
+}
 
 const stepDescriptions: { [key: number]: string } = {
   1: 'Started Application',
@@ -23,7 +29,7 @@ const stepDescriptions: { [key: number]: string } = {
   9: 'Agent Handoff Complete',
 };
 
-export default function TrafficClient({ onDataLoad }: { onDataLoad: (completions: number) => void }) {
+export default function TrafficClient({ onDataLoad }: { onDataLoad: (stats: MonthlyStats) => void }) {
   const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'timestamp', direction: 'descending'});
@@ -34,10 +40,21 @@ export default function TrafficClient({ onDataLoad }: { onDataLoad: (completions
         const data = await getTraffic();
         setTrafficData(data);
         
+        const now = new Date();
+        const lastMonth = subMonths(now, 1);
+
         const completedThisMonth = data.filter(item => 
           item.step >= 8 && isThisMonth(parseISO(item.timestamp))
         ).length;
-        onDataLoad(completedThisMonth);
+
+        const visitsThisMonth = data.filter(item => isThisMonth(parseISO(item.timestamp))).length;
+        const visitsLastMonth = data.filter(item => isSameMonth(parseISO(item.timestamp), lastMonth)).length;
+
+        onDataLoad({
+          completions: completedThisMonth,
+          visitsThisMonth: visitsThisMonth,
+          visitsLastMonth: visitsLastMonth,
+        });
 
       } catch (error) {
         console.error("Failed to fetch traffic data:", error);
