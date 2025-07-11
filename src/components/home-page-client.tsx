@@ -133,6 +133,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           window.location.reload();
         }
       }
+      
+      // Use event.altKey for Option (Mac) or Alt (Windows)
+      if (event.altKey && event.key === '5') {
+        event.preventDefault();
+        router.push('/admin');
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
