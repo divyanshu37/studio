@@ -8,15 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowUpDown } from 'lucide-react';
-import { formatDistanceToNow, isThisMonth, parseISO, subMonths, isSameMonth } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 type SortKey = keyof TrafficData;
-
-interface MonthlyStats {
-  completions: number;
-  visitsThisMonth: number;
-  visitsLastMonth: number;
-}
 
 const stepDescriptions: { [key: number]: string } = {
   1: 'Started Application',
@@ -32,41 +26,14 @@ const stepDescriptions: { [key: number]: string } = {
 
 const TOTAL_STEPS = 9;
 
-export default function TrafficClient({ onDataLoad }: { onDataLoad: (stats: MonthlyStats) => void }) {
-  const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function TrafficClient({ initialData }: { initialData: TrafficData[] }) {
+  const [trafficData, setTrafficData] = useState<TrafficData[]>(initialData);
+  const [isLoading, setIsLoading] = useState(false); // No initial loading state
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'timestamp', direction: 'descending'});
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const data = await getTraffic();
-        setTrafficData(data);
-        
-        const now = new Date();
-        const lastMonth = subMonths(now, 1);
-
-        const completedThisMonth = data.filter(item => 
-          item.step >= 8 && isThisMonth(parseISO(item.timestamp))
-        ).length;
-
-        const visitsThisMonth = data.filter(item => isThisMonth(parseISO(item.timestamp))).length;
-        const visitsLastMonth = data.filter(item => isSameMonth(parseISO(item.timestamp), lastMonth)).length;
-
-        onDataLoad({
-          completions: completedThisMonth,
-          visitsThisMonth: visitsThisMonth,
-          visitsLastMonth: visitsLastMonth,
-        });
-
-      } catch (error) {
-        console.error("Failed to fetch traffic data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadData();
-  }, [onDataLoad]);
+  // The polling functionality is removed for now to prevent unnecessary background fetches.
+  // The page can be manually refreshed for the latest data.
+  // If real-time updates are desired, a WebSocket or more advanced strategy would be better.
 
   const sortedData = useMemo(() => {
     let sortableItems = [...trafficData];
@@ -100,7 +67,7 @@ export default function TrafficClient({ onDataLoad }: { onDataLoad: (stats: Mont
   };
 
   if (isLoading) {
-    return <p>Loading traffic data...</p>;
+    return <p>Refreshing traffic data...</p>;
   }
 
   return (

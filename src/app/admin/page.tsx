@@ -1,11 +1,12 @@
 
-'use client';
+import { Suspense } from 'react';
 import TrafficClient from './traffic-client';
-import { Suspense, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getTraffic, type TrafficData } from '@/ai/flows/log-traffic-flow';
+import { isThisMonth, parseISO, subMonths, isSameMonth } from 'date-fns';
 
 interface MonthlyStats {
   completions: number;
@@ -13,16 +14,38 @@ interface MonthlyStats {
   visitsLastMonth: number;
 }
 
-export default function AdminPage() {
-  const [stats, setStats] = useState<MonthlyStats>({
-    completions: 0,
-    visitsThisMonth: 0,
-    visitsLastMonth: 0,
-  });
+async function getStats(trafficData: TrafficData[]): Promise<MonthlyStats> {
+    const now = new Date();
+    const lastMonth = subMonths(now, 1);
 
-  const handleDataLoad = (loadedStats: MonthlyStats) => {
-    setStats(loadedStats);
-  };
+    const uniqueUuidsThisMonth = new Set<string>();
+    const uniqueUuidsLastMonth = new Set<string>();
+    const completedThisMonthUuids = new Set<string>();
+
+    trafficData.forEach(item => {
+        const timestamp = parseISO(item.timestamp);
+        if (isThisMonth(timestamp)) {
+            uniqueUuidsThisMonth.add(item.uuid);
+            if (item.step >= 8) {
+                completedThisMonthUuids.add(item.uuid);
+            }
+        }
+        if (isSameMonth(timestamp, lastMonth)) {
+            uniqueUuidsLastMonth.add(item.uuid);
+        }
+    });
+
+    return {
+      completions: completedThisMonthUuids.size,
+      visitsThisMonth: uniqueUuidsThisMonth.size,
+      visitsLastMonth: uniqueUuidsLastMonth.size,
+    };
+}
+
+
+export default async function AdminPage() {
+  const initialTrafficData = await getTraffic();
+  const stats = await getStats(initialTrafficData);
   
   const lastMonthChange = stats.visitsThisMonth - stats.visitsLastMonth;
   const lastMonthChangePercentage = stats.visitsLastMonth > 0
@@ -83,7 +106,7 @@ export default function AdminPage() {
         </div>
 
         <Suspense fallback={<p>Loading traffic data...</p>}>
-          <TrafficClient onDataLoad={handleDataLoad} />
+          <TrafficClient initialData={initialTrafficData} />
         </Suspense>
       </div>
     </div>
