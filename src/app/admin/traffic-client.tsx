@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowUpDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 type SortKey = keyof TrafficData;
 
@@ -28,12 +29,8 @@ const TOTAL_STEPS = 9;
 
 export default function TrafficClient({ initialData }: { initialData: TrafficData[] }) {
   const [trafficData, setTrafficData] = useState<TrafficData[]>(initialData);
-  const [isLoading, setIsLoading] = useState(false); // No initial loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'timestamp', direction: 'descending'});
-
-  // The polling functionality is removed for now to prevent unnecessary background fetches.
-  // The page can be manually refreshed for the latest data.
-  // If real-time updates are desired, a WebSocket or more advanced strategy would be better.
 
   const sortedData = useMemo(() => {
     let sortableItems = [...trafficData];
@@ -65,6 +62,14 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
     }
     return sortConfig.direction === 'ascending' ? '▲' : '▼';
   };
+  
+  const getProgressColor = (step: number): string => {
+    if (step >= 8) return 'bg-green-500'; // Completion
+    if (step >= 5) return 'bg-lime-500';  // Past Payment
+    if (step >= 4) return 'bg-amber-500'; // Past Beneficiary/Policy
+    return 'bg-red-500';                   // Early steps
+  };
+
 
   if (isLoading) {
     return <p>Refreshing traffic data...</p>;
@@ -104,7 +109,11 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
                   <div className="flex flex-col w-64">
                     <div className="font-medium truncate text-sm">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
                      <div className="text-muted-foreground text-xs">Step {item.step} of {TOTAL_STEPS}</div>
-                    <Progress value={(item.step / TOTAL_STEPS) * 100} className="h-2 mt-1" indicatorClassName="data-[value='100']:bg-green-500" />
+                    <Progress 
+                        value={(item.step / TOTAL_STEPS) * 100} 
+                        className="h-2 mt-1" 
+                        indicatorClassName={getProgressColor(item.step)} 
+                    />
                   </div>
                   {item.step >= 8 && (
                     <Badge variant="success" className="ml-auto">
