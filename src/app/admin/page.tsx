@@ -3,13 +3,14 @@ import { Suspense } from 'react';
 import TrafficClient from './traffic-client';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, Users } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Users, PhoneForwarded } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTraffic, type TrafficData } from '@/ai/flows/log-traffic-flow';
 import { isThisMonth, parseISO, subMonths, isSameMonth } from 'date-fns';
 
 interface MonthlyStats {
-  completions: number;
+  selfEnrollCompletions: number;
+  agentHandoffs: number;
   visitsThisMonth: number;
   visitsLastMonth: number;
 }
@@ -20,14 +21,18 @@ async function getStats(trafficData: TrafficData[]): Promise<MonthlyStats> {
 
     const uniqueUuidsThisMonth = new Set<string>();
     const uniqueUuidsLastMonth = new Set<string>();
-    const completedThisMonthUuids = new Set<string>();
+    const selfEnrolledThisMonthUuids = new Set<string>();
+    const agentHandoffThisMonthUuids = new Set<string>();
 
     trafficData.forEach(item => {
         const timestamp = parseISO(item.timestamp);
         if (isThisMonth(timestamp)) {
             uniqueUuidsThisMonth.add(item.uuid);
-            if (item.step >= 8) {
-                completedThisMonthUuids.add(item.uuid);
+            if (item.step === 8) {
+                selfEnrolledThisMonthUuids.add(item.uuid);
+            }
+            if (item.step === 9) {
+                agentHandoffThisMonthUuids.add(item.uuid);
             }
         }
         if (isSameMonth(timestamp, lastMonth)) {
@@ -36,7 +41,8 @@ async function getStats(trafficData: TrafficData[]): Promise<MonthlyStats> {
     });
 
     return {
-      completions: completedThisMonthUuids.size,
+      selfEnrollCompletions: selfEnrolledThisMonthUuids.size,
+      agentHandoffs: agentHandoffThisMonthUuids.size,
       visitsThisMonth: uniqueUuidsThisMonth.size,
       visitsLastMonth: uniqueUuidsLastMonth.size,
     };
@@ -66,7 +72,7 @@ export default async function AdminPage() {
           </Link>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Visits This Month</CardTitle>
@@ -79,6 +85,30 @@ export default async function AdminPage() {
                     </p>
                 </CardContent>
             </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Self-Enrolled This Month</CardTitle>
+                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{stats.selfEnrollCompletions}</div>
+                    <p className="text-xs text-muted-foreground">
+                        Fully automated completions
+                    </p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Agent Handoffs This Month</CardTitle>
+                    <PhoneForwarded className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{stats.agentHandoffs}</div>
+                    <p className="text-xs text-muted-foreground">
+                        Applications needing agent follow-up
+                    </p>
+                </CardContent>
+            </Card>
              <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Visits Last Month</CardTitle>
@@ -88,18 +118,6 @@ export default async function AdminPage() {
                     <div className="text-2xl font-bold">{stats.visitsLastMonth}</div>
                      <p className="text-xs text-muted-foreground">
                         Total unique visitors last month
-                    </p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Completed This Month</CardTitle>
-                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{stats.completions}</div>
-                    <p className="text-xs text-muted-foreground">
-                        Total applications completed this month
                     </p>
                 </CardContent>
             </Card>

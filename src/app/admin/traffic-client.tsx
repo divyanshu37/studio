@@ -22,7 +22,7 @@ const stepDescriptions: { [key: number]: string } = {
   6: 'Started Self-Enroll',
   7: 'SMS Verification Sent',
   8: 'Self-Enroll Complete',
-  9: 'Agent Handoff Complete',
+  9: 'Agent Handoff Chosen',
 };
 
 const TOTAL_STEPS = 9;
@@ -64,7 +64,7 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
   };
   
   const getProgressColor = (step: number): string => {
-    if (step >= 8) return 'bg-green-500'; // Completion
+    if (step >= 8) return 'bg-green-500'; // Completion (Self-Enroll or Agent)
     if (step >= 5) return 'bg-lime-500';  // Past Payment
     if (step >= 4) return 'bg-amber-500'; // Past Beneficiary/Policy
     return 'bg-red-500';                   // Early steps
@@ -115,11 +115,18 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
                         indicatorClassName={getProgressColor(item.step)} 
                     />
                   </div>
-                  {item.step >= 8 && (
-                    <Badge variant="success" className="ml-auto">
-                      COMPLETE
-                    </Badge>
-                  )}
+                  <div className="ml-auto">
+                    {item.step === 8 && (
+                      <Badge variant="success">
+                        SELF-ENROLLED
+                      </Badge>
+                    )}
+                    {item.step === 9 && (
+                      <Badge variant="secondary">
+                        AGENT HANDOFF
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </TableCell>
               <TableCell className="p-2 text-xs">{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</TableCell>
