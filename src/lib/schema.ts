@@ -163,43 +163,51 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
 
   const rawData: Record<string, any> = {
     referenceId: (formData as any).referenceId, // For final submission
-    email: formData.email,
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    addressStreet: getFullStreet(formData.addressStreet, formData.addressApt),
-    addressCity: formData.addressCity,
-    addressState: formData.addressState,
-    addressZip: formData.addressZip,
-    dob: formatDate(formData.dob),
-    phone: formatPhone(formData.phone),
-    lastFour: formData.lastFour,
-    gender: capitalize(formData.gender),
-    beneficiaryFirstName: formData.beneficiaryFirstName,
-    beneficiaryLastName: formData.beneficiaryLastName,
-    beneficiaryDob: formatDate(formData.beneficiaryDob),
-    beneficiaryPhone: formatPhone(formData.beneficiaryPhone),
-    beneficiaryRelation: formData.beneficiaryRelation,
+    email: formData.email || '',
+    firstName: formData.firstName || '',
+    lastName: formData.lastName || '',
+    addressStreet: getFullStreet(formData.addressStreet, formData.addressApt) || '',
+    addressCity: formData.addressCity || '',
+    addressState: formData.addressState || '',
+    addressZip: formData.addressZip || '',
+    dob: formatDate(formData.dob) || '',
+    phone: formatPhone(formData.phone) || '',
+    lastFour: formData.lastFour || '',
+    gender: capitalize(formData.gender) || '',
+    beneficiaryFirstName: formData.beneficiaryFirstName || '',
+    beneficiaryLastName: formData.beneficiaryLastName || '',
+    beneficiaryDob: formatDate(formData.beneficiaryDob) || '',
+    beneficiaryPhone: formatPhone(formData.beneficiaryPhone) || '',
+    beneficiaryRelation: formData.beneficiaryRelation || '',
     beneficiaryPercentage: "100",
     faceAmount: formData.faceAmount ? formData.faceAmount.replace(/[^0-9]/g, '') : '',
-    paymentAccountHolderName: formData.paymentAccountHolderName,
-    paymentRoutingNumber: formData.paymentRoutingNumber,
-    paymentAccountNumber: formData.paymentAccountNumber,
-    differentOwner: formData.differentOwner,
-    healthQuestion1: formData.healthQuestion1,
-    healthQuestion2: formData.healthQuestion2,
-    healthQuestion3: formData.healthQuestion3,
-    tobaccoUse: formData.tobaccoUse,
-    existingPolicies: formData.existingPolicies,
-    otherHealthIssues: formData.otherHealthIssues,
-    otherHealthIssuesDetails: formData.otherHealthIssuesDetails,
+    paymentAccountHolderName: formData.paymentAccountHolderName || '',
+    paymentRoutingNumber: formData.paymentRoutingNumber || '',
+    paymentAccountNumber: formData.paymentAccountNumber || '',
+    differentOwner: formData.differentOwner || 'no',
+    healthQuestion1: formData.healthQuestion1 || 'no',
+    healthQuestion2: formData.healthQuestion2 || 'no',
+    healthQuestion3: formData.healthQuestion3 || 'no',
+    tobaccoUse: formData.tobaccoUse || 'no',
+    existingPolicies: formData.existingPolicies || 'no',
+    otherHealthIssues: formData.otherHealthIssues || 'no',
+    otherHealthIssuesDetails: formData.otherHealthIssuesDetails || '',
     effectiveDate: formatEffectiveDate(formData.effectiveDate),
   };
-
-  // Filter out any keys that have empty strings or null/undefined values
-  const transformedData: FinalPayload = Object.fromEntries(
-    Object.entries(rawData).filter(([_, value]) => value !== '' && value != null)
-  );
   
-  // This validates the data *after* transformation and filtering.
-  return FinalPayloadSchema.parse(transformedData);
+  return FinalPayloadSchema.parse(rawData);
+}
+
+export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<FinalPayload, 'paymentAccountHolderName' | 'paymentRoutingNumber' | 'paymentAccountNumber' | 'lastFour'> {
+  const fullPayload = transformDataForApi(formData);
+  
+  const { 
+    paymentAccountHolderName, 
+    paymentRoutingNumber, 
+    paymentAccountNumber, 
+    lastFour, 
+    ...leadPayload 
+  } = fullPayload;
+
+  return leadPayload;
 }

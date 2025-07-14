@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {transformDataForApi} from '@/lib/schema';
+import {transformDataForLeadApi} from '@/lib/schema';
 import {z} from 'zod';
 import axios from 'axios';
 
@@ -46,7 +46,7 @@ const submitLeadFlow = ai.defineFlow(
     }
 
     try {
-      const finalPayload = transformDataForApi(formData);
+      const finalPayload = transformDataForLeadApi(formData);
       await axios.post(leadUrl, finalPayload);
       return {success: true, message: 'Lead submitted successfully.'};
     } catch (error) {
