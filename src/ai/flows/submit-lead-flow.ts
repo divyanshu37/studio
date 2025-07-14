@@ -69,5 +69,3 @@ const submitLeadFlow = ai.defineFlow(
     }
   }
 );
-
-    

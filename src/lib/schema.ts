@@ -216,5 +216,3 @@ export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<Fin
 
   return leadPayload;
 }
-
-    
