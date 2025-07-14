@@ -42,7 +42,7 @@ export const beneficiaryFormSchema = z.object({
   addressApt: z.string().optional(),
   addressCity: z.string().min(1, { message: "City is required." }),
   addressState: z.string().length(2, { message: "State must be a 2-letter abbreviation." }),
-  addressZip: z.string().regex(/^\d{5}$/, { message: "Zip code must be 5 digits." }),
+  addressZip: z.string().min(1, { message: "Zip code is required." }),
   beneficiaryFirstName: z.string().min(1, { message: "First name is required." }),
   beneficiaryLastName: z.string().min(1, { message: "Last name is required." }),
   beneficiaryPhone: z.string().optional(),
@@ -96,7 +96,7 @@ export const FinalPayloadSchema = z.object({
   addressStreet: z.string().min(1).optional(),
   addressCity: z.string().min(1).optional(),
   addressState: z.string().length(2).optional(),
-  addressZip: z.string().regex(/^\d{5}$/).optional(),
+  addressZip: z.string().min(1).optional(),
   dob: z.string().optional(), // Formatted as MM/dd/yyyy
   phone: z.string().optional(), // Digits only
   lastFour: z.string().regex(/^\d{4}$/).optional(), // Last 4 of SSN
