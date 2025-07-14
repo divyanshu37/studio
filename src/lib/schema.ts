@@ -198,15 +198,18 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
   return FinalPayloadSchema.parse(rawData);
 }
 
+// 3. Create a dedicated transformation for the LEAD API call.
 export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<FinalPayload, 'paymentAccountHolderName' | 'paymentRoutingNumber' | 'paymentAccountNumber' | 'lastFour'> {
+  // First, get the fully transformed payload
   const fullPayload = transformDataForApi(formData);
   
+  // Then, destructure to remove the payment fields.
   const { 
     paymentAccountHolderName, 
     paymentRoutingNumber, 
     paymentAccountNumber, 
     lastFour, 
-    ...leadPayload 
+    ...leadPayload // The rest of the object is what we want
   } = fullPayload;
 
   return leadPayload;

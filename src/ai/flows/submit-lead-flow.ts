@@ -46,6 +46,7 @@ const submitLeadFlow = ai.defineFlow(
     }
 
     try {
+      // Use the dedicated transformation function for lead submission.
       const finalPayload = transformDataForLeadApi(formData);
       await axios.post(leadUrl, finalPayload);
       return {success: true, message: 'Lead submitted successfully.'};
