@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: 'Final Expense v2.0',
+  name: 'Final Expense Benefits',
   description: 'Simplified final expense insurance application.',
 };
 
