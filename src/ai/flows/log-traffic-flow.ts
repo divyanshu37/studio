@@ -12,6 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 import fs from 'fs/promises';
 import path from 'path';
+import { headers } from 'next/headers';
 
 const dataDir = path.resolve(process.cwd(), '.data');
 const logFilePath = path.join(dataDir, 'traffic-log.json');
@@ -20,12 +21,16 @@ const TrafficDataSchema = z.object({
   uuid: z.string().uuid(),
   step: z.number(),
   timestamp: z.string().datetime(),
+  city: z.string().optional(),
+  country: z.string().optional(),
 });
 export type TrafficData = z.infer<typeof TrafficDataSchema>;
 
 const LogTrafficInputSchema = z.object({
     uuid: z.string().uuid(),
     step: z.number(),
+    city: z.string().optional(),
+    country: z.string().optional(),
 });
 
 const LogTrafficOutputSchema = z.object({
@@ -80,29 +85,43 @@ export async function getTraffic(): Promise<z.infer<typeof getTrafficOutputSchem
     return getTrafficFlow();
 }
 
+export async function logTrafficWithLocation(input: { uuid: string; step: number }): Promise<z.infer<typeof LogTrafficOutputSchema>> {
+    const headersList = headers();
+    const city = headersList.get('x-appengine-city') || undefined;
+    const country = headersList.get('x-appengine-country') || undefined;
+    return logTrafficFlow({ ...input, city, country });
+}
+
 const logTrafficFlow = ai.defineFlow(
   {
     name: 'logTrafficFlow',
     inputSchema: LogTrafficInputSchema,
     outputSchema: LogTrafficOutputSchema,
   },
-  async ({ uuid, step }) => {
+  async ({ uuid, step, city, country }) => {
     const trafficLog = await readLogFile();
     const existingEntryIndex = trafficLog.findIndex(entry => entry.uuid === uuid);
     
-    const newEntry: TrafficData = {
-        uuid,
-        step,
-        timestamp: new Date().toISOString(),
-    };
-
     if (existingEntryIndex > -1) {
+        const existingEntry = trafficLog[existingEntryIndex];
         // Update if the new step is greater than the existing one
-        if (trafficLog[existingEntryIndex].step < step) {
-            trafficLog[existingEntryIndex] = newEntry;
+        if (existingEntry.step < step) {
+            existingEntry.step = step;
+            existingEntry.timestamp = new Date().toISOString();
         }
+        // Always update location if it's missing and now available
+        if (!existingEntry.city && city) existingEntry.city = city;
+        if (!existingEntry.country && country) existingEntry.country = country;
+
     } else {
         // Add new entry if UUID does not exist
+        const newEntry: TrafficData = {
+            uuid,
+            step,
+            timestamp: new Date().toISOString(),
+            city,
+            country
+        };
         trafficLog.push(newEntry);
     }
     

@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, MapPin } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -36,10 +36,16 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
     let sortableItems = [...trafficData];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        const valA = a[sortConfig.key];
+        const valB = b[sortConfig.key];
+        
+        if (valA === undefined || valA === null) return 1;
+        if (valB === undefined || valB === null) return -1;
+
+        if (valA < valB) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (valA > valB) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;
@@ -98,6 +104,9 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
                 {getSortIcon('timestamp')}
               </Button>
             </TableHead>
+            <TableHead>
+                Location
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -130,6 +139,16 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
                 </div>
               </TableCell>
               <TableCell className="p-2 text-xs">{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</TableCell>
+              <TableCell className="p-2 text-xs">
+                {item.city || item.country ? (
+                    <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span>{item.city}, {item.country}</span>
+                    </div>
+                ) : (
+                    <span className="text-muted-foreground">Unknown</span>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

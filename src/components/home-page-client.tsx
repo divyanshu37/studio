@@ -22,7 +22,7 @@ import {
 import { submitApplication } from '@/ai/flows/submit-application-flow';
 import { submitLead } from '@/ai/flows/submit-lead-flow';
 import { submitApplicationLead } from '@/ai/flows/submit-application-lead-flow';
-import { logTraffic } from '@/ai/flows/log-traffic-flow';
+import { logTrafficWithLocation } from '@/ai/flows/log-traffic-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useSocket } from '@/hooks/use-socket';
 
@@ -99,7 +99,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const changeStep = useCallback((newStep: number) => {
     if (newStep === step) return;
 
-    logTraffic({ uuid, step: newStep });
+    logTrafficWithLocation({ uuid, step: newStep });
 
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
@@ -112,7 +112,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   }, [step, uuid]);
   
   useEffect(() => {
-    logTraffic({ uuid, step: 1 });
+    logTrafficWithLocation({ uuid, step: 1 });
   }, [uuid]);
 
   useEffect(() => {
