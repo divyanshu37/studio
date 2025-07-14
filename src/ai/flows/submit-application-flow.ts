@@ -12,7 +12,6 @@ import {ai} from '@/ai/genkit';
 import { FormValues, fullFormSchema, transformDataForApi } from '@/lib/schema';
 import { z } from 'zod';
 import axios from 'axios';
-import { submitToSlack } from './submit-slack';
 
 // 1. Define the input from the form. This is the raw data from the UI.
 const SubmitApplicationInputSchema = fullFormSchema
@@ -80,9 +79,6 @@ const submitApplicationFlow = ai.defineFlow(
       // If we get a 2xx status, the webhook accepted the request.
       // The actual processing result will come via WebSocket.
       if (response.status >= 200 && response.status < 300) {
-        
-        // Fire-and-forget Slack notification
-        submitToSlack({ step: 'Self-Enrollment Submitted', formData: finalPayload });
 
         return {
           success: true,
