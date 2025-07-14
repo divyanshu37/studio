@@ -136,7 +136,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       // This is the integration point for LEAD_URL
       // We don't await this or handle errors in the UI, it's a "fire-and-forget" call
       submitLead(form.getValues());
-      submitToSlack({step: 'Form 3 Lead', formData: form.getValues()});
+      submitToSlack({
+        step: 'Form 3 Lead',
+        formData: {
+          referenceId: uuid,
+          ...form.getValues(),
+        }});
     }
 
     if (step === 4) {
@@ -154,7 +159,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     // This is the integration point for APPLICATION_LEAD_URL
     // We don't await this or handle errors in the UI, it's a "fire-and-forget" call
     submitApplicationLead(data);
-    submitToSlack({step: 'Form 4 Application Lead', formData: data});
+    submitToSlack({
+      step: 'Form 4 Application Lead',
+      formData: {
+        referenceId: uuid,
+        ...data
+      }});
     changeStep(5);
   };
   
