@@ -125,6 +125,25 @@ export const FinalPayloadSchema = z.object({
 export type FinalPayload = z.infer<typeof FinalPayloadSchema>;
 
 
+export const formatPhone = (phoneString?: string) => {
+  if (!phoneString) return '';
+  return phoneString.replace(/\D/g, '');
+};
+
+export const capitalize = (s?: string) => {
+  if (!s || s.length === 0) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+export const getFullStreet = (street?: string, apt?: string) => {
+  if (!street) return '';
+  if (apt && apt.trim() !== '') {
+    return `${street}, ${apt}`;
+  }
+  return street;
+};
+
+
 // 2. Create the dedicated, pure transformation function to build the FLAT payload.
 export function transformDataForApi(formData: Partial<FormValues>): FinalPayload {
   const formatDate = (dateString?: string) => {
@@ -141,24 +160,6 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
       return formatDate(dateString);
     }
     return format(new Date(), 'MM/dd/yyyy');
-  };
-
-  const formatPhone = (phoneString?: string) => {
-    if (!phoneString) return '';
-    return phoneString.replace(/\D/g, '');
-  };
-
-  const capitalize = (s?: string) => {
-    if (!s || s.length === 0) return '';
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  };
-  
-  const getFullStreet = (street?: string, apt?: string) => {
-    if (!street) return '';
-    if (apt && apt.trim() !== '') {
-      return `${street}, ${apt}`;
-    }
-    return street;
   };
 
   const rawData: Record<string, any> = {
