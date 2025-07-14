@@ -163,27 +163,27 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
 
   const rawData: Record<string, any> = {
     referenceId: (formData as any).referenceId, // For final submission
-    email: formData.email || '',
-    firstName: formData.firstName || '',
-    lastName: formData.lastName || '',
-    addressStreet: getFullStreet(formData.addressStreet, formData.addressApt) || '',
-    addressCity: formData.addressCity || '',
-    addressState: formData.addressState || '',
-    addressZip: formData.addressZip || '',
-    dob: formatDate(formData.dob) || '',
-    phone: formatPhone(formData.phone) || '',
-    lastFour: formData.lastFour || '',
-    gender: capitalize(formData.gender) || '',
-    beneficiaryFirstName: formData.beneficiaryFirstName || '',
-    beneficiaryLastName: formData.beneficiaryLastName || '',
-    beneficiaryDob: formatDate(formData.beneficiaryDob) || '',
-    beneficiaryPhone: formatPhone(formData.beneficiaryPhone) || '',
-    beneficiaryRelation: formData.beneficiaryRelation || '',
+    email: formData.email,
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    addressStreet: getFullStreet(formData.addressStreet, formData.addressApt),
+    addressCity: formData.addressCity,
+    addressState: formData.addressState,
+    addressZip: formData.addressZip,
+    dob: formatDate(formData.dob),
+    phone: formatPhone(formData.phone),
+    lastFour: formData.lastFour,
+    gender: capitalize(formData.gender),
+    beneficiaryFirstName: formData.beneficiaryFirstName,
+    beneficiaryLastName: formData.beneficiaryLastName,
+    beneficiaryDob: formatDate(formData.beneficiaryDob),
+    beneficiaryPhone: formatPhone(formData.beneficiaryPhone),
+    beneficiaryRelation: formData.beneficiaryRelation,
     beneficiaryPercentage: "100",
     faceAmount: formData.faceAmount ? formData.faceAmount.replace(/[^0-9]/g, '') : '',
-    paymentAccountHolderName: formData.paymentAccountHolderName || '',
-    paymentRoutingNumber: formData.paymentRoutingNumber || '',
-    paymentAccountNumber: formData.paymentAccountNumber || '',
+    paymentAccountHolderName: formData.paymentAccountHolderName,
+    paymentRoutingNumber: formData.paymentRoutingNumber,
+    paymentAccountNumber: formData.paymentAccountNumber,
     differentOwner: formData.differentOwner || 'no',
     healthQuestion1: formData.healthQuestion1 || 'no',
     healthQuestion2: formData.healthQuestion2 || 'no',
@@ -191,7 +191,7 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     tobaccoUse: formData.tobaccoUse || 'no',
     existingPolicies: formData.existingPolicies || 'no',
     otherHealthIssues: formData.otherHealthIssues || 'no',
-    otherHealthIssuesDetails: formData.otherHealthIssuesDetails || '',
+    otherHealthIssuesDetails: formData.otherHealthIssuesDetails,
     effectiveDate: formatEffectiveDate(formData.effectiveDate),
   };
   
@@ -203,7 +203,13 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
 // It removes payment-related fields to avoid validation errors for data that hasn't been collected yet.
 export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<FinalPayload, 'paymentAccountHolderName' | 'paymentRoutingNumber' | 'paymentAccountNumber' | 'lastFour'> {
   // First, get the fully transformed payload
-  const fullPayload = transformDataForApi(formData);
+  const fullPayload = transformDataForApi({
+    ...formData,
+    lastFour: undefined,
+    paymentAccountHolderName: undefined,
+    paymentRoutingNumber: undefined,
+    paymentAccountNumber: undefined,
+  });
   
   // Then, destructure to remove the payment fields.
   const { 
