@@ -9,13 +9,13 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {fullFormSchema, transformDataForApi} from '@/lib/schema';
+import {transformDataForApi} from '@/lib/schema';
 import {z} from 'zod';
 import axios from 'axios';
 
-// We use a partial schema because fields from later steps won't be filled yet.
-// The transformation function can handle missing optional fields.
-const SubmitLeadInputSchema = fullFormSchema.partial();
+// The input can be any part of the form, so we use z.any() here.
+// The real validation happens in transformDataForApi.
+const SubmitLeadInputSchema = z.any();
 export type SubmitLeadInput = z.infer<typeof SubmitLeadInputSchema>;
 
 const SubmitLeadOutputSchema = z.object({
@@ -52,12 +52,16 @@ const submitLeadFlow = ai.defineFlow(
     } catch (error) {
       let errorMessage = 'An unknown error occurred during lead submission.';
       if (axios.isAxiosError(error) && error.response) {
-        errorMessage =
-          error.response.data?.message || 'API submission failed.';
+        // Log the detailed error from the API response if available
+        const apiErrors = error.response.data?.errors || error.response.data?.message;
+        errorMessage = `API submission failed: ${JSON.stringify(apiErrors) || error.message}`;
+      } else if (error instanceof z.ZodError) {
+        errorMessage = `Data validation failed before sending: ${JSON.stringify(error.flatten())}`;
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
       console.error('Lead submission failed:', errorMessage);
+      console.error('Provided data:', JSON.stringify(formData));
       // We return success=false but this won't be shown to the user, it will just be logged.
       return {success: false, message: errorMessage};
     }

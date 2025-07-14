@@ -161,7 +161,7 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     return street;
   };
 
-  const transformedData: FinalPayload = {
+  const rawData: Record<string, any> = {
     referenceId: (formData as any).referenceId, // For final submission
     email: formData.email,
     firstName: formData.firstName,
@@ -184,7 +184,6 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     paymentAccountHolderName: formData.paymentAccountHolderName,
     paymentRoutingNumber: formData.paymentRoutingNumber,
     paymentAccountNumber: formData.paymentAccountNumber,
-    // Add the missing fields
     differentOwner: formData.differentOwner,
     healthQuestion1: formData.healthQuestion1,
     healthQuestion2: formData.healthQuestion2,
@@ -195,7 +194,12 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     otherHealthIssuesDetails: formData.otherHealthIssuesDetails,
     effectiveDate: formatEffectiveDate(formData.effectiveDate),
   };
+
+  // Filter out any keys that have empty strings or null/undefined values
+  const transformedData: FinalPayload = Object.fromEntries(
+    Object.entries(rawData).filter(([_, value]) => value !== '' && value != null)
+  );
   
-  // This validates the data *after* transformation against our flat schema.
+  // This validates the data *after* transformation and filtering.
   return FinalPayloadSchema.parse(transformedData);
 }
