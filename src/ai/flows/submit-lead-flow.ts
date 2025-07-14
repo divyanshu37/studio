@@ -14,7 +14,7 @@ import {z} from 'zod';
 import axios from 'axios';
 
 // The input can be any part of the form, so we use z.any() here.
-// The real validation happens in transformDataForApi.
+// The real validation happens in transformDataForLeadApi.
 const SubmitLeadInputSchema = z.any();
 export type SubmitLeadInput = z.infer<typeof SubmitLeadInputSchema>;
 
@@ -47,6 +47,7 @@ const submitLeadFlow = ai.defineFlow(
 
     try {
       // Use the dedicated transformation function for lead submission.
+      // This will strip out payment fields before sending.
       const finalPayload = transformDataForLeadApi(formData);
       await axios.post(leadUrl, finalPayload);
       return {success: true, message: 'Lead submitted successfully.'};
@@ -68,3 +69,5 @@ const submitLeadFlow = ai.defineFlow(
     }
   }
 );
+
+    

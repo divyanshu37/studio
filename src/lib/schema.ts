@@ -199,6 +199,8 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
 }
 
 // 3. Create a dedicated transformation for the LEAD API call.
+// This function prepares the data for the step 3 lead submission.
+// It removes payment-related fields to avoid validation errors for data that hasn't been collected yet.
 export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<FinalPayload, 'paymentAccountHolderName' | 'paymentRoutingNumber' | 'paymentAccountNumber' | 'lastFour'> {
   // First, get the fully transformed payload
   const fullPayload = transformDataForApi(formData);
@@ -214,3 +216,5 @@ export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<Fin
 
   return leadPayload;
 }
+
+    
