@@ -171,6 +171,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const handleSelfEnrollSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
+      submitToSlack({
+        step: 'Self-Enrollment',
+        formData: {
+          ...data,
+          referenceId: uuid,
+        }});
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {

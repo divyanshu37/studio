@@ -47,7 +47,7 @@ export default function FormNavigation({
 
   return (
     <div className="relative flex flex-wrap justify-between items-center mt-8 w-full gap-y-4">
-      {backButton ? (
+      {/* {backButton ? (
         <Button
           type="button"
           onClick={onBack}
@@ -57,9 +57,9 @@ export default function FormNavigation({
           <ArrowLeft className="h-5 w-5" />
           <span>BACK</span>
         </Button>
-      ) : (
-        <div className="w-48 hidden sm:block" /> // Spacer
-      )}
+      ) : ( */}
+        <div className="w-48 hidden sm:block" />
+      {/* )} */}
       
       <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-xs md:max-w-sm px-2 order-3 sm:order-2 z-10">
         <div
