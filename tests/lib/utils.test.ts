@@ -9,7 +9,7 @@ describe('formatPhoneNumber', () => {
   });
 
   it('should handle partial numbers correctly', () => {
-    expect(formatPhoneNumber('123')).toBe('(123');
+    expect(formatPhoneNumber('123')).toBe('(123)');
     expect(formatPhoneNumber('123456')).toBe('(123) 456');
   });
 
