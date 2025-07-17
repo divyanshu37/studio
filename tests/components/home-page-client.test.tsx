@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import HomePageClient from '@/components/home-page-client';
 import { Toaster } from '@/components/ui/toaster';
+import { getByLabelText, getByRole, getByText } from '@testing-library/dom';
 
 // Mocking necessary modules and hooks
 vi.mock('next/navigation', () => ({
@@ -68,7 +69,7 @@ describe('HomePageClient - Form Step 1', () => {
     await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/2000'); // Too young
     
     // The gender select is a bit more complex to interact with
-    const genderSelect = screen.getByRole('combobox', { name: '' });
+    const genderSelect = screen.getByRole('combobox');
     await userEvent.click(genderSelect);
     await userEvent.click(screen.getByText('Male'));
     
@@ -90,7 +91,7 @@ describe('HomePageClient - Form Step 1', () => {
     await userEvent.type(screen.getByPlaceholderText('Email'), 'jane.doe@example.com');
     await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970'); // Valid age
     
-    const genderSelect = screen.getByRole('combobox', { name: '' });
+    const genderSelect = screen.getByRole('combobox');
     await userEvent.click(genderSelect);
     await userEvent.click(screen.getByText('Female'));
     
@@ -121,7 +122,7 @@ describe('HomePageClient - Form Step 2', () => {
     await userEvent.type(screen.getByPlaceholderText('Valid Phone Number'), '5551234567');
     await userEvent.type(screen.getByPlaceholderText('Email'), 'jane.doe@example.com');
     await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970');
-    const genderSelect = screen.getByRole('combobox', { name: '' });
+    const genderSelect = screen.getByRole('combobox');
     await userEvent.click(genderSelect);
     await userEvent.click(screen.getByText('Female'));
     await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
@@ -149,8 +150,6 @@ describe('HomePageClient - Form Step 2', () => {
       expect(screen.getByText(/Is the policy owner different than the insured/i)).toBeInTheDocument();
     });
 
-    // The form contains multiple buttons with the same text ('Yes'/'No'). 
-    // We need to be specific about which button belongs to which question.
     const questions = [
         'Is the policy owner different than the insured?',
         'Have you ever been diagnosed or treated for HIV, AIDS, bipolar, schizophrenia, dementia, or any progressive neurological disorder?',
@@ -162,10 +161,11 @@ describe('HomePageClient - Form Step 2', () => {
     ];
 
     for (const questionText of questions) {
-        // Find the form item containing the question, then find the 'No' button within it.
         const questionElement = screen.getByText(questionText);
-        const formItem = questionElement.closest('div.space-y-4'); // Find the parent container for the question
-        const noButton = Array.from(formItem.querySelectorAll('button')).find(b => b.textContent.includes('No'));
+        const formItem = questionElement.closest('div.space-y-4');
+        if (!formItem) throw new Error(`Could not find form item for question: ${questionText}`);
+        
+        const noButton = getByRole(formItem as HTMLElement, 'button', { name: /No/ });
         await userEvent.click(noButton);
     }
     
