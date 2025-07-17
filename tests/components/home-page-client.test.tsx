@@ -108,3 +108,75 @@ describe('HomePageClient - Form Step 1', () => {
   });
 
 });
+
+
+describe('HomePageClient - Form Step 2', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const fillStepOne = async () => {
+    await userEvent.type(screen.getByPlaceholderText('First Name'), 'Jane');
+    await userEvent.type(screen.getByPlaceholderText('Last Name'), 'Doe');
+    await userEvent.type(screen.getByPlaceholderText('Valid Phone Number'), '5551234567');
+    await userEvent.type(screen.getByPlaceholderText('Email'), 'jane.doe@example.com');
+    await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970');
+    const genderSelect = screen.getByRole('combobox', { name: '' });
+    await userEvent.click(genderSelect);
+    await userEvent.click(screen.getByText('Female'));
+    await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
+  };
+  
+  it('should display validation errors for unanswered questions on step 2', async () => {
+    render(<TestWrapper uuid="test-uuid" />);
+    await fillStepOne();
+    
+    await waitFor(() => {
+      expect(screen.getByText(/Is the policy owner different than the insured/i)).toBeInTheDocument();
+    });
+
+    const nextButton = screen.getByRole('button', { name: /NEXT/i });
+    await userEvent.click(nextButton);
+
+    expect(await screen.findByText('Please select an option.')).toBeInTheDocument();
+  });
+
+  it('should proceed to step 3 with valid answers', async () => {
+    render(<TestWrapper uuid="test-uuid" />);
+    await fillStepOne();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Is the policy owner different than the insured/i)).toBeInTheDocument();
+    });
+
+    // The form contains multiple buttons with the same text ('Yes'/'No'). 
+    // We need to be specific about which button belongs to which question.
+    const questions = [
+        'Is the policy owner different than the insured?',
+        'Have you ever been diagnosed or treated for HIV, AIDS, bipolar, schizophrenia, dementia, or any progressive neurological disorder?',
+        'Have you ever used oxygen or dialysis for any condition?',
+        'In the last 5 years, have you had cancer (non-skin), stroke, heart attack, insulin-treated diabetes, COPD, hepatitis, cirrhosis, drug/alcohol abuse, PAH, hereditary angioedema, or pending tests for any of these?',
+        'Have you used any nicotine products in the past 12 months?',
+        'Do you have any existing life or annuity policies with this or another company?',
+        'Do you have any other health issues?'
+    ];
+
+    for (const questionText of questions) {
+        // Find the form item containing the question, then find the 'No' button within it.
+        const questionElement = screen.getByText(questionText);
+        const formItem = questionElement.closest('div.space-y-4'); // Find the parent container for the question
+        const noButton = Array.from(formItem.querySelectorAll('button')).find(b => b.textContent.includes('No'));
+        await userEvent.click(noButton);
+    }
+    
+    const nextButton = screen.getByRole('button', { name: /NEXT/i });
+    await userEvent.click(nextButton);
+
+    await waitFor(() => {
+        expect(screen.getByPlaceholderText("Applicant's Primary Address")).toBeInTheDocument();
+    });
+
+    // Ensure no validation errors from step 2 are visible
+    expect(screen.queryByText('Please select an option.')).not.toBeInTheDocument();
+  });
+});
