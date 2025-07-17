@@ -1,9 +1,9 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+
+import { render, screen, fireEvent, waitFor, getByRole as getByRoleInElement } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import HomePageClient from '@/components/home-page-client';
 import { Toaster } from '@/components/ui/toaster';
-import { getByRole, getByText } from '@testing-library/dom';
 
 // Mocking necessary modules and hooks
 vi.mock('next/navigation', () => ({
@@ -71,7 +71,9 @@ describe('HomePageClient - Form Step 1', () => {
     // The gender select is a bit more complex to interact with
     const genderSelect = screen.getByRole('combobox');
     await userEvent.click(genderSelect);
-    await userEvent.click(screen.getByText('Male'));
+    // Use `getByRole` on the listbox to be more specific
+    const listbox = await screen.findByRole('listbox');
+    await userEvent.click(getByRoleInElement(listbox, 'option', { name: 'Male' }));
     
     const nextButton = screen.getByRole('button', { name: /NEXT/i });
     await userEvent.click(nextButton);
@@ -93,7 +95,8 @@ describe('HomePageClient - Form Step 1', () => {
     
     const genderSelect = screen.getByRole('combobox');
     await userEvent.click(genderSelect);
-    await userEvent.click(screen.getByText('Female'));
+    const listbox = await screen.findByRole('listbox');
+    await userEvent.click(getByRoleInElement(listbox, 'option', { name: 'Female' }));
     
     const nextButton = screen.getByRole('button', { name: /NEXT/i });
     await userEvent.click(nextButton);
@@ -124,7 +127,8 @@ describe('HomePageClient - Form Step 2', () => {
     await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970');
     const genderSelect = screen.getByRole('combobox');
     await userEvent.click(genderSelect);
-    await userEvent.click(screen.getByText('Female'));
+    const listbox = await screen.findByRole('listbox');
+    await userEvent.click(getByRoleInElement(listbox, 'option', { name: 'Female' }));
     await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
   };
   
@@ -166,7 +170,7 @@ describe('HomePageClient - Form Step 2', () => {
         if (!formItem) throw new Error(`Could not find form item for question: ${questionText}`);
         
         // This is a more robust way to find the button within its specific question container
-        const noButton = getByRole(formItem as HTMLElement, 'button', { name: "No" });
+        const noButton = getByRoleInElement(formItem as HTMLElement, 'button', { name: "No" });
         await userEvent.click(noButton);
     }
     
