@@ -14,3 +14,6 @@ if (typeof Element.prototype.hasPointerCapture === 'undefined') {
 if (typeof Element.prototype.releasePointerCapture === 'undefined') {
     Element.prototype.releasePointerCapture = vi.fn();
 }
+if (typeof Element.prototype.setPointerCapture === 'undefined') {
+    Element.prototype.setPointerCapture = vi.fn();
+}
