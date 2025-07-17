@@ -300,10 +300,10 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   const getErrorMessage = () => {
     if (step < 1 || step > stepFields.length) return null;
-    const fields = stepFields[step - 1];
-    if (!fields) return null;
+    const currentStepFields = stepFields[step - 1];
+    if (!currentStepFields) return null;
 
-    for (const field of fields) {
+    for (const field of currentStepFields) {
       if (errors[field]) {
         return errors[field]?.message as string;
       }
