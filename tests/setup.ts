@@ -1,13 +1,13 @@
 import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
-// Polyfill for PointerEvent which is not fully supported in JSDOM
+// JSDOM doesn't implement PointerEvent so we need to mock it
 if (typeof window !== 'undefined' && !window.PointerEvent) {
     class PointerEvent extends MouseEvent {}
     window.PointerEvent = PointerEvent as any;
 }
 
-// Polyfill for hasPointerCapture which is also not supported in JSDOM
+// JSDOM doesn't implement these functions, so we need to mock them
 if (typeof Element.prototype.hasPointerCapture === 'undefined') {
   Element.prototype.hasPointerCapture = vi.fn();
 }
