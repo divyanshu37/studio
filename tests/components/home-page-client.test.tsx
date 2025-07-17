@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import HomePageClient from '@/components/home-page-client';
 import { Toaster } from '@/components/ui/toaster';
-import { getByLabelText, getByRole, getByText } from '@testing-library/dom';
+import { getByRole, getByText } from '@testing-library/dom';
 
 // Mocking necessary modules and hooks
 vi.mock('next/navigation', () => ({
@@ -165,7 +165,8 @@ describe('HomePageClient - Form Step 2', () => {
         const formItem = questionElement.closest('div.space-y-4');
         if (!formItem) throw new Error(`Could not find form item for question: ${questionText}`);
         
-        const noButton = getByRole(formItem as HTMLElement, 'button', { name: /No/ });
+        // This is a more robust way to find the button within its specific question container
+        const noButton = getByRole(formItem as HTMLElement, 'button', { name: "No" });
         await userEvent.click(noButton);
     }
     
