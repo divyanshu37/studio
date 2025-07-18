@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
-import { usStates } from '@/lib/states';
+import AddressAutocomplete from './address-autocomplete';
 
 const coverageOptions = [
   "$ 10,000", "$ 12,000", "$ 14,000", "$ 16,000", "$ 18,000", "$ 20,000", "$ 25,000"
@@ -46,75 +46,16 @@ export default function BeneficiaryForm() {
     <div className="w-full max-w-2xl space-y-6">
       
       <div className="space-y-4">
-        <FormField
-          control={control}
-          name="addressStreet"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl className={cn(errors.addressStreet && 'animate-shake')}>
-                <Input placeholder="Applicant's Primary Address" autoComplete="street-address" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressStreet && "border-destructive focus-visible:border-destructive")} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-           <FormField
-              control={control}
-              name="addressApt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl className={cn(errors.addressApt && 'animate-shake')}>
-                    <Input placeholder="Apt, suite, etc. (optional)" autoComplete="address-line2" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressApt && "border-destructive focus-visible:border-destructive animate-shake")} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          <FormField
-            control={control}
-            name="addressCity"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl className={cn(errors.addressCity && 'animate-shake')}>
-                  <Input placeholder="City" autoComplete="address-level2" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressCity && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={control}
-            name="addressState"
-            render={({ field }) => (
-              <FormItem>
-                <Select onValueChange={field.onChange} defaultValue={field.value} autoComplete="address-level1">
-                  <FormControl>
-                    <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressState && "border-destructive focus-visible:border-destructive animate-shake")}>
-                      <SelectValue placeholder="State" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {usStates.map(state => (
-                      <SelectItem key={state.abbreviation} value={state.abbreviation}>{state.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="addressZip"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl className={cn(errors.addressZip && 'animate-shake')}>
-                  <Input placeholder="Zip Code" autoComplete="postal-code" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressZip && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
+        <AddressAutocomplete />
       </div>
+      
+      {/* Hidden fields for validation, populated by AddressAutocomplete */}
+      <FormField control={control} name="addressStreet" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
+      <FormField control={control} name="addressCity" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
+      <FormField control={control} name="addressState" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
+      <FormField control={control} name="addressZip" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
+      <FormField control={control} name="addressApt" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
+
 
        <div className="space-y-4 pt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
