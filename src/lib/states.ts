@@ -3,7 +3,7 @@ export const usStates = [
     { name: 'Alaska', abbreviation: 'AK' },
     { name: 'Arizona', abbreviation: 'AZ' },
     { name: 'Arkansas', abbreviation: 'AR' },
-    { name: 'California', abbreviation: 'CA' },
+    // { name: 'California', abbreviation: 'CA' },
     { name: 'Colorado', abbreviation: 'CO' },
     { name: 'Connecticut', abbreviation: 'CT' },
     { name: 'Delaware', abbreviation: 'DE' },
