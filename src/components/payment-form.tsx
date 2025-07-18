@@ -61,16 +61,11 @@ export default function PaymentForm() {
                 >
                     <CreditCard className="w-12 h-12 mb-4 text-primary" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Credit/Debit Card</h3>
+                     <div className="flex items-center gap-2 mt-4 opacity-75">
+                       <ApplePayLogo />
+                       <span className="text-xs font-semibold">APPLE PAY AVAILABLE</span>
+                    </div>
                 </div>
-            </div>
-             <div className="relative my-8 w-full max-w-sm">
-                <hr className="border-border" />
-                <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-background px-2 text-sm text-muted-foreground">or</span>
-            </div>
-             <div className="w-full max-w-sm">
-                <Button type="button" variant="black" className="w-full h-14" disabled>
-                    <ApplePayLogo />
-                </Button>
             </div>
         </div>
     )
@@ -154,3 +149,4 @@ export default function PaymentForm() {
     </div>
   );
 }
+
