@@ -184,8 +184,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         }});
       changeStep(9);
     } else {
-      // For all other states, go to the Thank You page to choose
-      changeStep(5);
+      // For all other states, go to the Self-Enrollment flow
+      form.handleSubmit(handleSelfEnrollSubmit, handleSelfEnrollError)();
     }
   };
   
@@ -201,7 +201,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(7); // Go to contract page
+        changeStep(6); // Go to loading page before contract
       } else {
         toast({
           variant: "destructive",
@@ -349,8 +349,9 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     }
   };
 
-  const showHeader = step <= 5;
+  const showHeader = step <= 4; // Header shown on steps 1-4
   const showNavigation = step >= 1 && step <= 4;
+  const isFinalStep = step >= 5; // Steps 5 and beyond have their own UI and no main nav
 
   const getErrorMessage = () => {
     if (step < 1 || step > stepFields.length) return null;
@@ -398,9 +399,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                     State and Congress Approved Final Expense Benefits Emergency Funds
                 </h1>
                 <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
-                  {step === 5
-                    ? "We have all of the information necessary. How would you like to complete your application?"
-                    : "Amounts between $5,000 - $25,000 / Available to anyone ages 45-80"}
+                  Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
                 </p>
               </div>
             )}
@@ -428,14 +427,15 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             </div>
         </div>
       </main>
-
-      <footer className="w-full py-8 text-center">
-        <p className="text-xs text-foreground/60">
-          All information provided is private{" "}
-          <Link href="/admin" className="cursor-pointer">and</Link>
-          {" "}securely protected.
-        </p>
-      </footer>
+      { !isFinalStep && (
+        <footer className="w-full py-8 text-center">
+          <p className="text-xs text-foreground/60">
+            All information provided is private{" "}
+            <Link href="/admin" className="cursor-pointer">and</Link>
+            {" "}securely protected.
+          </p>
+        </footer>
+      )}
     </div>
   );
 }
