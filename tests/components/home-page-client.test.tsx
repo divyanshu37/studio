@@ -19,6 +19,7 @@ vi.mock('next/navigation', () => ({
 // Declare mocks that will be used in the factories
 let logTrafficWithLocation: any;
 let submitLead: any;
+let submitApplicationLead: any;
 let submitToSlack: any;
 
 vi.mock('@/ai/flows/log-traffic-flow', () => ({
@@ -27,6 +28,10 @@ vi.mock('@/ai/flows/log-traffic-flow', () => ({
 
 vi.mock('@/ai/flows/submit-lead-flow', () => ({
   submitLead: (...args: any[]) => submitLead(...args),
+}));
+
+vi.mock('@/ai/flows/submit-application-lead-flow', () => ({
+    submitApplicationLead: (...args: any[]) => submitApplicationLead(...args),
 }));
 
 vi.mock('@/ai/flows/submit-slack', () => ({
@@ -303,3 +308,92 @@ describe('HomePageClient - Form Step 3', () => {
     expect(screen.queryByText('Address is required.')).not.toBeInTheDocument();
   });
 });
+
+describe('HomePageClient - Form Step 4', () => {
+    beforeEach(() => {
+        // Reset mocks before each test
+        logTrafficWithLocation = vi.fn().mockResolvedValue({ success: true });
+        submitLead = vi.fn().mockResolvedValue({ success: true });
+        submitApplicationLead = vi.fn().mockResolvedValue({ success: true });
+        submitToSlack = vi.fn().mockResolvedValue({ success: true });
+    });
+
+    const fillThroughStepThree = async () => {
+        // Fill step 1
+        await userEvent.type(screen.getByPlaceholderText('First Name'), 'Jane');
+        await userEvent.type(screen.getByPlaceholderText('Last Name'), 'Doe');
+        await userEvent.type(screen.getByPlaceholderText('Valid Phone Number'), '5551234567');
+        await userEvent.type(screen.getByPlaceholderText('Email'), 'jane.doe@example.com');
+        await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970');
+        const genderSelect = screen.getByRole('combobox', { name: /gender/i });
+        await userEvent.click(genderSelect);
+        await userEvent.click(await screen.findByRole('option', { name: 'Female' }));
+        await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
+
+        // Fill step 2
+        await waitFor(() => expect(screen.getByText(/Is the policy owner different/i)).toBeInTheDocument());
+        const questions = screen.getAllByRole('radiogroup'); // Simplified selector, assuming this works
+        for (const question of questions) {
+            await userEvent.click(getByRoleInElement(question, 'button', { name: 'No' }));
+        }
+        await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
+
+        // Fill step 3
+        await waitFor(() => expect(screen.getByPlaceholderText("Applicant's Primary Address")).toBeInTheDocument());
+        await userEvent.type(screen.getByPlaceholderText("Applicant's Primary Address"), "123 Main St");
+        await userEvent.type(screen.getByPlaceholderText("City"), "Anytown");
+        await userEvent.type(screen.getByPlaceholderText("Zip Code"), "12345");
+        await userEvent.click(screen.getByRole('combobox', { name: /state/i }));
+        await userEvent.click(await screen.findByRole('option', { name: 'California' }));
+        await userEvent.type(screen.getByPlaceholderText("Beneficiary First Name"), "Ben");
+        await userEvent.type(screen.getByPlaceholderText("Beneficiary Last Name"), "Ficiary");
+        await userEvent.click(screen.getByRole('combobox', { name: /relationship/i }));
+        await userEvent.click(await screen.findByRole('option', { name: 'Spouse' }));
+        await userEvent.click(screen.getByRole('combobox', { name: /coverage/i }));
+        await userEvent.click(await screen.findByRole('option', { name: '$ 20,000' }));
+        await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
+    };
+
+    it('should display validation errors for empty fields on step 4', async () => {
+        render(<TestWrapper uuid="test-uuid" />);
+        await fillThroughStepThree();
+
+        await waitFor(() => {
+            expect(screen.getByPlaceholderText("Account Holder Name")).toBeInTheDocument();
+        });
+
+        const submitButton = screen.getByRole('button', { name: /SUBMIT/i });
+        await userEvent.click(submitButton);
+
+        expect(await screen.findByText('Account holder name is required.')).toBeInTheDocument();
+    });
+
+    it('should proceed to step 5 on successful submission', async () => {
+        render(<TestWrapper uuid="test-uuid" />);
+        await fillThroughStepThree();
+
+        await waitFor(() => {
+            expect(screen.getByPlaceholderText("Account Holder Name")).toBeInTheDocument();
+        });
+
+        // Fill in step 4 form
+        await userEvent.type(screen.getByPlaceholderText("Account Holder Name"), "Jane Doe");
+        await userEvent.type(screen.getByPlaceholderText("Account Number"), "123456789");
+        await userEvent.type(screen.getByPlaceholderText("Routing Number"), "987654321");
+        await userEvent.type(screen.getByPlaceholderText("Last 4 Digits of SSN"), "1234");
+        
+        const submitButton = screen.getByRole('button', { name: /SUBMIT/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.getByText(/We have all of the information necessary/i)).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: /Self-Enroll/i })).toBeInTheDocument();
+        });
+
+        // Check that background submissions were called
+        expect(submitApplicationLead).toHaveBeenCalledTimes(1);
+        expect(submitToSlack).toHaveBeenCalledTimes(2); // Called on step 3 and 4
+    });
+});
+
+    
