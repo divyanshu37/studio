@@ -39,6 +39,7 @@ import AgentHandoffComplete from '@/components/agent-handoff-complete';
 import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
 import { submitToSlack } from '@/ai/flows/submit-slack';
+import DevStepper from '@/components/dev-stepper';
 
 const stepFields: (keyof FormValues)[][] = [
   Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
@@ -97,10 +98,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   const { formState: { errors } } = form;
 
-  const changeStep = useCallback((newStep: number) => {
+  const changeStep = useCallback((newStep: number, fromDevStepper = false) => {
     if (newStep === step) return;
 
-    logTraffic({ uuid, step: newStep });
+    if (!fromDevStepper) {
+        logTraffic({ uuid, step: newStep });
+    }
 
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
@@ -181,7 +184,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(6);
+        changeStep(7); // Go to contract page
       } else {
         toast({
           variant: "destructive",
@@ -218,6 +221,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
 
   const handleSpeakToAgent = () => {
+    logTraffic({ uuid, step: 9 });
+    submitToSlack({
+        step: 'Agent Handoff',
+        formData: {
+          referenceId: uuid,
+          ...form.getValues(),
+        }});
     changeStep(9);
   };
   
@@ -241,8 +251,10 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             if (phoneLastFour) setPhoneLastFour(phoneLastFour);
 
             if (currentStep === 'sms-verification' || currentStep === 'CONTRACT_READY') {
+              logTraffic({ uuid, step: 7 });
               changeStep(7);
             } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing' || currentStep === 'RESULT_SUCCESS') {
+              logTraffic({ uuid, step: 8 });
               changeStep(8);
             } else if (currentStep === 'RESULT_FAILED' || (isError && error)) {
                 toast({
@@ -262,13 +274,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             changeStep(5);
         }
     }
-  }, [changeStep, toast]);
+  }, [changeStep, toast, uuid]);
 
-  const subscribeId = (step >= 6 && step <= 7) ? uuid : null;
+  const subscribeId = (step === 6) ? uuid : null;
   useSocket(subscribeId, handleSocketUpdate);
 
-  const handleStepChange = (newStep: number) => {
-    changeStep(newStep);
+  const handleDevStepChange = (newStep: number) => {
+    changeStep(newStep, true);
   };
 
   const renderStep = () => {
@@ -320,6 +332,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
         <Logo />
       </header>
+      
+      <DevStepper currentStep={step} onStepChange={handleDevStepChange} totalSteps={9} />
 
       <main className="flex-1 flex flex-col items-center justify-center w-full px-8 sm:px-12 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
