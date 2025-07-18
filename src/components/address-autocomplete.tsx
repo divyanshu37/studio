@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -38,15 +39,20 @@ export default function AddressAutocomplete() {
 
     try {
       const results = await getGeocode({ address });
-      const { lat, lng } = results[0].geometry.location;
-      const zipCode = await getZipCode({ lat, lng }, false);
+      const geocodeResult = results[0];
+
+      if (!geocodeResult) {
+        throw new Error('No results found for the selected address.');
+      }
+      
+      const zipCode = getZipCode(geocodeResult, false);
 
       let streetNumber = '';
       let route = '';
       let city = '';
       let state = '';
       
-      results[0].address_components.forEach(component => {
+      geocodeResult.address_components.forEach(component => {
         const types = component.types;
         if (types.includes('street_number')) streetNumber = component.long_name;
         if (types.includes('route')) route = component.short_name;
