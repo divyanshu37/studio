@@ -1,159 +1,121 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect } from 'react';
+import usePlacesAutocomplete, {
+  getGeocode,
+  getZipCode,
+} from 'use-places-autocomplete';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { getPlaceAutocomplete, getPlaceDetails } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
-interface Suggestion {
-  description: string;
-  place_id: string;
-}
-
 export default function AddressAutocomplete() {
   const { setValue: setFormValue, trigger, formState: { errors } } = useFormContext();
-  const [inputValue, setInputValue] = useState('');
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSelectionMade, setIsSelectionMade] = useState(false);
   const { toast } = useToast();
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const debounce = (func: Function, delay: number) => {
-    let timeout: NodeJS.Timeout;
-    return (...args: any) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), delay);
-    };
+  const {
+    ready,
+    value,
+    suggestions: { status, data, loading },
+    setValue,
+    clearSuggestions,
+  } = usePlacesAutocomplete({
+    requestOptions: {
+      componentRestrictions: { country: 'us' },
+    },
+    debounce: 300,
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
   };
 
-  const fetchSuggestions = useCallback(
-    debounce(async (input: string) => {
-      if (!input || isSelectionMade) {
-        setSuggestions([]);
-        setShowSuggestions(false);
-        setIsLoading(false);
-        return;
-      }
-      setIsLoading(true);
-      try {
-        const results = await getPlaceAutocomplete(input);
-        setSuggestions(results);
-        setShowSuggestions(true);
-      } catch (error) {
-        console.error("Autocomplete error:", error);
-        toast({
-          variant: 'destructive',
-          title: 'Address Search Failed',
-          description: 'Could not fetch address suggestions. Please enter your address manually.',
-        });
-        setSuggestions([]);
-        setShowSuggestions(false);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 300),
-    [isSelectionMade, toast]
-  );
-
-  useEffect(() => {
-    fetchSuggestions(inputValue);
-  }, [inputValue, fetchSuggestions]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSelect = async (suggestion: Suggestion) => {
-    setInputValue(suggestion.description);
-    setShowSuggestions(false);
-    setIsSelectionMade(true);
+  const handleSelect = async (address: string) => {
+    setValue(address, false);
+    clearSuggestions();
 
     try {
-      const result = await getPlaceDetails(suggestion.place_id);
-      const components = result.address_components;
-      
+      const results = await getGeocode({ address });
+      const { lat, lng } = results[0].geometry.location;
+      const zipCode = await getZipCode({ lat, lng }, false);
+
       let streetNumber = '';
       let route = '';
       let city = '';
       let state = '';
-      let zip = '';
-      let apt = '';
-
-      components.forEach((component: any) => {
+      
+      results[0].address_components.forEach(component => {
         const types = component.types;
         if (types.includes('street_number')) streetNumber = component.long_name;
         if (types.includes('route')) route = component.short_name;
         if (types.includes('locality')) city = component.long_name;
         if (types.includes('administrative_area_level_1')) state = component.short_name;
-        if (types.includes('postal_code')) zip = component.long_name;
-        if (types.includes('subpremise')) apt = component.long_name;
       });
 
       setFormValue('addressStreet', `${streetNumber} ${route}`.trim(), { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      setFormValue('addressApt', apt, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
       setFormValue('addressCity', city, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
       setFormValue('addressState', state, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      setFormValue('addressZip', zip, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      
+      setFormValue('addressZip', zipCode || '', { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+
       trigger(['addressStreet', 'addressCity', 'addressState', 'addressZip']);
 
     } catch (error) {
-        console.error("Place Details error:", error);
-        toast({
-            variant: 'destructive',
-            title: 'Could Not Get Address Details',
-            description: 'Please fill in the city, state, and ZIP code fields manually.',
-        });
+      console.error('Error fetching address details:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Could Not Get Address Details',
+        description: 'Please fill in the city, state, and ZIP code fields manually.',
+      });
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    if (isSelectionMade) {
-      setIsSelectionMade(false); 
+  useEffect(() => {
+    if (!ready) {
+      // The hook will be re-enabled once the script is loaded
+      // by the parent component (HomePageClient).
     }
-  };
-
+  }, [ready]);
+  
   return (
-    <div className="relative w-full" ref={containerRef}>
+    <div className="relative w-full">
       <div className="relative">
         <Input
-          value={inputValue}
+          value={value}
           onChange={handleInputChange}
-          placeholder="Applicant's Primary Address"
+          disabled={!ready}
+          placeholder={ready ? "Applicant's Primary Address" : "Loading Address Finder..."}
           autoComplete="off"
           className={cn(
             "h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0",
             (errors.addressStreet || errors.addressCity || errors.addressState || errors.addressZip) && "border-destructive focus-visible:border-destructive animate-shake"
           )}
         />
-        {isLoading && (
+         {loading && (
             <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-muted-foreground" />
         )}
       </div>
-      {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto text-left">
-          {suggestions.map(suggestion => (
-            <li
-              key={suggestion.place_id}
-              onClick={() => handleSelect(suggestion)}
-              className="p-2 hover:bg-muted cursor-pointer rounded-md"
-            >
-              {suggestion.description}
-            </li>
-          ))}
-        </ul>
+
+      {status === 'OK' && (
+        <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto text-left">
+          <ul className="p-0 m-0">
+            {data.map(({ place_id, description }) => (
+              <li
+                key={place_id}
+                onClick={() => handleSelect(description)}
+                className="p-2 hover:bg-muted cursor-pointer rounded-md"
+              >
+                {description}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+       {status === 'ZERO_RESULTS' && (
+         <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg p-2 text-sm text-muted-foreground">
+           No results found. Please try a different address.
+        </div>
       )}
     </div>
   );
