@@ -69,21 +69,7 @@ export const beneficiaryFormSchema = z.object({
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
-export const bankPaymentSchema = z.object({
-    paymentAccountHolderName: z.string(),
-    paymentAccountNumber: z.string(),
-    paymentRoutingNumber: z.string().length(9),
-});
-
-export const cardPaymentSchema = z.object({
-    cardholderName: z.string(),
-    cardNumber: z.string().length(16),
-    cardExpiry: z.string().regex(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/),
-    cardCvc: z.string().length(3),
-    billingZip: z.string().length(5),
-});
-
-export const paymentFormSchema = z.object({
+export const basePaymentFormSchema = z.object({
   paymentMethod: z.enum(['bank', 'card']),
   lastFour: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
   // Bank fields (optional)
@@ -96,7 +82,9 @@ export const paymentFormSchema = z.object({
   cardExpiry: z.string().optional(),
   cardCvc: z.string().optional(),
   billingZip: z.string().optional(),
-}).superRefine((data, ctx) => {
+});
+
+export const paymentFormSchema = basePaymentFormSchema.superRefine((data, ctx) => {
     if (data.paymentMethod === 'bank') {
         if (!data.paymentAccountHolderName || data.paymentAccountHolderName.trim() === '') {
             ctx.addIssue({ code: 'custom', path: ['paymentAccountHolderName'], message: 'Account holder name is required.' });

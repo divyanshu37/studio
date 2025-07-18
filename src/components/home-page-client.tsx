@@ -13,7 +13,7 @@ import {
   insuranceFormSchema, 
   additionalQuestionsObjectSchema,
   beneficiaryFormSchema, 
-  paymentFormSchema,
+  basePaymentFormSchema,
   type FormValues,
   type InsuranceFormValues,
   type AdditionalQuestionsFormValues,
@@ -46,7 +46,7 @@ const stepFields: (keyof FormValues)[][] = [
   Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
   Object.keys(additionalQuestionsObjectSchema.shape) as (keyof AdditionalQuestionsFormValues)[],
   Object.keys(beneficiaryFormSchema.shape) as (keyof BeneficiaryFormValues)[],
-  Object.keys(paymentFormSchema.shape) as (keyof PaymentFormValues)[],
+  Object.keys(basePaymentFormSchema.shape) as (keyof PaymentFormValues)[],
 ];
 
 export default function HomePageClient({ uuid }: { uuid: string }) {
