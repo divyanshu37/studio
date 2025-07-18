@@ -15,18 +15,18 @@ export default function DevStepper({ currentStep, onStepChange, totalSteps }: De
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-card p-4 rounded-lg shadow-lg border text-left">
-      <h4 className="text-sm font-bold mb-2 text-foreground">Dev Stepper</h4>
-      <div className="flex flex-wrap gap-2">
+    <div className="fixed top-4 right-4 z-50 bg-card p-2 rounded-lg shadow-lg border text-left">
+      <h4 className="text-xs font-bold mb-2 text-foreground px-1">Dev Stepper</h4>
+      <div className="grid grid-cols-5 gap-1">
         {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
           <Button
             key={step}
             variant={currentStep === step ? 'default' : 'outline'}
-            size="sm"
+            size="icon"
             onClick={() => onStepChange(step)}
-            className="w-20"
+            className="h-8 w-8"
           >
-            Step {step}
+            {step}
           </Button>
         ))}
       </div>
