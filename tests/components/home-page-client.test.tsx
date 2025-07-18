@@ -16,12 +16,15 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+const logTrafficWithLocation = vi.fn().mockResolvedValue({ success: true });
 vi.mock('@/ai/flows/log-traffic-flow', () => ({
-  logTrafficWithLocation: vi.fn().mockResolvedValue({ success: true }),
+  logTrafficWithLocation,
 }));
 
+
+const submitLead = vi.fn().mockResolvedValue({ success: true });
 vi.mock('@/ai/flows/submit-lead-flow', () => ({
-  submitLead: vi.fn().mockResolvedValue({ success: true }),
+  submitLead,
 }));
 
 vi.mock('@/ai/flows/submit-slack', () => ({
@@ -93,7 +96,7 @@ describe('HomePageClient - Form Step 1', () => {
     await userEvent.type(screen.getByPlaceholderText('Email'), 'jane.doe@example.com');
     await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970'); // Valid age
     
-    const genderSelect = screen.getByRole('combobox');
+    const genderSelect = screen.getByRole('combobox', { name: /gender/i });
     await userEvent.click(genderSelect);
     const listbox = await screen.findByRole('listbox');
     await userEvent.click(getByRoleInElement(listbox, 'option', { name: 'Female' }));
@@ -125,7 +128,7 @@ describe('HomePageClient - Form Step 2', () => {
     await userEvent.type(screen.getByPlaceholderText('Valid Phone Number'), '5551234567');
     await userEvent.type(screen.getByPlaceholderText('Email'), 'jane.doe@example.com');
     await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970');
-    const genderSelect = screen.getByRole('combobox');
+    const genderSelect = screen.getByRole('combobox', { name: /gender/i });
     await userEvent.click(genderSelect);
     const listbox = await screen.findByRole('listbox');
     await userEvent.click(getByRoleInElement(listbox, 'option', { name: 'Female' }));
@@ -154,24 +157,24 @@ describe('HomePageClient - Form Step 2', () => {
       expect(screen.getByText(/Is the policy owner different than the insured/i)).toBeInTheDocument();
     });
 
+    // A more robust way to select the 'No' buttons for each question
     const questions = [
-        'Is the policy owner different than the insured?',
-        'Have you ever been diagnosed or treated for HIV, AIDS, bipolar, schizophrenia, dementia, or any progressive neurological disorder?',
-        'Have you ever used oxygen or dialysis for any condition?',
-        'In the last 5 years, have you had cancer (non-skin), stroke, heart attack, insulin-treated diabetes, COPD, hepatitis, cirrhosis, drug/alcohol abuse, PAH, hereditary angioedema, or pending tests for any of these?',
-        'Have you used any nicotine products in the past 12 months?',
-        'Do you have any existing life or annuity policies with this or another company?',
-        'Do you have any other health issues?'
+      'Is the policy owner different than the insured?',
+      'Have you ever been diagnosed or treated for HIV, AIDS, bipolar, schizophrenia, dementia, or any progressive neurological disorder?',
+      'Have you ever used oxygen or dialysis for any condition?',
+      'In the last 5 years, have you had cancer (non-skin), stroke, heart attack, insulin-treated diabetes, COPD, hepatitis, cirrhosis, drug/alcohol abuse, PAH, hereditary angioedema, or pending tests for any of these?',
+      'Have you used any nicotine products in the past 12 months?',
+      'Do you have any existing life or annuity policies with this or another company?',
+      'Do you have any other health issues?'
     ];
 
     for (const questionText of questions) {
-        const questionElement = screen.getByText(questionText);
-        const formItem = questionElement.closest('div.space-y-4');
-        if (!formItem) throw new Error(`Could not find form item for question: ${questionText}`);
-        
-        // This is a more robust way to find the button within its specific question container
-        const noButton = getByRoleInElement(formItem as HTMLElement, 'button', { name: "No" });
-        await userEvent.click(noButton);
+      const questionElement = screen.getByText(questionText);
+      const formItem = questionElement.closest('.bg-card\\/50');
+      if (!formItem) throw new Error(`Could not find form item for question: ${questionText}`);
+      
+      const noButton = getByRoleInElement(formItem as HTMLElement, 'button', { name: "No" });
+      await userEvent.click(noButton);
     }
     
     const nextButton = screen.getByRole('button', { name: /NEXT/i });
@@ -183,5 +186,109 @@ describe('HomePageClient - Form Step 2', () => {
 
     // Ensure no validation errors from step 2 are visible
     expect(screen.queryByText('Please select an option.')).not.toBeInTheDocument();
+  });
+});
+
+describe('HomePageClient - Form Step 3', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const fillStepOneAndTwo = async () => {
+    // Fill step 1
+    await userEvent.type(screen.getByPlaceholderText('First Name'), 'Jane');
+    await userEvent.type(screen.getByPlaceholderText('Last Name'), 'Doe');
+    await userEvent.type(screen.getByPlaceholderText('Valid Phone Number'), '5551234567');
+    await userEvent.type(screen.getByPlaceholderText('Email'), 'jane.doe@example.com');
+    await userEvent.type(screen.getByPlaceholderText('Birthdate'), '01/01/1970');
+    
+    const genderSelect = screen.getByRole('combobox', { name: /gender/i });
+    await userEvent.click(genderSelect);
+    const genderListbox = await screen.findByRole('listbox');
+    await userEvent.click(getByRoleInElement(genderListbox, 'option', { name: 'Female' }));
+    
+    await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
+    
+    // Fill step 2
+    await waitFor(() => {
+      expect(screen.getByText(/Is the policy owner different than the insured/i)).toBeInTheDocument();
+    });
+
+    const questions = [
+      'Is the policy owner different than the insured?',
+      'Have you ever been diagnosed or treated for HIV, AIDS, bipolar, schizophrenia, dementia, or any progressive neurological disorder?',
+      'Have you ever used oxygen or dialysis for any condition?',
+      'In the last 5 years, have you had cancer (non-skin), stroke, heart attack, insulin-treated diabetes, COPD, hepatitis, cirrhosis, drug/alcohol abuse, PAH, hereditary angioedema, or pending tests for any of these?',
+      'Have you used any nicotine products in the past 12 months?',
+      'Do you have any existing life or annuity policies with this or another company?',
+      'Do you have any other health issues?'
+    ];
+    for (const q of questions) {
+      const qEl = screen.getByText(q);
+      const formItem = qEl.closest('.bg-card\\/50');
+      if (!formItem) throw new Error(`Could not find form item for: ${q}`);
+      await userEvent.click(getByRoleInElement(formItem as HTMLElement, 'button', { name: 'No' }));
+    }
+    
+    await userEvent.click(screen.getByRole('button', { name: /NEXT/i }));
+  };
+
+  it('should display validation errors for empty required fields on step 3', async () => {
+    render(<TestWrapper uuid="test-uuid" />);
+    await fillStepOneAndTwo();
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Applicant's Primary Address")).toBeInTheDocument();
+    });
+
+    const nextButton = screen.getByRole('button', { name: /NEXT/i });
+    await userEvent.click(nextButton);
+    
+    expect(await screen.findByText('Address is required.')).toBeInTheDocument();
+  });
+  
+  it('should proceed to step 4 with valid data and call submitLead', async () => {
+    render(<TestWrapper uuid="test-uuid" />);
+    await fillStepOneAndTwo();
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Applicant's Primary Address")).toBeInTheDocument();
+    });
+
+    // Fill in step 3 form
+    await userEvent.type(screen.getByPlaceholderText("Applicant's Primary Address"), "123 Main St");
+    await userEvent.type(screen.getByPlaceholderText("City"), "Anytown");
+    await userEvent.type(screen.getByPlaceholderText("Zip Code"), "12345");
+    
+    const stateSelect = screen.getByRole('combobox', { name: /state/i });
+    await userEvent.click(stateSelect);
+    const stateListbox = await screen.findByRole('listbox');
+    await userEvent.click(getByRoleInElement(stateListbox, 'option', { name: 'California' }));
+    
+    await userEvent.type(screen.getByPlaceholderText("Beneficiary First Name"), "Ben");
+    await userEvent.type(screen.getByPlaceholderText("Beneficiary Last Name"), "Ficiary");
+
+    const relationSelect = screen.getByRole('combobox', { name: /relationship/i });
+    await userEvent.click(relationSelect);
+    const relationListbox = await screen.findByRole('listbox');
+    await userEvent.click(getByRoleInElement(relationListbox, 'option', { name: 'Spouse' }));
+
+    const coverageSelect = screen.getByRole('combobox', { name: /coverage/i });
+    await userEvent.click(coverageSelect);
+    const coverageListbox = await screen.findByRole('listbox');
+    await userEvent.click(getByRoleInElement(coverageListbox, 'option', { name: '$ 20,000' }));
+
+    const nextButton = screen.getByRole('button', { name: /NEXT/i });
+    await userEvent.click(nextButton);
+
+    await waitFor(() => {
+        expect(screen.getByPlaceholderText("Account Holder Name")).toBeInTheDocument();
+    });
+
+    // Check that submitLead was called
+    expect(submitLead).toHaveBeenCalledTimes(1);
+    
+    // Ensure no validation errors from step 3 are visible
+    expect(screen.queryByText('Address is required.')).not.toBeInTheDocument();
   });
 });
