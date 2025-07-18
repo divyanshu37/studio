@@ -54,7 +54,7 @@ export default function BeneficiaryForm() {
             <FormItem>
               <FormControl>
                 <Input
-                  placeholder="Secondary (Apartment or Mailbox)"
+                  placeholder="(Appt or Mailbox, Optional)"
                   autoComplete="address-line2"
                   {...field}
                   className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressApt && "border-destructive focus-visible:border-destructive animate-shake")}
