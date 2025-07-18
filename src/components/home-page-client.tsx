@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import Script from 'next/script';
+import { useLoadScript } from '@react-google-maps/api';
 
 import { 
   fullFormSchema, 
@@ -48,6 +50,8 @@ const stepFields: (keyof FormValues)[][] = [
   Object.keys(paymentFormSchema.shape) as (keyof PaymentFormValues)[],
 ];
 
+const libraries: "places"[] = ["places"];
+
 export default function HomePageClient({ uuid }: { uuid: string }) {
   const [step, setStep] = useState(1);
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
@@ -58,6 +62,11 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
+
+  const { isLoaded: isGoogleScriptLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || "",
+    libraries,
+  });
   
   const form = useForm<FormValues>({
     resolver: zodResolver(fullFormSchema),
@@ -299,6 +308,27 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
 
   const renderStep = () => {
+    if (!isGoogleScriptLoaded && step === 3) {
+      return (
+        <div className="flex items-center justify-center h-40">
+            <svg
+                className="animate-spin h-8 w-8 text-primary"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 100 100"
+            >
+                <path
+                d="M 50,10 A 40,40 0 1 1 10,50"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="10"
+                strokeLinecap="round"
+                />
+            </svg>
+        </div>
+      );
+    }
+
     switch (step) {
       case 1:
         return <InsuranceForm />;
@@ -379,7 +409,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                         backButton={step > 1}
                         isSubmit={step === 4}
                         actionLabel={step === 4 ? "SUBMIT" : "NEXT"}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || (!isGoogleScriptLoaded && step === 3)}
                         errorMessage={errorMessage}
                         />
                     </div>
