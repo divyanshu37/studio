@@ -47,6 +47,22 @@ export default function BeneficiaryForm() {
       
       <div className="space-y-4">
         <AddressAutocomplete />
+         <FormField
+          control={control}
+          name="addressApt"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input
+                  placeholder="Secondary (Apartment or Mailbox)"
+                  autoComplete="address-line2"
+                  {...field}
+                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressApt && "border-destructive focus-visible:border-destructive animate-shake")}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </div>
       
       {/* Hidden fields for validation, populated by AddressAutocomplete */}
@@ -54,7 +70,6 @@ export default function BeneficiaryForm() {
       <FormField control={control} name="addressCity" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
       <FormField control={control} name="addressState" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
       <FormField control={control} name="addressZip" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
-      <FormField control={control} name="addressApt" render={({ field }) => <FormItem><FormControl><Input type="hidden" {...field} /></FormControl></FormItem>} />
 
 
        <div className="space-y-4 pt-4">
