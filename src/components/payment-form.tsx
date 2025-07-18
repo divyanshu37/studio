@@ -36,14 +36,14 @@ export default function PaymentForm() {
   if (paymentChoice === 'choice') {
     return (
         <div className="w-full max-w-4xl flex flex-col items-center text-center">
-            <h2 className="text-xl font-semibold tracking-tight mb-8 max-w-lg">You're at the last step! Your Final Expense policy will be active momentarily. Please choose either Bank Info or Card below.</h2>
+            <h2 className="text-base text-foreground/80 mb-8 max-w-[55rem]">You're at the last step! Your Final Expense policy will be active momentarily. Please choose either Bank Info or Card below.</h2>
             <div className="w-full flex flex-col md:flex-row justify-center items-stretch gap-8">
                 {/* Bank Account Card */}
                 <div 
                     onClick={() => selectPaymentMethod('bank')}
                     className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
                 >
-                    <Landmark className="w-12 h-12 mb-4 text-primary" />
+                    <Landmark strokeWidth={1.5} className="w-12 h-12 mb-4 text-primary" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Bank Account</h3>
                 </div>
 
@@ -52,7 +52,7 @@ export default function PaymentForm() {
                     onClick={() => selectPaymentMethod('card')}
                     className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
                 >
-                    <CreditCard className="w-12 h-12 mb-4 text-primary" />
+                    <CreditCard strokeWidth={1.5} className="w-12 h-12 mb-4 text-primary" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Credit/Debit Card</h3>
                 </div>
             </div>

