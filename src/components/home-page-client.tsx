@@ -171,8 +171,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       }});
 
     const state = data.addressState;
-    if (state === 'CA') {
-      // For CA, go directly to Agent Handoff
+    if (state === 'CA' || state === 'NY') {
+      // For CA or NY, go directly to Agent Handoff
       logTraffic({ uuid, step: 9 });
       submitToSlack({
         step: 'Agent Handoff (Auto - Restricted State)',

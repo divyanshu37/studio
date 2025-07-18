@@ -1,8 +1,10 @@
 
 'use client';
 
+import { useState } from 'react';
 import type { BeneficiaryFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
+import { format } from "date-fns";
 import {
   FormControl,
   FormField,
@@ -10,6 +12,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { CalendarIcon } from 'lucide-react';
 import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
 import { usStates } from '@/lib/states';
 
@@ -26,6 +32,7 @@ const relationshipOptions = [
 
 export default function BeneficiaryForm() {
   const { control, formState: { errors } } = useFormContext<BeneficiaryFormValues>();
+  const [isCalendarOpen, setCalendarOpen] = useState(false);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
     field.onChange(formatDateInput(e.target.value));
@@ -80,7 +87,7 @@ export default function BeneficiaryForm() {
             name="addressState"
             render={({ field }) => (
               <FormItem>
-                <Select onValueChange={field.onChange} defaultValue={field.value} >
+                <Select onValueChange={field.onChange} defaultValue={field.value} autoComplete="address-level1">
                   <FormControl>
                     <SelectTrigger className={cn("h-auto py-4 bg-card shadow-xl text-base focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.addressState && "border-destructive focus-visible:border-destructive animate-shake")}>
                       <SelectValue placeholder="State" />
@@ -219,17 +226,44 @@ export default function BeneficiaryForm() {
           control={control}
           name="effectiveDate"
           render={({ field }) => (
-            <FormItem>
-                <FormControl className={cn(errors.effectiveDate && 'animate-shake')}>
-                <Input 
-                  type="text"
-                  placeholder="Policy Start Date (Default Today)"
-                  autoComplete="off"
-                  {...field}
-                  onChange={(e) => handleDateChange(e, field)}
-                  className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake")} 
-                />
-              </FormControl>
+            <FormItem className="flex flex-col">
+              <Popover open={isCalendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 justify-start text-left font-normal text-base",
+                        !field.value && "text-muted-foreground",
+                        errors.effectiveDate && "border-destructive focus-visible:border-destructive animate-shake"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value ? (
+                        format(field.value, "MM/dd/yyyy")
+                      ) : (
+                        <span>Policy Start Date (Default Today)</span>
+                      )}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value ? new Date(field.value) : undefined}
+                    onSelect={(date) => {
+                      field.onChange(date ? format(date, "MM/dd/yyyy") : "");
+                      setCalendarOpen(false);
+                    }}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </FormItem>
           )}
         />
