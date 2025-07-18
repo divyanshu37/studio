@@ -125,28 +125,6 @@ export default function PaymentForm() {
                  <CardPaymentForm />
             </div>
         )}
-
-        <div className="pt-8">
-             <h3 className="text-xl font-semibold text-foreground mb-4">Final Verification</h3>
-            <FormField
-            control={control}
-            name="lastFour"
-            render={({ field }) => (
-                <FormItem>
-                <FormControl>
-                    <Input 
-                    placeholder="Last 4 Digits of SSN" 
-                    autoComplete="off"
-                    {...field} 
-                    onChange={(e) => handleSsnChange(e, field)}
-                    className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.lastFour && "border-destructive focus-visible:border-destructive animate-shake")} 
-                    />
-                </FormControl>
-                </FormItem>
-            )}
-            />
-        </div>
     </div>
   );
 }
-
