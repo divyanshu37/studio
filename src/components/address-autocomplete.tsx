@@ -1,120 +1,77 @@
 
 'use client';
 
-import usePlacesAutocomplete, { getGeocode, getZipCode, getLatLng } from 'use-places-autocomplete';
+import { useState, useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useEffect } from 'react';
+import { getPlaceAutocomplete, getPlaceDetails } from '@/app/actions';
+
+interface Suggestion {
+  description: string;
+  place_id: string;
+}
 
 export default function AddressAutocomplete() {
-  const {
-    ready,
-    value,
-    suggestions: { status, data },
-    setValue,
-    clearSuggestions,
-  } = usePlacesAutocomplete({
-    requestOptions: {
-      componentRestrictions: { country: 'us' },
-    },
-    debounce: 300,
-  });
-
+  const [inputValue, setInputValue] = useState('');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const { setValue: setFormValue, trigger, formState: { errors } } = useFormContext();
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Pre-fill the input with any existing address data
-  useEffect(() => {
-    if (!value) {
-        // You can pre-fill it here if you have initial data, e.g.
-        // setValue(getValues('addressStreet'));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
     }
-  }, [setValue]);
-
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    
+    if (value.length > 2) {
+        setIsSearching(true);
+        searchTimeout.current = setTimeout(async () => {
+            try {
+                const results = await getPlaceAutocomplete(value);
+                setSuggestions(results);
+            } catch (error) {
+                console.error("Error fetching place suggestions:", error);
+                setSuggestions([]);
+            } finally {
+                setIsSearching(false);
+            }
+        }, 300); // Debounce for 300ms
+    } else {
+        setSuggestions([]);
+    }
   };
 
-  const handleSelect = ({ description, place_id }: { description: string, place_id: string }) => async () => {
-    setValue(description, false);
-    clearSuggestions();
+  const handleSelectSuggestion = async (placeId: string, description: string) => {
+    setInputValue(description);
+    setSuggestions([]);
 
     try {
-      const results = await getGeocode({ placeId: place_id });
-      const { lat, lng } = await getLatLng(results[0]);
-      
-      let streetNumber = '';
-      let route = '';
-      let city = '';
-      let state = '';
-      let zipCode = '';
-      let aptNumber = '';
-
-      // Extract address components
-      for (const component of results[0].address_components) {
-        const componentType = component.types[0];
-        switch (componentType) {
-          case 'street_number':
-            streetNumber = component.long_name;
-            break;
-          case 'route':
-            route = component.short_name;
-            break;
-          case 'locality':
-            city = component.long_name;
-            break;
-          case 'administrative_area_level_1':
-            state = component.short_name;
-            break;
-          case 'postal_code':
-            zipCode = component.long_name;
-            break;
-          case 'subpremise':
-            aptNumber = component.long_name;
-            break;
-        }
+      const details = await getPlaceDetails(placeId);
+      if (details) {
+        setFormValue('addressStreet', details.street, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setFormValue('addressCity', details.city, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setFormValue('addressState', details.state, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setFormValue('addressZip', details.zip, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        setFormValue('addressApt', details.apt, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+        
+        trigger(['addressStreet', 'addressCity', 'addressState', 'addressZip']);
       }
-      
-      // Update form values
-      setFormValue('addressStreet', `${streetNumber} ${route}`, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      setFormValue('addressCity', city, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      setFormValue('addressState', state, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      setFormValue('addressZip', zipCode, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      setFormValue('addressApt', aptNumber, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-      
-      // Manually trigger validation for all address fields after setting them
-      trigger(['addressStreet', 'addressCity', 'addressState', 'addressZip']);
-
     } catch (error) {
-      console.log('😱 Error: ', error);
+      console.error("Error fetching place details:", error);
     }
   };
 
-  const renderSuggestions = () =>
-    data.map((suggestion) => {
-      const {
-        place_id,
-        structured_formatting: { main_text, secondary_text },
-      } = suggestion;
-
-      return (
-        <li
-          key={place_id}
-          onClick={handleSelect(suggestion)}
-          className="p-2 hover:bg-muted cursor-pointer rounded-md"
-        >
-          <strong>{main_text}</strong> <small>{secondary_text}</small>
-        </li>
-      );
-    });
-
   return (
-    <div className="relative w-full">
+    <div className="relative w-full" onBlur={() => setTimeout(() => setIsFocused(false), 100)}>
       <Input
-        value={value}
-        onChange={handleInput}
-        disabled={!ready}
+        value={inputValue}
+        onChange={handleInputChange}
+        onFocus={() => setIsFocused(true)}
         placeholder="Applicant's Primary Address"
         autoComplete="off"
         className={cn(
@@ -122,9 +79,18 @@ export default function AddressAutocomplete() {
           (errors.addressStreet || errors.addressCity || errors.addressState || errors.addressZip) && "border-destructive focus-visible:border-destructive animate-shake"
         )}
       />
-      {status === 'OK' && (
+      {isFocused && (isSearching || suggestions.length > 0) && (
         <ul className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-y-auto text-left">
-          {renderSuggestions()}
+          {isSearching && !suggestions.length && <li className="p-2 text-muted-foreground">Searching...</li>}
+          {suggestions.map((suggestion) => (
+            <li
+              key={suggestion.place_id}
+              onMouseDown={() => handleSelectSuggestion(suggestion.place_id, suggestion.description)}
+              className="p-2 hover:bg-muted cursor-pointer rounded-md"
+            >
+              {suggestion.description}
+            </li>
+          ))}
         </ul>
       )}
     </div>

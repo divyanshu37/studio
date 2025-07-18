@@ -6,7 +6,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import Script from 'next/script';
 
 import { 
   fullFormSchema, 
@@ -54,7 +53,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isScriptLoaded, setScriptLoaded] = useState(false);
   const [pin, setPin] = useState('');
   const [phoneLastFour, setPhoneLastFour] = useState('');
   const searchParams = useSearchParams();
@@ -307,7 +305,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       case 2:
         return <AdditionalQuestionsForm />;
       case 3:
-        if (!isScriptLoaded) return <div className="h-10 animate-pulse bg-muted-foreground/20 rounded-md w-full max-w-2xl" />;
         return <BeneficiaryForm />;
       case 4:
         return <PaymentForm />;
@@ -347,11 +344,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
-      <Script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places&loading=async`}
-          onLoad={() => setScriptLoaded(true)}
-          strategy="afterInteractive"
-      />
       <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
         <Logo />
       </header>
@@ -387,7 +379,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                         backButton={step > 1}
                         isSubmit={step === 4}
                         actionLabel={step === 4 ? "SUBMIT" : "NEXT"}
-                        disabled={isSubmitting || (step === 3 && !isScriptLoaded)}
+                        disabled={isSubmitting}
                         errorMessage={errorMessage}
                         />
                     </div>
