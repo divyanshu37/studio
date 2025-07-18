@@ -92,9 +92,15 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       beneficiaryDob: "",
       beneficiaryRelation: "",
       faceAmount: "",
+      paymentMethod: 'bank',
       paymentAccountHolderName: "",
       paymentAccountNumber: "",
       paymentRoutingNumber: "",
+      cardholderName: '',
+      cardNumber: '',
+      cardExpiry: '',
+      cardCvc: '',
+      billingZip: '',
     },
   });
 
@@ -355,6 +361,22 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   const getErrorMessage = () => {
     if (step < 1 || step > stepFields.length) return null;
+    
+    // For step 4 (payment), the errors depend on the selected payment method.
+    if (step === 4) {
+        const paymentMethod = form.getValues('paymentMethod');
+        const relevantFields = paymentMethod === 'bank' 
+            ? ['paymentAccountHolderName', 'paymentAccountNumber', 'paymentRoutingNumber', 'lastFour']
+            : ['cardholderName', 'cardNumber', 'cardExpiry', 'cardCvc', 'billingZip', 'lastFour'];
+        
+        for (const field of relevantFields) {
+            if (errors[field as keyof FormValues]) {
+                return errors[field as keyof FormValues]?.message as string;
+            }
+        }
+        return null;
+    }
+
     const currentStepFields = stepFields[step - 1];
     if (!currentStepFields) return null;
 

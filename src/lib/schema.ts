@@ -69,12 +69,63 @@ export const beneficiaryFormSchema = z.object({
 });
 export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
-export const paymentFormSchema = z.object({
-  paymentAccountHolderName: z.string().min(1, { message: "Account holder name is required." }),
-  paymentAccountNumber: z.string().min(1, { message: "Account number is required." }),
-  paymentRoutingNumber: z.string().length(9, { message: "A valid 9-digit routing number is required." }),
-  lastFour: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
+export const bankPaymentSchema = z.object({
+    paymentAccountHolderName: z.string(),
+    paymentAccountNumber: z.string(),
+    paymentRoutingNumber: z.string().length(9),
 });
+
+export const cardPaymentSchema = z.object({
+    cardholderName: z.string(),
+    cardNumber: z.string().length(16),
+    cardExpiry: z.string().regex(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/),
+    cardCvc: z.string().length(3),
+    billingZip: z.string().length(5),
+});
+
+export const paymentFormSchema = z.object({
+  paymentMethod: z.enum(['bank', 'card']),
+  lastFour: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
+  // Bank fields (optional)
+  paymentAccountHolderName: z.string().optional(),
+  paymentAccountNumber: z.string().optional(),
+  paymentRoutingNumber: z.string().optional(),
+  // Card fields (optional)
+  cardholderName: z.string().optional(),
+  cardNumber: z.string().optional(),
+  cardExpiry: z.string().optional(),
+  cardCvc: z.string().optional(),
+  billingZip: z.string().optional(),
+}).superRefine((data, ctx) => {
+    if (data.paymentMethod === 'bank') {
+        if (!data.paymentAccountHolderName || data.paymentAccountHolderName.trim() === '') {
+            ctx.addIssue({ code: 'custom', path: ['paymentAccountHolderName'], message: 'Account holder name is required.' });
+        }
+        if (!data.paymentAccountNumber || data.paymentAccountNumber.trim() === '') {
+            ctx.addIssue({ code: 'custom', path: ['paymentAccountNumber'], message: 'Account number is required.' });
+        }
+        if (!data.paymentRoutingNumber || data.paymentRoutingNumber.length !== 9) {
+            ctx.addIssue({ code: 'custom', path: ['paymentRoutingNumber'], message: 'A valid 9-digit routing number is required.' });
+        }
+    } else if (data.paymentMethod === 'card') {
+        if (!data.cardholderName || data.cardholderName.trim() === '') {
+            ctx.addIssue({ code: 'custom', path: ['cardholderName'], message: 'Cardholder name is required.' });
+        }
+        if (!data.cardNumber || !/^\d{16}$/.test(data.cardNumber)) {
+            ctx.addIssue({ code: 'custom', path: ['cardNumber'], message: 'A valid 16-digit card number is required.' });
+        }
+        if (!data.cardExpiry || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(data.cardExpiry)) {
+            ctx.addIssue({ code: 'custom', path: ['cardExpiry'], message: 'Expiry must be in MM/YY format.' });
+        }
+        if (!data.cardCvc || !/^\d{3,4}$/.test(data.cardCvc)) {
+            ctx.addIssue({ code: 'custom', path: ['cardCvc'], message: 'A valid CVC is required.' });
+        }
+        if (!data.billingZip || !/^\d{5}$/.test(data.billingZip)) {
+            ctx.addIssue({ code: 'custom', path: ['billingZip'], message: 'A valid 5-digit ZIP code is required.' });
+        }
+    }
+});
+
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
 export const fullFormSchema = insuranceFormSchema
