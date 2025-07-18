@@ -6,21 +6,14 @@ import type { PaymentFormValues } from '@/lib/schema';
 import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { cn, formatLastFour } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Landmark, ArrowLeft } from 'lucide-react';
 import CardPaymentForm from './card-payment-form';
-import { ApplePayLogo } from './apple-pay-logo';
-import { Separator } from './ui/separator';
-
 
 export default function PaymentForm() {
   const { control, formState: { errors }, setValue, trigger } = useFormContext<PaymentFormValues>();
   const [paymentChoice, setPaymentChoice] = useState<'choice' | 'bank' | 'card'>('choice');
-
-  const handleSsnChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
-    field.onChange(formatLastFour(e.target.value));
-  };
 
   const selectPaymentMethod = (method: 'bank' | 'card') => {
     setValue('paymentMethod', method, { shouldValidate: true });
@@ -43,7 +36,7 @@ export default function PaymentForm() {
   if (paymentChoice === 'choice') {
     return (
         <div className="w-full max-w-4xl flex flex-col items-center text-center">
-            <h2 className="text-3xl font-bold tracking-tight mb-8">How would you like to pay?</h2>
+            <h2 className="text-xl font-semibold tracking-tight mb-8 max-w-lg">You're at the last step! Your Final Expense policy will be active momentarily. Please choose either Bank Info or Card below.</h2>
             <div className="w-full flex flex-col md:flex-row justify-center items-stretch gap-8">
                 {/* Bank Account Card */}
                 <div 
@@ -61,10 +54,6 @@ export default function PaymentForm() {
                 >
                     <CreditCard className="w-12 h-12 mb-4 text-primary" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Credit/Debit Card</h3>
-                     <div className="flex items-center gap-2 mt-4 opacity-75">
-                       <ApplePayLogo />
-                       <span className="text-xs font-semibold">APPLE PAY AVAILABLE</span>
-                    </div>
                 </div>
             </div>
         </div>
