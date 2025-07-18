@@ -169,7 +169,22 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         referenceId: uuid,
         ...data
       }});
-    changeStep(5);
+
+    const state = data.addressState;
+    if (state === 'CA') {
+      // For CA, go directly to Agent Handoff
+      logTraffic({ uuid, step: 9 });
+      submitToSlack({
+        step: 'Agent Handoff (Auto - Restricted State)',
+        formData: {
+          referenceId: uuid,
+          ...form.getValues(),
+        }});
+      changeStep(9);
+    } else {
+      // For all other states, go to the Thank You page to choose
+      changeStep(5);
+    }
   };
   
   const handleSelfEnrollSubmit = async (data: FormValues) => {
