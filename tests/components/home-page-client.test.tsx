@@ -16,19 +16,21 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-const logTrafficWithLocation = vi.fn().mockResolvedValue({ success: true });
+// Declare mocks that will be used in the factories
+let logTrafficWithLocation: any;
+let submitLead: any;
+let submitToSlack: any;
+
 vi.mock('@/ai/flows/log-traffic-flow', () => ({
-  logTrafficWithLocation,
+  logTrafficWithLocation: (...args: any[]) => logTrafficWithLocation(...args),
 }));
 
-
-const submitLead = vi.fn().mockResolvedValue({ success: true });
 vi.mock('@/ai/flows/submit-lead-flow', () => ({
-  submitLead,
+  submitLead: (...args: any[]) => submitLead(...args),
 }));
 
 vi.mock('@/ai/flows/submit-slack', () => ({
-    submitToSlack: vi.fn().mockResolvedValue({ success: true }),
+    submitToSlack: (...args: any[]) => submitToSlack(...args),
 }));
 
 vi.mock('@/hooks/use-socket', () => ({
@@ -48,7 +50,10 @@ const TestWrapper = ({ uuid }: { uuid: string }) => (
 describe('HomePageClient - Form Step 1', () => {
     
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Reset mocks before each test
+    logTrafficWithLocation = vi.fn().mockResolvedValue({ success: true });
+    submitLead = vi.fn().mockResolvedValue({ success: true });
+    submitToSlack = vi.fn().mockResolvedValue({ success: true });
   });
 
   it('should display validation errors for empty required fields on step 1', async () => {
@@ -119,7 +124,10 @@ describe('HomePageClient - Form Step 1', () => {
 
 describe('HomePageClient - Form Step 2', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Reset mocks before each test
+    logTrafficWithLocation = vi.fn().mockResolvedValue({ success: true });
+    submitLead = vi.fn().mockResolvedValue({ success: true });
+    submitToSlack = vi.fn().mockResolvedValue({ success: true });
   });
 
   const fillStepOne = async () => {
@@ -191,7 +199,10 @@ describe('HomePageClient - Form Step 2', () => {
 
 describe('HomePageClient - Form Step 3', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Reset mocks before each test
+    logTrafficWithLocation = vi.fn().mockResolvedValue({ success: true });
+    submitLead = vi.fn().mockResolvedValue({ success: true });
+    submitToSlack = vi.fn().mockResolvedValue({ success: true });
   });
 
   const fillStepOneAndTwo = async () => {
