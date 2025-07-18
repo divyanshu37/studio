@@ -22,7 +22,7 @@ import {
 import { submitApplication } from '@/ai/flows/submit-application-flow';
 import { submitLead } from '@/ai/flows/submit-lead-flow';
 import { submitApplicationLead } from '@/ai/flows/submit-application-lead-flow';
-import { logTrafficWithLocation } from '@/ai/flows/log-traffic-flow';
+import { logTraffic } from '@/ai/flows/log-traffic-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useSocket } from '@/hooks/use-socket';
 
@@ -100,7 +100,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const changeStep = useCallback((newStep: number) => {
     if (newStep === step) return;
 
-    logTrafficWithLocation({ uuid, step: newStep });
+    logTraffic({ uuid, step: newStep });
 
     setIsAnimatingOut(true);
     setAnimationClass('animate-fade-out-down');
@@ -113,7 +113,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   }, [step, uuid]);
   
   useEffect(() => {
-    logTrafficWithLocation({ uuid, step: 1 });
+    // Log the initial visit as step 1
+    logTraffic({ uuid, step: 1 });
   }, [uuid]);
 
   useEffect(() => {
@@ -121,10 +122,10 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
       if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
-        changeStep(stepNumber);
+        setStep(stepNumber); // Directly set step without animation on initial load
       }
     }
-  }, [searchParams, changeStep]);
+  }, []);
   
   const handleNext = async () => {
     const fields = stepFields[step - 1];

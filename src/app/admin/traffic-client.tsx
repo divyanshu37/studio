@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowUpDown, MapPin } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, differenceInSeconds, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 type SortKey = keyof TrafficData;
@@ -31,6 +31,22 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
   const [trafficData, setTrafficData] = useState<TrafficData[]>(initialData);
   const [isLoading, setIsLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'timestamp', direction: 'descending'});
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      setIsLoading(true);
+      try {
+        const newData = await getTraffic();
+        setTrafficData(newData);
+      } catch (error) {
+        console.error("Failed to fetch traffic data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const sortedData = useMemo(() => {
     let sortableItems = [...trafficData];
@@ -77,8 +93,8 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
   };
 
 
-  if (isLoading) {
-    return <p>Refreshing traffic data...</p>;
+  if (isLoading && trafficData.length === 0) {
+    return <p>Loading traffic data...</p>;
   }
 
   return (
@@ -88,7 +104,7 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
           <TableRow>
             <TableHead>
               <Button variant="ghost" onClick={() => requestSort('uuid')}>
-                UUID
+                User
                 {getSortIcon('uuid')}
               </Button>
             </TableHead>
@@ -110,9 +126,18 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedData.map((item) => (
-            <TableRow key={item.uuid}>
-              <TableCell className="font-mono text-xs p-2">{item.uuid}</TableCell>
+          {sortedData.map((item) => {
+            const isRecent = differenceInSeconds(new Date(), parseISO(item.timestamp)) < 10;
+            return (
+            <TableRow key={item.uuid} className={cn(isRecent && "bg-green-500/10")}>
+              <TableCell className="font-mono text-xs p-2">
+                 <div className="flex items-center gap-3">
+                    {isRecent && (
+                        <Badge variant="success" className="bg-green-600 text-white animate-pulse">Now</Badge>
+                    )}
+                    <span className="truncate">{item.uuid}</span>
+                </div>
+              </TableCell>
               <TableCell className="p-2">
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col w-64">
@@ -143,14 +168,14 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
                 {item.city || item.country ? (
                     <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{item.city}, {item.country}</span>
+                        <span>{item.city}{item.city && item.country && ", "}{item.country}</span>
                     </div>
                 ) : (
                     <span className="text-muted-foreground">Unknown</span>
                 )}
               </TableCell>
             </TableRow>
-          ))}
+          )})}
         </TableBody>
       </Table>
     </div>
