@@ -41,10 +41,14 @@ export type SubmitApplicationOutput = z.infer<typeof SubmitApplicationOutputSche
 
 // 3. Public-facing function remains the same.
 export async function submitApplication(formData: SubmitApplicationInput): Promise<SubmitApplicationOutput> {
-  if (!formData) {
+  // We can do an initial validation here before calling the flow.
+  const validation = fullFormSchema.extend({referenceId: z.string().uuid()}).safeParse(formData);
+  if (!validation.success) {
+    // This provides detailed validation errors in the server logs if the data is malformed.
+    console.error("Submit Application validation failed:", validation.error.flatten());
     return { success: false, message: 'Invalid application data provided.' };
   }
-  return submitApplicationFlow(formData);
+  return submitApplicationFlow(validation.data);
 }
 
 // 4. The flow itself is now updated to send the correct flat structure.

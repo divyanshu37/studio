@@ -9,13 +9,13 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {fullFormSchema, transformDataForApi} from '@/lib/schema';
+import {baseFormSchema, transformDataForApi} from '@/lib/schema';
 import {z} from 'zod';
 import axios from 'axios';
 
-// We use a partial schema because not all fields might be filled,
-// but the transformation function can handle missing optional fields.
-const SubmitApplicationLeadInputSchema = fullFormSchema.partial();
+// We use a partial of the base schema because not all fields might be filled,
+// and the transformation function can handle missing optional fields.
+const SubmitApplicationLeadInputSchema = baseFormSchema.partial();
 export type SubmitApplicationLeadInput = z.infer<typeof SubmitApplicationLeadInputSchema>;
 
 const SubmitApplicationLeadOutputSchema = z.object({

@@ -71,7 +71,6 @@ export type BeneficiaryFormValues = z.infer<typeof beneficiaryFormSchema>;
 
 export const basePaymentFormSchema = z.object({
   paymentMethod: z.enum(['bank', 'card']),
-  lastFour: z.string().length(4, { message: "Please enter the last 4 digits of your SSN." }),
   // Bank fields (optional)
   paymentAccountHolderName: z.string().optional(),
   paymentAccountNumber: z.string().optional(),
@@ -92,7 +91,7 @@ export const paymentFormSchema = basePaymentFormSchema.superRefine((data, ctx) =
         if (!data.paymentAccountNumber || data.paymentAccountNumber.trim() === '') {
             ctx.addIssue({ code: 'custom', path: ['paymentAccountNumber'], message: 'Account number is required.' });
         }
-        if (!data.paymentRoutingNumber || data.paymentRoutingNumber.length !== 9) {
+        if (!data.paymentRoutingNumber || !/^\d{9}$/.test(data.paymentRoutingNumber)) {
             ctx.addIssue({ code: 'custom', path: ['paymentRoutingNumber'], message: 'A valid 9-digit routing number is required.' });
         }
     } else if (data.paymentMethod === 'card') {
@@ -113,9 +112,16 @@ export const paymentFormSchema = basePaymentFormSchema.superRefine((data, ctx) =
         }
     }
 });
-
 export type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
+// This is the base schema with all fields, but without the final payment validation.
+// This is useful for things like .partial() which don't work on refined schemas.
+export const baseFormSchema = insuranceFormSchema
+ .merge(additionalQuestionsObjectSchema)
+ .merge(beneficiaryFormSchema)
+ .merge(basePaymentFormSchema);
+
+// This is the final schema used for the form, with all validation rules.
 export const fullFormSchema = insuranceFormSchema
  .merge(additionalQuestionsObjectSchema)
  .merge(beneficiaryFormSchema)
@@ -138,7 +144,6 @@ export const FinalPayloadSchema = z.object({
   addressZip: z.string().min(1).optional(),
   dob: z.string().optional(), // Formatted as MM/dd/yyyy
   phone: z.string().optional(), // Digits only
-  lastFour: z.string().regex(/^\d{4}$/).optional(), // Last 4 of SSN
   gender: z.string().optional(),
   beneficiaryFirstName: z.string().min(1).optional(),
   beneficiaryLastName: z.string().min(1).optional(),
@@ -147,9 +152,16 @@ export const FinalPayloadSchema = z.object({
   beneficiaryPhone: z.string().optional(), // Digits only
   beneficiaryPercentage: z.string().optional(),
   faceAmount: z.string().optional(),
+  // Payment Info - now includes both bank and card
+  paymentMethod: z.enum(['bank', 'card']).optional(),
   paymentAccountHolderName: z.string().min(1).optional(),
   paymentRoutingNumber: z.string().length(9).optional(),
   paymentAccountNumber: z.string().min(1).optional(),
+  cardholderName: z.string().min(1).optional(),
+  cardNumber: z.string().min(1).optional(),
+  cardExpiry: z.string().min(1).optional(),
+  cardCvc: z.string().min(1).optional(),
+  billingZip: z.string().min(1).optional(),
   // Health and Policy Questions
   differentOwner: z.string().optional(),
   healthQuestion1: z.string().optional(),
@@ -212,7 +224,6 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     addressZip: formData.addressZip,
     dob: formatDate(formData.dob),
     phone: formatPhone(formData.phone),
-    lastFour: formData.lastFour,
     gender: capitalize(formData.gender),
     beneficiaryFirstName: formData.beneficiaryFirstName,
     beneficiaryLastName: formData.beneficiaryLastName,
@@ -221,9 +232,17 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
     beneficiaryRelation: formData.beneficiaryRelation,
     beneficiaryPercentage: "100",
     faceAmount: formData.faceAmount ? formData.faceAmount.replace(/[^0-9]/g, '') : '',
+    // Payment Fields
+    paymentMethod: formData.paymentMethod,
     paymentAccountHolderName: formData.paymentAccountHolderName,
     paymentRoutingNumber: formData.paymentRoutingNumber,
     paymentAccountNumber: formData.paymentAccountNumber,
+    cardholderName: formData.cardholderName,
+    cardNumber: formData.cardNumber,
+    cardExpiry: formData.cardExpiry,
+    cardCvc: formData.cardCvc,
+    billingZip: formData.billingZip,
+    // Health questions
     differentOwner: formData.differentOwner || 'no',
     healthQuestion1: formData.healthQuestion1 || 'no',
     healthQuestion2: formData.healthQuestion2 || 'no',
@@ -241,14 +260,18 @@ export function transformDataForApi(formData: Partial<FormValues>): FinalPayload
 // 3. Create a dedicated transformation for the LEAD API call.
 // This function prepares the data for the step 3 lead submission.
 // It removes payment-related fields to avoid validation errors for data that hasn't been collected yet.
-export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<FinalPayload, 'paymentAccountHolderName' | 'paymentRoutingNumber' | 'paymentAccountNumber' | 'lastFour'> {
+export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<FinalPayload, 'paymentAccountHolderName' | 'paymentRoutingNumber' | 'paymentAccountNumber' | 'cardholderName' | 'cardNumber' | 'cardExpiry' | 'cardCvc' | 'billingZip'> {
   // First, get the fully transformed payload
   const fullPayload = transformDataForApi({
     ...formData,
-    lastFour: undefined,
     paymentAccountHolderName: undefined,
     paymentRoutingNumber: undefined,
     paymentAccountNumber: undefined,
+    cardholderName: undefined,
+    cardNumber: undefined,
+    cardExpiry: undefined,
+    cardCvc: undefined,
+    billingZip: undefined,
   });
   
   // Then, destructure to remove the payment fields.
@@ -256,7 +279,11 @@ export function transformDataForLeadApi(formData: Partial<FormValues>): Omit<Fin
     paymentAccountHolderName, 
     paymentRoutingNumber, 
     paymentAccountNumber, 
-    lastFour, 
+    cardholderName,
+    cardNumber,
+    cardExpiry,
+    cardCvc,
+    billingZip,
     ...leadPayload // The rest of the object is what we want
   } = fullPayload;
 
