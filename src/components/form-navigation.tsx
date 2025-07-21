@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, XCircle } from 'lucide-react';
+import { ArrowRight, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FormNavigationProps {

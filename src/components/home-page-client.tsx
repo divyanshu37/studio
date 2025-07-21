@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
+import { useForm, FormProvider, FieldErrors, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -14,6 +14,7 @@ import {
   additionalQuestionsObjectSchema,
   beneficiaryFormSchema, 
   basePaymentFormSchema,
+  paymentFormSchema,
   type FormValues,
   type InsuranceFormValues,
   type AdditionalQuestionsFormValues,
@@ -47,6 +48,29 @@ const stepFields: (keyof FormValues)[][] = [
   Object.keys(beneficiaryFormSchema.shape) as (keyof BeneficiaryFormValues)[],
   Object.keys(basePaymentFormSchema.shape) as (keyof PaymentFormValues)[],
 ];
+
+const PaymentAutoSubmitter = ({ onValid }: { onValid: () => void }) => {
+  const { control, formState: { errors } } = useForm<FormValues>();
+  const paymentMethod = useWatch({ control: useFormContext().control, name: 'paymentMethod' });
+  const formValues = useWatch({ control: useFormContext().control });
+
+  useEffect(() => {
+    const checkValidity = () => {
+      const result = paymentFormSchema.safeParse(formValues);
+      if (result.success) {
+        onValid();
+      }
+    };
+
+    // We only want to auto-submit after a method has been chosen and fields have likely been filled.
+    if (paymentMethod) {
+       const timer = setTimeout(checkValidity, 500); // Small debounce
+       return () => clearTimeout(timer);
+    }
+  }, [formValues, paymentMethod, onValid]);
+
+  return null;
+};
 
 export default function HomePageClient({ uuid }: { uuid: string }) {
   const [step, setStep] = useState(1);
@@ -155,11 +179,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         }});
     }
 
-    if (step === 4) {
-      form.handleSubmit(processForm)();
-    } else {
-      changeStep(step + 1);
-    }
+    changeStep(step + 1);
   };
 
   const handleBack = () => {
@@ -167,6 +187,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
   
   const processForm = async (data: FormValues) => {
+    setIsSubmitting(true);
     // This is the integration point for APPLICATION_LEAD_URL
     // We don't await this or handle errors in the UI, it's a "fire-and-forget" call
     submitApplicationLead(data);
@@ -190,11 +211,12 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       changeStep(9);
     } else {
       // For all other states, go to the Self-Enrollment flow
-      form.handleSubmit(handleSelfEnrollSubmit, handleSelfEnrollError)();
+      handleSelfEnrollSubmit(data);
     }
   };
   
   const handleSelfEnrollSubmit = async (data: FormValues) => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
     try {
       submitToSlack({
@@ -348,7 +370,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
 
   const showHeader = step <= 4; // Header shown on steps 1-4
-  const showNavigation = step >= 1 && step <= 4;
+  const showNavigation = step >= 1 && step <= 3; // Only show nav for steps 1-3
   const isFinalStep = step >= 5; // Steps 5 and beyond have their own UI and no main nav
 
   const getErrorMessage = () => {
@@ -423,6 +445,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             <div className="w-full flex justify-center">
               <FormProvider {...form}>
                 <form onSubmit={form.handleSubmit(processForm)} className={cn("w-full flex flex-col items-center", animationClass)}>
+                  {step === 4 && <PaymentAutoSubmitter onValid={() => form.handleSubmit(processForm, handleSelfEnrollError)()} />}
                   {renderStep()}
 
                   {showNavigation && (
@@ -431,8 +454,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                         onBack={handleBack}
                         onNext={handleNext}
                         backButton={step > 1}
-                        isSubmit={step === 4}
-                        actionLabel={step === 4 ? "SUBMIT" : "NEXT"}
+                        isSubmit={false}
+                        actionLabel={"NEXT"}
                         disabled={isSubmitting || (step === 3 && !isScriptLoaded)}
                         errorMessage={errorMessage}
                         />

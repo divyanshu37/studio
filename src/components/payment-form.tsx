@@ -8,7 +8,7 @@ import { FormControl, FormField, FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Landmark, ArrowLeft } from 'lucide-react';
+import { CreditCard, Landmark } from 'lucide-react';
 import CardPaymentForm from './card-payment-form';
 import { Separator } from './ui/separator';
 
@@ -17,7 +17,7 @@ export default function PaymentForm() {
   const [paymentChoice, setPaymentChoice] = useState<'choice' | 'bank' | 'card'>('choice');
 
   const selectPaymentMethod = (method: 'bank' | 'card') => {
-    setValue('paymentMethod', method, { shouldValidate: true });
+    setValue('paymentMethod', method, { shouldValidate: true, shouldDirty: true });
     setPaymentChoice(method);
     // Clear fields from the other method to prevent validation errors on invisible fields
     if (method === 'bank') {
@@ -65,11 +65,6 @@ export default function PaymentForm() {
 
   return (
     <div className="w-full max-w-2xl text-left">
-        <Button variant="ghost" onClick={() => setPaymentChoice('choice')} className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Payment Options
-        </Button>
-
         {paymentChoice === 'bank' && (
              <div className="space-y-4 animate-fade-in-up">
                 <h3 className="text-xl font-semibold text-foreground mb-4">Bank Account Details</h3>
