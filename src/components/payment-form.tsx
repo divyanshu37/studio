@@ -46,15 +46,17 @@ export default function PaymentForm() {
                 >
                     <Landmark strokeWidth={2} className="w-12 h-12 mb-4 text-primary" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Bank Account</h3>
+                    <Separator className="bg-primary/50 my-2 w-full" />
                 </div>
 
                 {/* Credit/Debit Card */}
                 <div 
                     onClick={() => selectPaymentMethod('card')}
-                    className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
+                     className="w-full md:w-1/2 p-8 bg-primary text-primary-foreground rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer border-2 border-white"
                 >
-                    <CreditCard strokeWidth={2} className="w-12 h-12 mb-4 text-primary" />
+                    <CreditCard strokeWidth={2} className="w-12 h-12 mb-4 text-primary-foreground" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Credit/Debit Card</h3>
+                     <Separator className="bg-primary-foreground/50 my-2 w-full" />
                 </div>
             </div>
         </div>
