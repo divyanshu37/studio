@@ -28,10 +28,10 @@ async function getStats(trafficData: TrafficData[]): Promise<MonthlyStats> {
         const timestamp = parseISO(item.timestamp);
         if (isThisMonth(timestamp)) {
             uniqueUuidsThisMonth.add(item.uuid);
-            if (item.step === 7) { // Updated step for self-enroll completion
+            if (item.step === 7) { // Corrected step for self-enroll completion
                 selfEnrolledThisMonthUuids.add(item.uuid);
             }
-            if (item.step === 8) { // Updated step for agent handoff
+            if (item.step === 8) { // Corrected step for agent handoff
                 agentHandoffThisMonthUuids.add(item.uuid);
             }
         }
