@@ -42,7 +42,7 @@ export default function PaymentForm() {
                 {/* Bank Account Card */}
                 <div 
                     onClick={() => selectPaymentMethod('bank')}
-                    className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
+                    className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
                 >
                     <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">Bank Account</h2>
                     <Separator className="bg-primary/50 my-2 w-full" />
@@ -52,7 +52,7 @@ export default function PaymentForm() {
                 {/* Credit/Debit Card */}
                 <div 
                     onClick={() => selectPaymentMethod('card')}
-                     className="w-full md:w-1/2 p-8 bg-primary text-primary-foreground rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer border-2 border-white"
+                     className="w-full md:w-1/2 p-8 bg-primary text-primary-foreground rounded-lg shadow-xl flex flex-col items-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer border-2 border-white"
                 >
                     <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">Credit/Debit Card</h2>
                      <Separator className="bg-primary-foreground/50 my-2 w-full" />

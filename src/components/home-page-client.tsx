@@ -114,7 +114,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       beneficiaryDob: "",
       beneficiaryRelation: "",
       faceAmount: "",
-      paymentMethod: 'bank',
+      paymentMethod: undefined,
       paymentAccountHolderName: "",
       paymentAccountNumber: "",
       paymentRoutingNumber: "",
@@ -373,6 +373,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     // For step 4 (payment), the errors depend on the selected payment method.
     if (step === 4) {
         const paymentMethod = form.getValues('paymentMethod');
+        if (!paymentMethod) return null; // No errors if no method is chosen yet
         const relevantFields = paymentMethod === 'bank' 
             ? ['paymentAccountHolderName', 'paymentAccountNumber', 'paymentRoutingNumber']
             : ['cardholderName', 'cardNumber', 'cardExpiry', 'cardCvc', 'billingZip'];
@@ -420,10 +421,10 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       
       <DevStepper currentStep={step} onStepChange={handleDevStepChange} totalSteps={9} />
 
-      <main className="flex-1 flex flex-col items-center justify-center w-full px-8 sm:px-12 text-center">
+      <main className="flex-1 flex flex-col items-center justify-start pt-16 sm:pt-24 w-full px-8 sm:px-12 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
             {showHeader && (
-              <div className="flex flex-col items-center pt-24">
+              <div className="flex flex-col items-center">
                 <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
                 <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
                     State and Congress Approved Final Expense Benefits Emergency Funds
