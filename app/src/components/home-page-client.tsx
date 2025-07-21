@@ -370,8 +370,27 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     }
   };
 
-  const showHeader = step <= 4; // Header shown on steps 1-4
-  const isFinalStep = step >= 5; // Steps 5 and beyond have their own UI and no main nav
+  const getSubtitle = () => {
+    switch (step) {
+      case 1:
+      case 2:
+      case 3:
+        return 'Amounts between $5,000 - $25,000 / Available to anyone ages 45-80';
+      case 4:
+        return "You're at the last step! Your Final Expense policy will be active momentarily. Please choose either Bank Info or Card below.";
+      case 6:
+        return 'Please have your phone ready. This page will advance automatically.';
+      case 7:
+        return 'A text with a link to sign has been sent. Please use the PIN below to access it.';
+      case 8:
+        return 'Your application is complete and your policy is now active. You will receive an email confirmation shortly.';
+      case 9:
+        return "Your application is complete and you're ready to go. You will receive a call from an agent within the next few days to finalize your policy!";
+      default:
+        return 'Amounts between $5,000 - $25,000 / Available to anyone ages 45-80';
+    }
+  };
+  const subtitle = getSubtitle();
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
@@ -383,19 +402,17 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
       <main className="flex-1 flex flex-col items-center justify-start pt-16 sm:pt-24 w-full px-8 sm:px-12 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
-            {showHeader && (
-              <div className="flex flex-col items-center">
-                <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
-                <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
-                    State and Congress Approved Final Expense Benefits Emergency Funds
-                </h1>
-                {step !== 4 && (
-                  <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
-                    Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
-                  </p>
-                )}
-              </div>
-            )}
+            <div className="flex flex-col items-center">
+              <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
+              <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
+                  State and Congress Approved Final Expense Benefits Emergency Funds
+              </h1>
+              {subtitle && (
+                <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
+                  {subtitle}
+                </p>
+              )}
+            </div>
 
             <div className="w-full flex justify-center">
               <PlacesProvider>
@@ -409,15 +426,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             </div>
         </div>
       </main>
-      { !isFinalStep && (
-        <footer className="w-full py-8 text-center">
-          <p className="text-xs text-foreground/60">
-            All information provided is private{" "}
-            <Link href="/admin" className="cursor-pointer">and</Link>
-            {" "}securely protected.
-          </p>
-        </footer>
-      )}
+      <footer className="w-full py-8 text-center">
+        <p className="text-xs text-foreground/60">
+          All information provided is private{" "}
+          <Link href="/admin" className="cursor-pointer">and</Link>
+          {" "}securely protected.
+        </p>
+      </footer>
     </div>
   );
 }
