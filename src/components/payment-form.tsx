@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Landmark, ArrowLeft } from 'lucide-react';
 import CardPaymentForm from './card-payment-form';
+import { Separator } from './ui/separator';
 
 export default function PaymentForm() {
   const { control, formState: { errors }, setValue, trigger } = useFormContext<PaymentFormValues>();
@@ -43,7 +44,7 @@ export default function PaymentForm() {
                     onClick={() => selectPaymentMethod('bank')}
                     className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
                 >
-                    <Landmark strokeWidth={1.5} className="w-12 h-12 mb-4 text-primary" />
+                    <Landmark strokeWidth={2} className="w-12 h-12 mb-4 text-primary" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Bank Account</h3>
                 </div>
 
@@ -52,7 +53,7 @@ export default function PaymentForm() {
                     onClick={() => selectPaymentMethod('card')}
                     className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
                 >
-                    <CreditCard strokeWidth={1.5} className="w-12 h-12 mb-4 text-primary" />
+                    <CreditCard strokeWidth={2} className="w-12 h-12 mb-4 text-primary" />
                     <h3 className="font-headline text-2xl font-bold tracking-tight">Credit/Debit Card</h3>
                 </div>
             </div>
