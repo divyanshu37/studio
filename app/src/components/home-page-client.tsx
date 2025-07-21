@@ -36,7 +36,6 @@ import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
 import AgentHandoffComplete from '@/components/agent-handoff-complete';
-import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
 import { submitToSlack } from '@/ai/flows/submit-slack';
 import DevStepper from '@/components/dev-stepper';
@@ -422,5 +421,3 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     </div>
   );
 }
-
-    

@@ -8,8 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
+import FormNavigation from './form-navigation';
 
-export default function AdditionalQuestionsForm() {
+interface AdditionalQuestionsFormProps {
+    onNext: () => void;
+    errorMessage?: string | null;
+    disabled?: boolean;
+}
+
+export default function AdditionalQuestionsForm({ onNext, errorMessage, disabled }: AdditionalQuestionsFormProps) {
   const { control, watch, formState: { errors } } = useFormContext<AdditionalQuestionsFormValues>();
   const otherHealthIssuesValue = watch('otherHealthIssues');
 
@@ -107,6 +114,13 @@ export default function AdditionalQuestionsForm() {
             )}
           </FormItem>
         )}
+      />
+      <FormNavigation
+        onNext={onNext}
+        isSubmit={false}
+        actionLabel={"NEXT"}
+        disabled={disabled}
+        errorMessage={errorMessage}
       />
     </div>
   );

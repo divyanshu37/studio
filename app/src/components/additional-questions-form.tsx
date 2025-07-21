@@ -125,5 +125,3 @@ export default function AdditionalQuestionsForm({ onNext, errorMessage, disabled
     </div>
   );
 }
-
-    

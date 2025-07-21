@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { InsuranceFormValues } from '@/lib/schema';
@@ -6,8 +7,15 @@ import { Input } from '@/components/ui/input';
 import { FormField, FormItem, FormControl } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
+import FormNavigation from './form-navigation';
 
-export default function InsuranceForm() {
+interface InsuranceFormProps {
+    onNext: () => void;
+    errorMessage?: string | null;
+    disabled?: boolean;
+}
+
+export default function InsuranceForm({ onNext, errorMessage, disabled }: InsuranceFormProps) {
   const { control, formState: { errors } } = useFormContext<InsuranceFormValues>();
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
@@ -134,6 +142,13 @@ export default function InsuranceForm() {
             )}
           />
         </div>
+        <FormNavigation
+            onNext={onNext}
+            isSubmit={false}
+            actionLabel={"NEXT"}
+            disabled={disabled}
+            errorMessage={errorMessage}
+        />
     </div>
   );
 }

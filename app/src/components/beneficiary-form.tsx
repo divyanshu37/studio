@@ -231,7 +231,7 @@ export default function BeneficiaryForm({ onNext, errorMessage, disabled }: Bene
           )}
         />
       </div>
-        <FormNavigation
+      <FormNavigation
             onNext={onNext}
             isSubmit={false}
             actionLabel={"NEXT"}
@@ -241,5 +241,3 @@ export default function BeneficiaryForm({ onNext, errorMessage, disabled }: Bene
     </div>
   );
 }
-
-    

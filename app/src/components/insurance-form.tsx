@@ -152,5 +152,3 @@ export default function InsuranceForm({ onNext, errorMessage, disabled }: Insura
     </div>
   );
 }
-
-    
