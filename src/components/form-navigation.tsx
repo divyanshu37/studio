@@ -7,20 +7,16 @@ import { ArrowRight, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FormNavigationProps {
-  onBack?: () => void;
   onNext?: () => void;
   isSubmit?: boolean;
-  backButton?: boolean;
   actionLabel: string;
   disabled?: boolean;
   errorMessage?: string | null;
 }
 
 export default function FormNavigation({
-  onBack,
   onNext,
   isSubmit = false,
-  backButton = false,
   actionLabel,
   disabled = false,
   errorMessage = null,
@@ -46,7 +42,7 @@ export default function FormNavigation({
   };
 
   return (
-    <div className="flex flex-col items-center mt-8 w-full gap-y-4">
+    <div className="flex flex-col items-center mt-4 w-full gap-y-4">
       <div className="h-10 w-full max-w-xs md:max-w-sm">
         <div
           className={cn(
@@ -66,12 +62,11 @@ export default function FormNavigation({
           )}
         </div>
       </div>
-      <div className="flex justify-between items-center w-full">
-        <div className="w-48 hidden sm:block" />
+      <div className="flex justify-center items-center w-full">
         <Button
           type={isSubmit ? 'submit' : 'button'}
           onClick={!isSubmit ? onNext : undefined}
-          className="h-auto justify-between w-48 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
+          className="h-auto justify-between w-64 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
           disabled={disabled}
         >
           <span>{actionLabel}</span>
