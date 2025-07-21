@@ -152,7 +152,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
+      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 8) {
         setStep(stepNumber); // Directly set step without animation on initial load
       }
     }
@@ -195,14 +195,14 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     const state = data.addressState;
     if (state === 'CA') {
       // For CA, go directly to Agent Handoff
-      logTraffic({ uuid, step: 9 });
+      logTraffic({ uuid, step: 8 });
       submitToSlack({
         step: 'Agent Handoff (Auto - Restricted State)',
         formData: {
           referenceId: uuid,
           ...form.getValues(),
         }});
-      changeStep(9);
+      changeStep(8);
     } else {
       // For all other states, go to the Self-Enrollment flow
       handleSelfEnrollSubmit(data);
@@ -220,7 +220,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(6); // Go to loading page before contract
+        changeStep(5); // Go to loading page before contract
       } else {
         toast({
           variant: "destructive",
@@ -273,11 +273,11 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             if (phoneLastFour) setPhoneLastFour(phoneLastFour);
 
             if (currentStep === 'sms-verification' || currentStep === 'CONTRACT_READY') {
+              logTraffic({ uuid, step: 6 });
+              changeStep(6);
+            } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing' || currentStep === 'RESULT_SUCCESS') {
               logTraffic({ uuid, step: 7 });
               changeStep(7);
-            } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing' || currentStep === 'RESULT_SUCCESS') {
-              logTraffic({ uuid, step: 8 });
-              changeStep(8);
             } else if (currentStep === 'RESULT_FAILED' || (isError && error)) {
                 toast({
                     variant: "destructive",
@@ -296,7 +296,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     }
   }, [changeStep, toast, uuid]);
 
-  const subscribeId = (step === 6) ? uuid : null;
+  const subscribeId = (step === 5) ? uuid : null;
   useSocket(subscribeId, handleSocketUpdate);
 
   const handleDevStepChange = (newStep: number) => {
@@ -346,13 +346,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         return <BeneficiaryForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
       case 4:
         return <PaymentForm />;
-      case 6:
+      case 5:
         return <SelfEnrollLoading />;
-      case 7:
+      case 6:
         return <SelfEnrollContract pin={pin} phoneLastFour={phoneLastFour} />;
-      case 8:
+      case 7:
         return <SelfEnrollComplete />;
-      case 9:
+      case 8:
         return <AgentHandoffComplete />;
       default:
         return <InsuranceForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
@@ -367,13 +367,13 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         return 'Amounts between $5,000 - $25,000 / Available to anyone ages 45-80';
       case 4:
         return "You're at the last step! Your Final Expense policy will be active momentarily. Please choose either Bank Info or Card below.";
-      case 6:
+      case 5:
         return 'Please have your phone ready. This page will advance automatically.';
-      case 7:
+      case 6:
         return 'A text with a link to sign has been sent. Please use the PIN below to access it.';
-      case 8:
+      case 7:
         return 'Your application is complete and your policy is now active. You will receive an email confirmation shortly.';
-      case 9:
+      case 8:
         return "Your application is complete and you're ready to go. You will receive a call from an agent within the next few days to finalize your policy!";
       default:
         return 'Amounts between $5,000 - $25,000 / Available to anyone ages 45-80';
@@ -387,7 +387,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         <Logo />
       </header>
       
-      <DevStepper currentStep={step} onStepChange={handleDevStepChange} totalSteps={9} />
+      <DevStepper currentStep={step} onStepChange={handleDevStepChange} totalSteps={8} />
 
       <main className="flex-1 flex flex-col items-center justify-start pt-16 sm:pt-24 w-full px-8 sm:px-12 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
