@@ -36,33 +36,35 @@ export default function CardPaymentForm() {
 
     return (
         <div className="space-y-4">
-            <FormField
-            control={control}
-            name="cardholderName"
-            render={({ field }) => (
-                <FormItem>
-                <FormControl>
-                    <Input placeholder="Cardholder Name" autoComplete="cc-name" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.cardholderName && "border-destructive focus-visible:border-destructive animate-shake")} />
-                </FormControl>
-                </FormItem>
-            )}
-            />
-            <FormField
-                control={control}
-                name="cardNumber"
-                render={({ field }) => (
-                <FormItem>
-                    <FormControl>
-                    <Input 
-                        placeholder="Card Number" 
-                        autoComplete="cc-number" 
-                        {...field}
-                        onChange={(e) => field.onChange(formatCardNumber(e.target.value))}
-                        className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.cardNumber && "border-destructive focus-visible:border-destructive animate-shake")} />
-                    </FormControl>
-                </FormItem>
-                )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                    control={control}
+                    name="cardholderName"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormControl>
+                            <Input placeholder="Cardholder Name" autoComplete="cc-name" {...field} className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.cardholderName && "border-destructive focus-visible:border-destructive animate-shake")} />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="cardNumber"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Input 
+                            placeholder="Card Number" 
+                            autoComplete="cc-number" 
+                            {...field}
+                            onChange={(e) => field.onChange(formatCardNumber(e.target.value))}
+                            className={cn("h-auto py-4 bg-card shadow-xl focus-visible:border-primary focus-visible:ring-0 focus-visible:ring-offset-0", errors.cardNumber && "border-destructive focus-visible:border-destructive animate-shake")} />
+                        </FormControl>
+                    </FormItem>
+                    )}
+                />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                     control={control}
