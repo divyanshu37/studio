@@ -42,7 +42,7 @@ export default function FormNavigation({
   };
 
   return (
-    <div className="flex flex-col items-center mt-8 w-full gap-y-4">
+    <div className="flex flex-col items-center mt-6 w-full gap-y-4">
       <div className="h-10 w-full max-w-xs md:max-w-sm">
         <div
           className={cn(
