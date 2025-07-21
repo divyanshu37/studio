@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useForm, FormProvider, FieldErrors, useWatch } from 'react-hook-form';
+import { useForm, FormProvider, FieldErrors, useWatch, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -50,9 +50,9 @@ const stepFields: (keyof FormValues)[][] = [
 ];
 
 const PaymentAutoSubmitter = ({ onValid }: { onValid: () => void }) => {
-  const { control, formState: { errors } } = useForm<FormValues>();
-  const paymentMethod = useWatch({ control: useFormContext().control, name: 'paymentMethod' });
-  const formValues = useWatch({ control: useFormContext().control });
+  const { control } = useFormContext<FormValues>();
+  const formValues = useWatch({ control });
+  const paymentMethod = formValues.paymentMethod;
 
   useEffect(() => {
     const checkValidity = () => {
@@ -93,7 +93,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       phone: '',
       email: '',
       dob: '',
-      lastFour: '',
       gender: '',
       differentOwner: 'no',
       healthQuestion1: 'no',
@@ -181,12 +180,9 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
     changeStep(step + 1);
   };
-
-  const handleBack = () => {
-    changeStep(step - 1);
-  };
   
   const processForm = async (data: FormValues) => {
+    if (isSubmitting) return; // Prevent double submission
     setIsSubmitting(true);
     // This is the integration point for APPLICATION_LEAD_URL
     // We don't await this or handle errors in the UI, it's a "fire-and-forget" call
@@ -216,8 +212,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
   
   const handleSelfEnrollSubmit = async (data: FormValues) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
     try {
       submitToSlack({
         step: 'Self-Enrollment',
@@ -235,6 +229,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           title: "Submission Failed",
           description: result.message,
         });
+        setIsSubmitting(false); // Re-enable submission on failure
       }
     } catch (error) {
       toast({
@@ -242,9 +237,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         title: "An unexpected error occurred.",
         description: "Please try again later.",
       });
-    } finally {
-      setIsSubmitting(false);
-    }
+      setIsSubmitting(false); // Re-enable submission on error
+    } 
   };
 
   const handleSelfEnrollError = (formErrors: FieldErrors<FormValues>) => {
@@ -444,16 +438,14 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
             <div className="w-full flex justify-center">
               <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(processForm)} className={cn("w-full flex flex-col items-center", animationClass)}>
+                <form onSubmit={form.handleSubmit(processForm, handleSelfEnrollError)} className={cn("w-full flex flex-col items-center", animationClass)}>
                   {step === 4 && <PaymentAutoSubmitter onValid={() => form.handleSubmit(processForm, handleSelfEnrollError)()} />}
                   {renderStep()}
 
                   {showNavigation && (
                     <div className="w-full max-w-2xl">
                         <FormNavigation
-                        onBack={handleBack}
                         onNext={handleNext}
-                        backButton={step > 1}
                         isSubmit={false}
                         actionLabel={"NEXT"}
                         disabled={isSubmitting || (step === 3 && !isScriptLoaded)}
