@@ -6,7 +6,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm, FormProvider, FieldErrors, useWatch, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import Script from 'next/script';
 
 import { 
   fullFormSchema, 
@@ -41,6 +40,7 @@ import FormNavigation from '@/components/form-navigation';
 import { cn } from '@/lib/utils';
 import { submitToSlack } from '@/ai/flows/submit-slack';
 import DevStepper from '@/components/dev-stepper';
+import PlacesProvider from './places-provider';
 
 const stepFields: (keyof FormValues)[][] = [
   Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
@@ -82,7 +82,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [isScriptLoaded, setScriptLoaded] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(fullFormSchema),
@@ -317,30 +316,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   };
 
   const renderStep = () => {
-    if (!isScriptLoaded && step === 3) {
-      return (
-        <div className="flex flex-col items-center justify-center h-40">
-           <div className="relative w-12 h-12">
-            <svg
-              className="animate-spin h-full w-full text-primary"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 100 100"
-            >
-              <path
-                d="M 50,10 A 40,40 0 1 1 10,50"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="10"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-          <p className="mt-4 text-muted-foreground">Initializing Address Finder...</p>
-        </div>
-      );
-    }
-
     switch (step) {
       case 1:
         return <InsuranceForm />;
@@ -402,19 +377,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
-       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places`}
-        onLoad={() => setScriptLoaded(true)}
-        onError={(e) => {
-          console.error('Failed to load Google Maps script', e);
-          toast({
-            variant: 'destructive',
-            title: 'Address Finder Failed',
-            description: 'Could not load Google Maps. Please refresh the page or contact support.',
-          });
-        }}
-        strategy="afterInteractive"
-      />
       <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
         <Logo />
       </header>
@@ -438,24 +400,26 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             )}
 
             <div className="w-full flex justify-center">
-              <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(processForm, handleSelfEnrollError)} className={cn("w-full flex flex-col items-center", animationClass)}>
-                  {step === 4 && <PaymentAutoSubmitter onValid={() => form.handleSubmit(processForm, handleSelfEnrollError)()} />}
-                  {renderStep()}
+              <PlacesProvider>
+                <FormProvider {...form}>
+                  <form onSubmit={form.handleSubmit(processForm, handleSelfEnrollError)} className={cn("w-full flex flex-col items-center", animationClass)}>
+                    {step === 4 && <PaymentAutoSubmitter onValid={() => form.handleSubmit(processForm, handleSelfEnrollError)()} />}
+                    {renderStep()}
 
-                  {showNavigation && (
-                    <div className="w-full max-w-2xl">
-                        <FormNavigation
-                        onNext={handleNext}
-                        isSubmit={false}
-                        actionLabel={"NEXT"}
-                        disabled={isSubmitting || (step === 3 && !isScriptLoaded)}
-                        errorMessage={errorMessage}
-                        />
-                    </div>
-                  )}
-                </form>
-              </FormProvider>
+                    {showNavigation && (
+                      <div className="w-full max-w-2xl">
+                          <FormNavigation
+                          onNext={handleNext}
+                          isSubmit={false}
+                          actionLabel={"NEXT"}
+                          disabled={isSubmitting}
+                          errorMessage={errorMessage}
+                          />
+                      </div>
+                    )}
+                  </form>
+                </FormProvider>
+              </PlacesProvider>
             </div>
         </div>
       </main>
