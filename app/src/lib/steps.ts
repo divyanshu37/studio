@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview Centralized definition for the application's multi-step flow.
  * This file serves as the single source of truth for step identifiers, sequence,

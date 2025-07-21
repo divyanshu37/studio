@@ -27,8 +27,9 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
 
   const stepIdMap = useMemo(() => {
     const map: { [key: number]: string } = {};
-    ALL_STEPS.forEach((id, index) => {
-        map[index + 1] = stepDescriptions[id] || `Unknown Step ${index + 1}`;
+    ALL_STEPS.forEach((id) => {
+        const stepNum = getStepNumber(id);
+        map[stepNum] = stepDescriptions[id] || `Unknown Step ${stepNum}`;
     });
     return map;
   }, []);

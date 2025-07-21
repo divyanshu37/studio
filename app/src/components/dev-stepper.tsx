@@ -17,7 +17,7 @@ export default function DevStepper({ currentStep, onStepChange }: DevStepperProp
   return (
     <div className="fixed top-4 right-4 z-50 bg-card p-2 rounded-lg shadow-lg border text-left">
       <h4 className="text-xs font-bold mb-2 text-foreground px-1">Dev Stepper</h4>
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-4 gap-1">
         {ALL_STEPS.map((stepId) => (
           <Button
             key={stepId}
