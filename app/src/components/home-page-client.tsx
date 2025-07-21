@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useForm, FormProvider, FieldErrors, useWatch, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 
@@ -20,7 +20,8 @@ import {
     STEP_IDS,
     FORM_STEPS,
     getStepNumber,
-    type StepId
+    type StepId,
+    ALL_STEPS
 } from '@/lib/steps';
 
 import { submitApplication } from '@/ai/flows/submit-application-flow';
@@ -154,9 +155,10 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   useEffect(() => {
     const stepParam = searchParams.get('step');
     if (stepParam) {
-      const stepKey = Object.keys(STEP_IDS).find(key => getStepNumber(key as StepId) === parseInt(stepParam, 10));
+      const stepNumber = parseInt(stepParam, 10);
+      const stepKey = ALL_STEPS.find(key => getStepNumber(key) === stepNumber);
       if (stepKey) {
-        setStep(stepKey as StepId);
+        setStep(stepKey);
       }
     }
   }, [searchParams]);
