@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm, FormProvider, FieldErrors, useWatch, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
@@ -15,11 +15,15 @@ import {
   basePaymentFormSchema,
   paymentFormSchema,
   type FormValues,
-  type InsuranceFormValues,
-  type AdditionalQuestionsFormValues,
-  type BeneficiaryFormValues,
-  type PaymentFormValues
 } from '@/lib/schema';
+import {
+    STEP_IDS,
+    FORM_STEPS,
+    getStepNumber,
+    type StepId,
+    ALL_STEPS
+} from '@/lib/steps';
+
 import { submitApplication } from '@/ai/flows/submit-application-flow';
 import { submitLead } from '@/ai/flows/submit-lead-flow';
 import { submitApplicationLead } from '@/ai/flows/submit-application-lead-flow';
@@ -41,12 +45,19 @@ import { submitToSlack } from '@/ai/flows/submit-slack';
 import DevStepper from '@/components/dev-stepper';
 import PlacesProvider from './places-provider';
 
-const stepFields: (keyof FormValues)[][] = [
-  Object.keys(insuranceFormSchema.shape) as (keyof InsuranceFormValues)[],
-  Object.keys(additionalQuestionsObjectSchema.shape) as (keyof AdditionalQuestionsFormValues)[],
-  Object.keys(beneficiaryFormSchema.shape) as (keyof BeneficiaryFormValues)[],
-  Object.keys(basePaymentFormSchema.shape) as (keyof PaymentFormValues)[],
-];
+
+const stepFieldMapping: Record<StepId, (keyof FormValues)[]> = {
+  [STEP_IDS.USER_INFO]: Object.keys(insuranceFormSchema.shape) as (keyof FormValues)[],
+  [STEP_IDS.HEALTH_QUESTIONS]: Object.keys(additionalQuestionsObjectSchema.shape) as (keyof FormValues)[],
+  [STEP_IDS.BENEFICIARY]: Object.keys(beneficiaryFormSchema.shape) as (keyof FormValues)[],
+  [STEP_IDS.PAYMENT]: Object.keys(basePaymentFormSchema.shape) as (keyof FormValues)[],
+  // Non-form steps have no fields
+  [STEP_IDS.SELF_ENROLL_LOADING]: [],
+  [STEP_IDS.SELF_ENROLL_CONTRACT]: [],
+  [STEP_IDS.SELF_ENROLL_COMPLETE]: [],
+  [STEP_IDS.AGENT_HANDOFF]: [],
+};
+
 
 const PaymentAutoSubmitter = ({ onValid }: { onValid: () => void }) => {
   const { control } = useFormContext<FormValues>();
@@ -61,9 +72,8 @@ const PaymentAutoSubmitter = ({ onValid }: { onValid: () => void }) => {
       }
     };
 
-    // We only want to auto-submit after a method has been chosen and fields have likely been filled.
     if (paymentMethod) {
-       const timer = setTimeout(checkValidity, 500); // Small debounce
+       const timer = setTimeout(checkValidity, 500);
        return () => clearTimeout(timer);
     }
   }, [formValues, paymentMethod, onValid]);
@@ -72,14 +82,12 @@ const PaymentAutoSubmitter = ({ onValid }: { onValid: () => void }) => {
 };
 
 export default function HomePageClient({ uuid }: { uuid: string }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<StepId>(STEP_IDS.USER_INFO);
   const [animationClass, setAnimationClass] = useState('animate-fade-in-up');
-  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pin, setPin] = useState('');
   const [phoneLastFour, setPhoneLastFour] = useState('');
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -126,47 +134,45 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   const { formState: { errors } } = form;
 
-  const changeStep = useCallback((newStep: number, fromDevStepper = false) => {
+  const changeStep = useCallback((newStep: StepId, fromDevStepper = false) => {
     if (newStep === step) return;
 
     if (!fromDevStepper) {
-        logTraffic({ uuid, step: newStep });
+        logTraffic({ uuid, step: getStepNumber(newStep) });
     }
-
-    setIsAnimatingOut(true);
+    
     setAnimationClass('animate-fade-out-down');
-
     setTimeout(() => {
       setStep(newStep);
-      setIsAnimatingOut(false);
       setAnimationClass('animate-fade-in-up');
     }, 300);
   }, [step, uuid]);
   
   useEffect(() => {
-    // Log the initial visit as step 1
-    logTraffic({ uuid, step: 1 });
+    logTraffic({ uuid, step: getStepNumber(STEP_IDS.USER_INFO) });
   }, [uuid]);
 
   useEffect(() => {
     const stepParam = searchParams.get('step');
     if (stepParam) {
       const stepNumber = parseInt(stepParam, 10);
-      if (!isNaN(stepNumber) && stepNumber >= 1 && stepNumber <= 9) {
-        setStep(stepNumber); // Directly set step without animation on initial load
+      const stepKey = ALL_STEPS.find(key => getStepNumber(key) === stepNumber);
+      if (stepKey) {
+        setStep(stepKey);
       }
     }
-  }, []);
+  }, [searchParams]);
   
   const handleNext = async () => {
-    const fields = stepFields[step - 1];
-    const output = await form.trigger(fields, { shouldFocus: true });
+    const currentStepIndex = FORM_STEPS.indexOf(step);
+    if (currentStepIndex === -1) return;
+
+    const fields = stepFieldMapping[step];
+    const output = await form.trigger(fields as any, { shouldFocus: true });
     
     if (!output) return;
     
-    if (step === 3) {
-      // This is the integration point for LEAD_URL
-      // We don't await this or handle errors in the UI, it's a "fire-and-forget" call
+    if (step === STEP_IDS.BENEFICIARY) {
       submitLead(form.getValues());
       submitToSlack({
         step: 'Form 3 Lead',
@@ -176,14 +182,16 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         }});
     }
 
-    changeStep(step + 1);
+    const nextStepId = FORM_STEPS[currentStepIndex + 1];
+    if(nextStepId) {
+        changeStep(nextStepId);
+    }
   };
   
   const processForm = async (data: FormValues) => {
-    if (isSubmitting) return; // Prevent double submission
+    if (isSubmitting) return;
     setIsSubmitting(true);
-    // This is the integration point for APPLICATION_LEAD_URL
-    // We don't await this or handle errors in the UI, it's a "fire-and-forget" call
+
     submitApplicationLead(data);
     submitToSlack({
       step: 'Form 4 Application Lead',
@@ -194,17 +202,14 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
     const state = data.addressState;
     if (state === 'CA') {
-      // For CA, go directly to Agent Handoff
-      logTraffic({ uuid, step: 9 });
       submitToSlack({
         step: 'Agent Handoff (Auto - Restricted State)',
         formData: {
           referenceId: uuid,
           ...form.getValues(),
         }});
-      changeStep(9);
+      changeStep(STEP_IDS.AGENT_HANDOFF);
     } else {
-      // For all other states, go to the Self-Enrollment flow
       handleSelfEnrollSubmit(data);
     }
   };
@@ -220,14 +225,14 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(6); // Go to loading page before contract
+        changeStep(STEP_IDS.SELF_ENROLL_LOADING);
       } else {
         toast({
           variant: "destructive",
           title: "Submission Failed",
           description: result.message,
         });
-        setIsSubmitting(false); // Re-enable submission on failure
+        setIsSubmitting(false);
       }
     } catch (error) {
       toast({
@@ -235,7 +240,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         title: "An unexpected error occurred.",
         description: "Please try again later.",
       });
-      setIsSubmitting(false); // Re-enable submission on error
+      setIsSubmitting(false);
     } 
   };
 
@@ -247,22 +252,11 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     });
     
     const firstErrorField = Object.keys(formErrors)[0] as keyof FormValues;
-    const stepWithError = stepFields.findIndex(fields => fields.includes(firstErrorField));
+    const stepWithError = FORM_STEPS.find(stepId => stepFieldMapping[stepId].includes(firstErrorField));
     
-    if (stepWithError !== -1) {
-      changeStep(stepWithError + 1);
+    if (stepWithError) {
+      changeStep(stepWithError);
     }
-  };
-
-  const handleSpeakToAgent = () => {
-    logTraffic({ uuid, step: 9 });
-    submitToSlack({
-        step: 'Agent Handoff',
-        formData: {
-          referenceId: uuid,
-          ...form.getValues(),
-        }});
-    changeStep(9);
   };
   
   const handleSocketUpdate = useCallback((data: any) => {
@@ -284,11 +278,9 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             if (phoneLastFour) setPhoneLastFour(phoneLastFour);
 
             if (currentStep === 'sms-verification' || currentStep === 'CONTRACT_READY') {
-              logTraffic({ uuid, step: 7 });
-              changeStep(7);
+              changeStep(STEP_IDS.SELF_ENROLL_CONTRACT);
             } else if (currentStep === 'ENROLLMENT_COMPLETE' || currentStep === 'processing' || currentStep === 'RESULT_SUCCESS') {
-              logTraffic({ uuid, step: 8 });
-              changeStep(8);
+              changeStep(STEP_IDS.SELF_ENROLL_COMPLETE);
             } else if (currentStep === 'RESULT_FAILED' || (isError && error)) {
                 toast({
                     variant: "destructive",
@@ -305,22 +297,21 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             });
         }
     }
-  }, [changeStep, toast, uuid]);
+  }, [changeStep, toast]);
 
-  const subscribeId = (step === 6) ? uuid : null;
+  const subscribeId = (step === STEP_IDS.SELF_ENROLL_LOADING) ? uuid : null;
   useSocket(subscribeId, handleSocketUpdate);
 
-  const handleDevStepChange = (newStep: number) => {
-    changeStep(newStep, true);
+  const handleDevStepChange = (newStepId: StepId) => {
+    changeStep(newStepId, true);
   };
   
   const getErrorMessage = () => {
-    if (step < 1 || step > stepFields.length) return null;
+    if (!FORM_STEPS.includes(step)) return null;
     
-    // For step 4 (payment), the errors depend on the selected payment method.
-    if (step === 4) {
+    if (step === STEP_IDS.PAYMENT) {
         const paymentMethod = form.getValues('paymentMethod');
-        if (!paymentMethod) return null; // No errors if no method is chosen yet
+        if (!paymentMethod) return null;
         const relevantFields = paymentMethod === 'bank' 
             ? ['paymentAccountHolderName', 'paymentAccountNumber', 'paymentRoutingNumber']
             : ['cardholderName', 'cardNumber', 'cardExpiry', 'cardCvc', 'billingZip'];
@@ -333,7 +324,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         return null;
     }
 
-    const currentStepFields = stepFields[step - 1];
+    const currentStepFields = stepFieldMapping[step];
     if (!currentStepFields) return null;
 
     for (const field of currentStepFields) {
@@ -349,29 +340,44 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
   const renderStep = () => {
     switch (step) {
-      case 1:
+      case STEP_IDS.USER_INFO:
         return <InsuranceForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
-      case 2:
+      case STEP_IDS.HEALTH_QUESTIONS:
         return <AdditionalQuestionsForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
-      case 3:
+      case STEP_IDS.BENEFICIARY:
         return <BeneficiaryForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
-      case 4:
+      case STEP_IDS.PAYMENT:
         return <PaymentForm />;
-      case 6:
+      case STEP_IDS.SELF_ENROLL_LOADING:
         return <SelfEnrollLoading />;
-      case 7:
+      case STEP_IDS.SELF_ENROLL_CONTRACT:
         return <SelfEnrollContract pin={pin} phoneLastFour={phoneLastFour} />;
-      case 8:
+      case STEP_IDS.SELF_ENROLL_COMPLETE:
         return <SelfEnrollComplete />;
-      case 9:
+      case STEP_IDS.AGENT_HANDOFF:
         return <AgentHandoffComplete />;
       default:
         return <InsuranceForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
     }
   };
 
-  const showHeader = step <= 4; // Header shown on steps 1-4
-  const isFinalStep = step >= 5; // Steps 5 and beyond have their own UI and no main nav
+  const getSubtitle = () => {
+    switch (step) {
+      case STEP_IDS.PAYMENT:
+        return "You're at the last step! Your Final Expense policy will be active momentarily. Please choose either Bank Info or Card below.";
+      case STEP_IDS.SELF_ENROLL_LOADING:
+        return 'Please have your phone ready. This page will advance automatically.';
+      case STEP_IDS.SELF_ENROLL_CONTRACT:
+        return 'A text with a link to sign has been sent. Please use the PIN below to access it.';
+      case STEP_IDS.SELF_ENROLL_COMPLETE:
+        return 'Your application is complete and your policy is now active. You will receive an email confirmation shortly.';
+      case STEP_IDS.AGENT_HANDOFF:
+        return "Your application is complete and you're ready to go. You will receive a call from an agent within the next few days to finalize your policy!";
+      default:
+        return 'Amounts between $5,000 - $25,000 / Available to anyone ages 45-80';
+    }
+  };
+  const subtitle = getSubtitle();
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
@@ -379,29 +385,27 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         <Logo />
       </header>
       
-      <DevStepper currentStep={step} onStepChange={handleDevStepChange} totalSteps={9} />
+      <DevStepper currentStep={step} onStepChange={handleDevStepChange} />
 
       <main className="flex-1 flex flex-col items-center justify-start pt-16 sm:pt-24 w-full px-8 sm:px-12 text-center">
         <div className="max-w-4xl w-full flex flex-col items-center">
-            {showHeader && (
-              <div className="flex flex-col items-center">
-                <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
-                <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
-                    State and Congress Approved Final Expense Benefits Emergency Funds
-                </h1>
-                {step !== 4 && (
-                  <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
-                    Amounts between $5,000 - $25,000 / Available to anyone ages 45-80
-                  </p>
-                )}
-              </div>
-            )}
+            <div className="flex flex-col items-center">
+              <Icon className="h-20 w-20 md:h-36 md:w-36 text-accent mb-2 md:mb-8" />
+              <h1 className="font-headline text-3xl md:text-5xl tracking-tight mb-8 leading-tight max-w-2xl">
+                  State and Congress Approved Final Expense Benefits Emergency Funds
+              </h1>
+              {subtitle && (
+                <p className="text-base text-foreground/80 mb-8 max-w-[55rem]">
+                  {subtitle}
+                </p>
+              )}
+            </div>
 
             <div className="w-full flex justify-center">
               <PlacesProvider>
                 <FormProvider {...form}>
                   <form onSubmit={form.handleSubmit(processForm, handleSelfEnrollError)} className={cn("w-full flex flex-col items-center", animationClass)}>
-                    {step === 4 && <PaymentAutoSubmitter onValid={() => form.handleSubmit(processForm, handleSelfEnrollError)()} />}
+                    {step === STEP_IDS.PAYMENT && <PaymentAutoSubmitter onValid={() => form.handleSubmit(processForm, handleSelfEnrollError)()} />}
                     {renderStep()}
                   </form>
                 </FormProvider>
@@ -409,7 +413,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
             </div>
         </div>
       </main>
-      { !isFinalStep && (
+      {FORM_STEPS.includes(step) && (
         <footer className="w-full py-8 text-center">
           <p className="text-xs text-foreground/60">
             All information provided is private{" "}

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Users, PhoneForwarded } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTraffic, type TrafficData } from '@/ai/flows/log-traffic-flow';
+import { STEP_IDS, getStepNumber } from '@/lib/steps';
 import { isThisMonth, parseISO, subMonths, isSameMonth } from 'date-fns';
 
 interface MonthlyStats {
@@ -19,6 +20,9 @@ async function getStats(trafficData: TrafficData[]): Promise<MonthlyStats> {
     const now = new Date();
     const lastMonth = subMonths(now, 1);
 
+    const selfEnrollCompletionStep = getStepNumber(STEP_IDS.SELF_ENROLL_COMPLETE);
+    const agentHandoffStep = getStepNumber(STEP_IDS.AGENT_HANDOFF);
+
     const uniqueUuidsThisMonth = new Set<string>();
     const uniqueUuidsLastMonth = new Set<string>();
     const selfEnrolledThisMonthUuids = new Set<string>();
@@ -28,10 +32,10 @@ async function getStats(trafficData: TrafficData[]): Promise<MonthlyStats> {
         const timestamp = parseISO(item.timestamp);
         if (isThisMonth(timestamp)) {
             uniqueUuidsThisMonth.add(item.uuid);
-            if (item.step === 8) {
+            if (item.step === selfEnrollCompletionStep) {
                 selfEnrolledThisMonthUuids.add(item.uuid);
             }
-            if (item.step === 9) {
+            if (item.step === agentHandoffStep) {
                 agentHandoffThisMonthUuids.add(item.uuid);
             }
         }
