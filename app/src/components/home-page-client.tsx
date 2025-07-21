@@ -32,6 +32,7 @@ import InsuranceForm from '@/components/insurance-form';
 import AdditionalQuestionsForm from '@/components/additional-questions-form';
 import BeneficiaryForm from '@/components/beneficiary-form';
 import PaymentForm from '@/components/payment-form';
+import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
@@ -204,12 +205,15 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         }});
       changeStep(9);
     } else {
-      // For all other states, go to the Self-Enrollment flow
-      handleSelfEnrollSubmit(data);
+      // For all other states, go to the choice page
+      changeStep(5);
     }
+     setIsSubmitting(false);
   };
   
-  const handleSelfEnrollSubmit = async (data: FormValues) => {
+  const handleSelfEnrollSubmit = async () => {
+    const data = form.getValues();
+    setIsSubmitting(true);
     try {
       submitToSlack({
         step: 'Self-Enrollment',
@@ -228,6 +232,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           description: result.message,
         });
         setIsSubmitting(false); // Re-enable submission on failure
+        changeStep(5); // Go back to choice page
       }
     } catch (error) {
       toast({
@@ -236,6 +241,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         description: "Please try again later.",
       });
       setIsSubmitting(false); // Re-enable submission on error
+      changeStep(5); // Go back to choice page
     } 
   };
 
@@ -272,6 +278,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           title: data.error.title,
           description: data.error.message,
        });
+       changeStep(5); // Go back to choice page on error
        return;
     }
 
@@ -295,6 +302,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                     title: "Enrollment Failed",
                     description: error || "An error occurred during enrollment.",
                 });
+                changeStep(5); // Go back to choice page on error
             }
         } catch (e) {
             console.error("Error parsing socket message", e);
@@ -303,6 +311,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                 title: "Error",
                 description: "Received an invalid message from the server."
             });
+            changeStep(5); // Go back to choice page on error
         }
     }
   }, [changeStep, toast, uuid]);
@@ -357,6 +366,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         return <BeneficiaryForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
       case 4:
         return <PaymentForm />;
+      case 5:
+        return <ThankYou onSelfEnroll={handleSelfEnrollSubmit} onSpeakToAgent={handleSpeakToAgent} />;
       case 6:
         return <SelfEnrollLoading />;
       case 7:
@@ -378,6 +389,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         return 'Amounts between $5,000 - $25,000 / Available to anyone ages 45-80';
       case 4:
         return "You're at the last step! Your Final Expense policy will be active momentarily. Please choose either Bank Info or Card below.";
+       case 5:
+        return "We have all of the information necessary. How would you like to complete your application?";
       case 6:
         return 'Please have your phone ready. This page will advance automatically.';
       case 7:
