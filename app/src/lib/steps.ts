@@ -28,7 +28,7 @@ export const FORM_STEPS: StepId[] = [
   STEP_IDS.PAYMENT,
 ];
 
-// All possible steps in the application.
+// All possible steps in the application, in order.
 export const ALL_STEPS: StepId[] = [
     ...FORM_STEPS,
     STEP_IDS.SELF_ENROLL_LOADING,

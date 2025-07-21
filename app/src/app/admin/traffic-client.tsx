@@ -15,10 +15,11 @@ import { STEP_IDS, stepDescriptions, getTotalSteps, ALL_STEPS, getStepNumber } f
 type SortKey = keyof TrafficData;
 
 const TOTAL_STEPS = getTotalSteps();
-const SELF_ENROLL_STEP = getStepNumber(STEP_IDS.SELF_ENROLL_COMPLETE);
+const SELF_ENROLL_COMPLETE_STEP = getStepNumber(STEP_IDS.SELF_ENROLL_COMPLETE);
 const AGENT_HANDOFF_STEP = getStepNumber(STEP_IDS.AGENT_HANDOFF);
 const PAYMENT_STEP = getStepNumber(STEP_IDS.PAYMENT);
-const START_ENROLL_STEP = getStepNumber(STEP_IDS.SELF_ENROLL_LOADING);
+const SELF_ENROLL_LOADING_STEP = getStepNumber(STEP_IDS.SELF_ENROLL_LOADING);
+
 
 export default function TrafficClient({ initialData }: { initialData: TrafficData[] }) {
   const [trafficData, setTrafficData] = useState<TrafficData[]>(initialData);
@@ -88,9 +89,9 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
   };
   
   const getProgressColor = (step: number): string => {
-    if (step >= SELF_ENROLL_STEP) return 'bg-green-500';
-    if (step >= START_ENROLL_STEP) return 'bg-lime-500';
-    if (step >= PAYMENT_STEP) return 'bg-amber-500';
+    if (step >= SELF_ENROLL_COMPLETE_STEP) return 'bg-green-500';
+    if (step >= SELF_ENROLL_LOADING_STEP) return 'bg-lime-500';
+    if (step > PAYMENT_STEP) return 'bg-amber-500';
     return 'bg-red-500';
   };
 
@@ -152,7 +153,7 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
                     />
                   </div>
                   <div className="ml-auto">
-                    {item.step === SELF_ENROLL_STEP && (
+                    {item.step === SELF_ENROLL_COMPLETE_STEP && (
                       <Badge variant="success">
                         SELF-ENROLLED
                       </Badge>
