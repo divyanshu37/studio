@@ -10,15 +10,15 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowUpDown, MapPin } from 'lucide-react';
 import { formatDistanceToNow, differenceInSeconds, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { STEP_IDS, stepDescriptions, getTotalSteps, ALL_STEPS } from '@/lib/steps';
+import { STEP_IDS, stepDescriptions, getTotalSteps, ALL_STEPS, getStepNumber } from '@/lib/steps';
 
 type SortKey = keyof TrafficData;
 
 const TOTAL_STEPS = getTotalSteps();
-const SELF_ENROLL_STEP = ALL_STEPS.indexOf(STEP_IDS.SELF_ENROLL_COMPLETE) + 1;
-const AGENT_HANDOFF_STEP = ALL_STEPS.indexOf(STEP_IDS.AGENT_HANDOFF) + 1;
-const PAYMENT_STEP = ALL_STEPS.indexOf(STEP_IDS.PAYMENT) + 1;
-const START_ENROLL_STEP = ALL_STEPS.indexOf(STEP_IDS.SELF_ENROLL_LOADING) + 1;
+const SELF_ENROLL_STEP = getStepNumber(STEP_IDS.SELF_ENROLL_COMPLETE);
+const AGENT_HANDOFF_STEP = getStepNumber(STEP_IDS.AGENT_HANDOFF);
+const PAYMENT_STEP = getStepNumber(STEP_IDS.PAYMENT);
+const START_ENROLL_STEP = getStepNumber(STEP_IDS.SELF_ENROLL_LOADING);
 
 export default function TrafficClient({ initialData }: { initialData: TrafficData[] }) {
   const [trafficData, setTrafficData] = useState<TrafficData[]>(initialData);

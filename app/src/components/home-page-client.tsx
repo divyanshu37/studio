@@ -20,7 +20,6 @@ import {
     STEP_IDS,
     FORM_STEPS,
     getStepNumber,
-    getTotalSteps,
     type StepId
 } from '@/lib/steps';
 
