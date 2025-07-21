@@ -66,7 +66,7 @@ export default function FormNavigation({
         <Button
           type={isSubmit ? 'submit' : 'button'}
           onClick={!isSubmit ? onNext : undefined}
-          className="h-auto justify-between w-64 px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
+          className="h-auto justify-between w-full px-5 py-4 text-base font-body border-2 border-white shadow-xl tracking-widest"
           disabled={disabled}
         >
           <span>{actionLabel}</span>
