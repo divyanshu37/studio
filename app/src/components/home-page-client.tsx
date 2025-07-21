@@ -314,34 +314,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   const handleDevStepChange = (newStep: number) => {
     changeStep(newStep, true);
   };
-
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return <InsuranceForm />;
-      case 2:
-        return <AdditionalQuestionsForm />;
-      case 3:
-        return <BeneficiaryForm />;
-      case 4:
-        return <PaymentForm />;
-      case 6:
-        return <SelfEnrollLoading />;
-      case 7:
-        return <SelfEnrollContract pin={pin} phoneLastFour={phoneLastFour} />;
-      case 8:
-        return <SelfEnrollComplete />;
-      case 9:
-        return <AgentHandoffComplete />;
-      default:
-        return <InsuranceForm />;
-    }
-  };
-
-  const showHeader = step <= 4; // Header shown on steps 1-4
-  const showNavigation = step >= 1 && step <= 3; // Only show nav for steps 1-3
-  const isFinalStep = step >= 5; // Steps 5 and beyond have their own UI and no main nav
-
+  
   const getErrorMessage = () => {
     if (step < 1 || step > stepFields.length) return null;
     
@@ -375,6 +348,32 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
   
   const errorMessage = getErrorMessage();
 
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return <InsuranceForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
+      case 2:
+        return <AdditionalQuestionsForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
+      case 3:
+        return <BeneficiaryForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
+      case 4:
+        return <PaymentForm />;
+      case 6:
+        return <SelfEnrollLoading />;
+      case 7:
+        return <SelfEnrollContract pin={pin} phoneLastFour={phoneLastFour} />;
+      case 8:
+        return <SelfEnrollComplete />;
+      case 9:
+        return <AgentHandoffComplete />;
+      default:
+        return <InsuranceForm onNext={handleNext} errorMessage={errorMessage} disabled={isSubmitting} />;
+    }
+  };
+
+  const showHeader = step <= 4; // Header shown on steps 1-4
+  const isFinalStep = step >= 5; // Steps 5 and beyond have their own UI and no main nav
+
   return (
     <div className="relative flex flex-col min-h-screen bg-background text-foreground font-body">
       <header className="absolute top-0 left-0 p-8 md:p-12 hidden md:block">
@@ -405,18 +404,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                   <form onSubmit={form.handleSubmit(processForm, handleSelfEnrollError)} className={cn("w-full flex flex-col items-center", animationClass)}>
                     {step === 4 && <PaymentAutoSubmitter onValid={() => form.handleSubmit(processForm, handleSelfEnrollError)()} />}
                     {renderStep()}
-
-                    {showNavigation && (
-                      <div className="w-full max-w-2xl">
-                          <FormNavigation
-                          onNext={handleNext}
-                          isSubmit={false}
-                          actionLabel={"NEXT"}
-                          disabled={isSubmitting}
-                          errorMessage={errorMessage}
-                          />
-                      </div>
-                    )}
                   </form>
                 </FormProvider>
               </PlacesProvider>
@@ -435,3 +422,5 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
     </div>
   );
 }
+
+    

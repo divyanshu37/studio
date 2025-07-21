@@ -18,6 +18,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn, formatPhoneNumber, formatDateInput } from '@/lib/utils';
 import AddressAutocomplete from './address-autocomplete';
+import FormNavigation from './form-navigation';
 
 const coverageOptions = [
   "$ 10,000", "$ 12,000", "$ 14,000", "$ 16,000", "$ 18,000", "$ 20,000", "$ 25,000"
@@ -30,7 +31,13 @@ const relationshipOptions = [
   "Stepmother", "Stepsister", "Uncle"
 ];
 
-export default function BeneficiaryForm() {
+interface BeneficiaryFormProps {
+    onNext: () => void;
+    errorMessage?: string | null;
+    disabled?: boolean;
+}
+
+export default function BeneficiaryForm({ onNext, errorMessage, disabled }: BeneficiaryFormProps) {
   const { control, formState: { errors } } = useFormContext<BeneficiaryFormValues>();
   const [isCalendarOpen, setCalendarOpen] = useState(false);
 
@@ -224,6 +231,15 @@ export default function BeneficiaryForm() {
           )}
         />
       </div>
+        <FormNavigation
+            onNext={onNext}
+            isSubmit={false}
+            actionLabel={"NEXT"}
+            disabled={disabled}
+            errorMessage={errorMessage}
+        />
     </div>
   );
 }
+
+    
