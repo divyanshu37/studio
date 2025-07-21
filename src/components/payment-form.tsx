@@ -44,9 +44,9 @@ export default function PaymentForm() {
                     onClick={() => selectPaymentMethod('bank')}
                     className="w-full md:w-1/2 p-8 bg-card text-card-foreground border-2 border-primary rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer"
                 >
-                    <Landmark strokeWidth={2} className="w-12 h-12 mb-4 text-primary" />
-                    <h3 className="font-headline text-2xl font-bold tracking-tight">Bank Account</h3>
+                    <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">Bank Account</h2>
                     <Separator className="bg-primary/50 my-2 w-full" />
+                    <Landmark strokeWidth={2} className="w-12 h-12 my-4 text-primary" />
                 </div>
 
                 {/* Credit/Debit Card */}
@@ -54,9 +54,9 @@ export default function PaymentForm() {
                     onClick={() => selectPaymentMethod('card')}
                      className="w-full md:w-1/2 p-8 bg-primary text-primary-foreground rounded-lg shadow-xl flex flex-col items-center justify-center transition-transform duration-300 ease-in-out hover:scale-105 hover:-translate-y-1 cursor-pointer border-2 border-white"
                 >
-                    <CreditCard strokeWidth={2} className="w-12 h-12 mb-4 text-primary-foreground" />
-                    <h3 className="font-headline text-2xl font-bold tracking-tight">Credit/Debit Card</h3>
+                    <h2 className="font-headline text-3xl font-bold tracking-tight mb-4">Credit/Debit Card</h2>
                      <Separator className="bg-primary-foreground/50 my-2 w-full" />
+                    <CreditCard strokeWidth={2} className="w-12 h-12 my-4 text-primary-foreground" />
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@ export default function PaymentForm() {
   }
 
   return (
-    <div className="w-full max-w-2xl text-left">
+    <div className="w-full max-w-2xl text-center">
         {paymentChoice === 'bank' && (
              <div className="space-y-4 animate-fade-in-up">
                 <h3 className="text-xl font-semibold text-foreground mb-4">Bank Account Details</h3>
