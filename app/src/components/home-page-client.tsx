@@ -220,7 +220,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(5); // Go to loading page before contract (Step 5)
+        changeStep(5); // Go to loading page (the new step 5)
       } else {
         toast({
           variant: "destructive",
