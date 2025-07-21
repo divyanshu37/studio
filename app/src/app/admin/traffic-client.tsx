@@ -10,26 +10,28 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowUpDown, MapPin } from 'lucide-react';
 import { formatDistanceToNow, differenceInSeconds, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { STEP_IDS, stepDescriptions, getTotalSteps, ALL_STEPS } from '@/lib/steps';
 
 type SortKey = keyof TrafficData;
 
-const stepDescriptions: { [key: number]: string } = {
-  1: 'Started Application',
-  2: 'Answered Health Questions',
-  3: 'Entered Beneficiary Info',
-  4: 'Entered Payment Info',
-  5: 'Started Self-Enroll',
-  6: 'SMS Verification Sent',
-  7: 'Self-Enroll Complete',
-  8: 'Agent Handoff Chosen',
-};
-
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = getTotalSteps();
+const SELF_ENROLL_STEP = ALL_STEPS.indexOf(STEP_IDS.SELF_ENROLL_COMPLETE) + 1;
+const AGENT_HANDOFF_STEP = ALL_STEPS.indexOf(STEP_IDS.AGENT_HANDOFF) + 1;
+const PAYMENT_STEP = ALL_STEPS.indexOf(STEP_IDS.PAYMENT) + 1;
+const START_ENROLL_STEP = ALL_STEPS.indexOf(STEP_IDS.SELF_ENROLL_LOADING) + 1;
 
 export default function TrafficClient({ initialData }: { initialData: TrafficData[] }) {
   const [trafficData, setTrafficData] = useState<TrafficData[]>(initialData);
   const [isLoading, setIsLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'timestamp', direction: 'descending'});
+
+  const stepIdMap = useMemo(() => {
+    const map: { [key: number]: string } = {};
+    ALL_STEPS.forEach((id, index) => {
+        map[index + 1] = stepDescriptions[id] || `Unknown Step ${index + 1}`;
+    });
+    return map;
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -85,10 +87,10 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
   };
   
   const getProgressColor = (step: number): string => {
-    if (step >= 7) return 'bg-green-500'; // Completion (Self-Enroll or Agent)
-    if (step >= 5) return 'bg-lime-500';  // Past Payment
-    if (step >= 4) return 'bg-amber-500'; // Past Beneficiary/Policy
-    return 'bg-red-500';                   // Early steps
+    if (step >= SELF_ENROLL_STEP) return 'bg-green-500';
+    if (step >= START_ENROLL_STEP) return 'bg-lime-500';
+    if (step >= PAYMENT_STEP) return 'bg-amber-500';
+    return 'bg-red-500';
   };
 
 
@@ -140,7 +142,7 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
               <TableCell className="p-2">
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col w-64">
-                    <div className="font-medium truncate text-sm">{stepDescriptions[item.step] || `Unknown Step ${item.step}`}</div>
+                    <div className="font-medium truncate text-sm">{stepIdMap[item.step] || `Unknown Step ${item.step}`}</div>
                      <div className="text-muted-foreground text-xs">Step {item.step} of {TOTAL_STEPS}</div>
                     <Progress 
                         value={(item.step / TOTAL_STEPS) * 100} 
@@ -149,12 +151,12 @@ export default function TrafficClient({ initialData }: { initialData: TrafficDat
                     />
                   </div>
                   <div className="ml-auto">
-                    {item.step === 7 && (
+                    {item.step === SELF_ENROLL_STEP && (
                       <Badge variant="success">
                         SELF-ENROLLED
                       </Badge>
                     )}
-                    {item.step === 8 && (
+                    {item.step === AGENT_HANDOFF_STEP && (
                       <Badge variant="secondary">
                         AGENT HANDOFF
                       </Badge>
