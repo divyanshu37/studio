@@ -1,4 +1,3 @@
-
 /**
  * @fileOverview Centralized definition for the application's multi-step flow.
  * This file serves as the single source of truth for step identifiers, sequence,
@@ -29,6 +28,7 @@ export const FORM_STEPS: StepId[] = [
 ];
 
 // All possible steps in the application, in order.
+// This is the single source of truth for the step sequence.
 export const ALL_STEPS: StepId[] = [
     ...FORM_STEPS,
     STEP_IDS.SELF_ENROLL_LOADING,
@@ -48,7 +48,7 @@ export const stepDescriptions: Record<StepId, string> = {
   [STEP_IDS.AGENT_HANDOFF]: 'Agent Handoff Chosen',
 };
 
-// Provides a numerical index for each step, useful for progress indicators.
+// Provides a numerical index for each step (1-based), useful for progress indicators.
 export const getStepNumber = (stepId: StepId): number => {
     const index = ALL_STEPS.indexOf(stepId);
     return index !== -1 ? index + 1 : 0;
