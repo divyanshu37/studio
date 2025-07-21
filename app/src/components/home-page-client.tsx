@@ -194,7 +194,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
 
     const state = data.addressState;
     if (state === 'CA') {
-      // For CA, go directly to Agent Handoff
+      // For CA, go directly to Agent Handoff (Step 8)
       logTraffic({ uuid, step: 8 });
       submitToSlack({
         step: 'Agent Handoff (Auto - Restricted State)',
@@ -220,7 +220,7 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       const result = await submitApplication({ ...data, referenceId: uuid });
 
       if (result.success) {
-        changeStep(5); // Go to loading page before contract
+        changeStep(5); // Go to loading page before contract (Step 5)
       } else {
         toast({
           variant: "destructive",
