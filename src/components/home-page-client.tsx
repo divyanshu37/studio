@@ -32,7 +32,6 @@ import InsuranceForm from '@/components/insurance-form';
 import AdditionalQuestionsForm from '@/components/additional-questions-form';
 import BeneficiaryForm from '@/components/beneficiary-form';
 import PaymentForm from '@/components/payment-form';
-import ThankYou from '@/components/thank-you';
 import SelfEnrollLoading from '@/components/self-enroll-loading';
 import SelfEnrollContract from '@/components/self-enroll-contract';
 import SelfEnrollComplete from '@/components/self-enroll-complete';
@@ -179,8 +178,8 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
       }});
 
     const state = data.addressState;
-    if (state === 'CA' || state === 'NY') {
-      // For CA or NY, go directly to Agent Handoff
+    if (state === 'CA') {
+      // For CA, go directly to Agent Handoff
       logTraffic({ uuid, step: 9 });
       submitToSlack({
         step: 'Agent Handoff (Auto - Restricted State)',
@@ -214,7 +213,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           title: "Submission Failed",
           description: result.message,
         });
-        changeStep(5);
       }
     } catch (error) {
       toast({
@@ -222,7 +220,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         title: "An unexpected error occurred.",
         description: "Please try again later.",
       });
-      changeStep(5);
     } finally {
       setIsSubmitting(false);
     }
@@ -261,7 +258,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
           title: data.error.title,
           description: data.error.message,
        });
-       changeStep(5);
        return;
     }
 
@@ -285,7 +281,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                     title: "Enrollment Failed",
                     description: error || "An error occurred during enrollment.",
                 });
-                changeStep(5);
             }
         } catch (e) {
             console.error("Error parsing socket message", e);
@@ -294,7 +289,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
                 title: "Error",
                 description: "Received an invalid message from the server."
             });
-            changeStep(5);
         }
     }
   }, [changeStep, toast, uuid]);
@@ -340,8 +334,6 @@ export default function HomePageClient({ uuid }: { uuid: string }) {
         return <BeneficiaryForm />;
       case 4:
         return <PaymentForm />;
-      case 5:
-        return <ThankYou onSelfEnroll={() => form.handleSubmit(handleSelfEnrollSubmit, handleSelfEnrollError)()} onSpeakToAgent={handleSpeakToAgent} />;
       case 6:
         return <SelfEnrollLoading />;
       case 7:

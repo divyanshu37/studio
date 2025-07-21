@@ -30,7 +30,6 @@ export const usStates = [
     { name: 'New Hampshire', abbreviation: 'NH' },
     { name: 'New Jersey', abbreviation: 'NJ' },
     { name: 'New Mexico', abbreviation: 'NM' },
-    { name: 'New York', abbreviation: 'NY' },
     { name: 'North Carolina', abbreviation: 'NC' },
     { name: 'North Dakota', abbreviation: 'ND' },
     { name: 'Ohio', abbreviation: 'OH' },
