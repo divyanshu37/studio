@@ -35,6 +35,10 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  allowedDevOrigins: [
+    'https://9000-firebase-studio-1751933235617.cluster-joak5ukfbnbyqspg4tewa33d24.cloudworkstations.dev',
+    'https://6000-firebase-studio-1751933235617.cluster-joak5ukfbnbyqspg4tewa33d24.cloudworkstations.dev'
+  ],
 };
 
 export default nextConfig;
